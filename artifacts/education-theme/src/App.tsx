@@ -51,7 +51,7 @@ function App() {
 
   return (
     <main className="site-shell">
-      <section className="hero" id="home">
+      <section className="hero bg-[#FF0000]" id="home">
         <div className="topline">
           <div className="container topline-inner">
             <a className="topbrand" href="#home" aria-label="Academia home">ACADEMIA<small>ONLINE EDUCATION &amp; LEARNING</small></a>
@@ -87,7 +87,6 @@ function App() {
         </div>
         <div className="hero-scroll" aria-hidden="true" />
       </section>
-
       <section className="benefits" id="benefits">
         <div className="container">
           <div className="section-heading">
@@ -108,7 +107,6 @@ function App() {
           </div>
         </div>
       </section>
-
       <section className="section courses" id="courses">
         <div className="container">
           <div className="section-heading compact">
@@ -132,7 +130,6 @@ function App() {
           <div className="center-link"><a className="button button-teal" href="#categories">BROWSE ALL COURSES <ArrowRight size={14} /></a></div>
         </div>
       </section>
-
       <section className="section categories" id="categories">
         <div className="container">
           <div className="section-heading compact">
@@ -148,7 +145,6 @@ function App() {
           </div>
         </div>
       </section>
-
       <section className="section testimonials" id="team">
         <div className="container">
           <div className="section-heading compact">
@@ -170,7 +166,6 @@ function App() {
           </div>
         </div>
       </section>
-
       <section className="section journal" id="journal">
         <div className="container">
           <div className="section-heading compact">
@@ -185,7 +180,6 @@ function App() {
           </div>
         </div>
       </section>
-
       <section className="section pricing" id="pricing">
         <div className="container">
           <div className="section-heading compact">
@@ -204,7 +198,6 @@ function App() {
           </div>
         </div>
       </section>
-
       <section className="newsletter" id="newsletter">
         <div className="container newsletter-inner">
           <div><div className="eyebrow">A little inspiration, now and then</div><h2>Make room for what’s next.</h2><p>Get new courses, useful ideas, and learner stories in your inbox.</p></div>
@@ -218,7 +211,6 @@ function App() {
           </div>
         </div>
       </section>
-
       <footer className="footer" id="contact">
         <div className="container">
           <div className="footer-grid">
