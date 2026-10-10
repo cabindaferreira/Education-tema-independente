@@ -63,13 +63,13 @@ function App() {
           </div>
         </div>
         <header className="nav-wrap">
-          <div className="container nav bg-[#faf9f5]">
+          <div className="container nav bg-foreground">
             <a className="brand" href="#home" onClick={closeMenu} aria-label="Academia home"><span className="brand-mark"><span>A</span></span><span>ACADEMIA</span></a>
             <button className="menu-toggle" type="button" aria-label={menuOpen ? 'Close navigation' : 'Open navigation'} aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)} data-testid="button-mobile-menu">
               {menuOpen ? <X size={23} /> : <Menu size={23} />}
             </button>
             <nav className={`nav-links ${menuOpen ? 'open' : ''}`} aria-label="Main navigation">
-              {navItems.map(([label, href]) => <a key={href} href={href} onClick={closeMenu}>{label}</a>)}
+              {navItems.map(([label, href]) => <a key={href} href={href} onClick={closeMenu} className="text-background">{label}</a>)}
               <a className="nav-cta bg-[#FF0000]" href="#pricing" onClick={closeMenu}>GET CERTIFICATE <ArrowRight size={13} /></a>
             </nav>
           </div>
