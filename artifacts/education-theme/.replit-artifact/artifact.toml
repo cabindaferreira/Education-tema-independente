@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Education — site independente"
+description = "Uma versão independente do tema Education do Colorlib para apresentar cursos, professores, eventos e conteúdos educacionais, sem WordPress."
+version = "1.0.0"
+id = "artifacts/education-theme"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24262
+
+[services.development]
+run = "pnpm --filter @workspace/education-theme run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/education-theme", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/education-theme/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24262"
+BASE_PATH = "/"
