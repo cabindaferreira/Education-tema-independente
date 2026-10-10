@@ -52,7 +52,7 @@ function App() {
   return (
     <main className="site-shell">
       <section className="hero bg-[#FF0000]" id="home">
-        <div className="topline">
+        <div className="topline border-t-[#FF0000] border-r-[#FF0000] border-b-[#FF0000] border-l-[#FF0000]">
           <div className="container topline-inner">
             <a className="topbrand" href="#home" aria-label="Academia home">ACADEMIA<small>ONLINE EDUCATION &amp; LEARNING</small></a>
             <div className="top-details">
@@ -63,14 +63,14 @@ function App() {
           </div>
         </div>
         <header className="nav-wrap">
-          <div className="container nav">
+          <div className="container nav bg-[#faf9f5]">
             <a className="brand" href="#home" onClick={closeMenu} aria-label="Academia home"><span className="brand-mark"><span>A</span></span><span>ACADEMIA</span></a>
             <button className="menu-toggle" type="button" aria-label={menuOpen ? 'Close navigation' : 'Open navigation'} aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)} data-testid="button-mobile-menu">
               {menuOpen ? <X size={23} /> : <Menu size={23} />}
             </button>
             <nav className={`nav-links ${menuOpen ? 'open' : ''}`} aria-label="Main navigation">
               {navItems.map(([label, href]) => <a key={href} href={href} onClick={closeMenu}>{label}</a>)}
-              <a className="nav-cta" href="#pricing" onClick={closeMenu}>GET CERTIFICATE <ArrowRight size={13} /></a>
+              <a className="nav-cta bg-[#FF0000]" href="#pricing" onClick={closeMenu}>GET CERTIFICATE <ArrowRight size={13} /></a>
             </nav>
           </div>
         </header>
@@ -80,7 +80,7 @@ function App() {
             <h1>Learn New Skills Online with Expert Teachers</h1>
             <p className="hero-copy">Practical courses in software, design, business and music, taught by people who do the work every day, with a certificate when you finish.</p>
             <div className="actions">
-              <a className="button button-teal" href="#courses">GET STARTED NOW! <ArrowRight size={14} /></a>
+              <a className="button button-teal bg-[#FF0000]" href="#courses">GET STARTED NOW! <ArrowRight size={14} /></a>
               <a className="button button-white" href="#courses">VIEW COURSE <ArrowRight size={14} /></a>
             </div>
           </div>
