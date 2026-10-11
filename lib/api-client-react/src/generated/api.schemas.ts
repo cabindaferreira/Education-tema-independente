@@ -9,6 +9,35 @@ export interface HealthStatus {
   status: string;
 }
 
+export interface NewsletterSignupInput {
+  /** @maxLength 320 */
+  email: string;
+}
+
+export type NewsletterSignupResponseStatus = typeof NewsletterSignupResponseStatus[keyof typeof NewsletterSignupResponseStatus];
+
+
+export const NewsletterSignupResponseStatus = {
+  confirmation_sent: 'confirmation_sent',
+  already_subscribed: 'already_subscribed',
+} as const;
+
+export interface NewsletterSignupResponse {
+  status: NewsletterSignupResponseStatus;
+}
+
+export type NewsletterSignupErrorError = typeof NewsletterSignupErrorError[keyof typeof NewsletterSignupErrorError];
+
+
+export const NewsletterSignupErrorError = {
+  invalid_email: 'invalid_email',
+  email_delivery_failed: 'email_delivery_failed',
+} as const;
+
+export interface NewsletterSignupError {
+  error: NewsletterSignupErrorError;
+}
+
 export interface UserProfile {
   /** Clerk user ID */
   id: string;
@@ -132,115 +161,5 @@ export interface RoomReservation {
   durationMinutes: number;
   priceKz: number;
   status: string;
-}
-
-export type CourseId = typeof CourseId[keyof typeof CourseId];
-
-
-export const CourseId = {
-  crm: 'crm',
-  tesouraria: 'tesouraria',
-  'lideranca-equipas': 'lideranca-equipas',
-  'gestao-comercial': 'gestao-comercial',
-  'gestao-empresas': 'gestao-empresas',
-  'recursos-humanos': 'recursos-humanos',
-} as const;
-
-export interface CourseEnrollmentInput {
-  courseId: CourseId;
-  /**
-     * @minLength 2
-     * @maxLength 160
-     */
-  fullName: string;
-  birthDate: string;
-  /**
-     * @minLength 3
-     * @maxLength 40
-     */
-  identityNumber: string;
-  /**
-     * @minLength 2
-     * @maxLength 80
-     */
-  nationality: string;
-  /**
-     * @minLength 6
-     * @maxLength 40
-     */
-  phone: string;
-  /** @maxLength 254 */
-  email: string;
-  /**
-     * @minLength 3
-     * @maxLength 240
-     */
-  address: string;
-  /**
-     * @minLength 2
-     * @maxLength 100
-     */
-  municipality: string;
-  /**
-     * @minLength 2
-     * @maxLength 100
-     */
-  province: string;
-  /**
-     * @minLength 2
-     * @maxLength 120
-     */
-  profession: string;
-  /**
-     * @minLength 2
-     * @maxLength 40
-     */
-  maritalStatus: string;
-  privacyAccepted: true;
-}
-
-export type CoursePaymentStatus = typeof CoursePaymentStatus[keyof typeof CoursePaymentStatus];
-
-
-export const CoursePaymentStatus = {
-  pending: 'pending',
-  paid: 'paid',
-  review_required: 'review_required',
-  expired: 'expired',
-} as const;
-
-export interface CourseEnrollmentCheckout {
-  id: string;
-  courseId: CourseId;
-  courseTitle: string;
-  amountKz: number;
-  paymentEntity: string;
-  paymentReference: string;
-  paymentStatus: CoursePaymentStatus;
-  expiresAt: string;
-}
-
-export type CourseEnrollmentStatusConfirmationEmailStatus = typeof CourseEnrollmentStatusConfirmationEmailStatus[keyof typeof CourseEnrollmentStatusConfirmationEmailStatus];
-
-
-export const CourseEnrollmentStatusConfirmationEmailStatus = {
-  pending: 'pending',
-  sent: 'sent',
-} as const;
-
-export type CourseEnrollmentStatus = CourseEnrollmentCheckout & ({
-  confirmationEmailStatus: CourseEnrollmentStatusConfirmationEmailStatus;
-  /** @nullable */
-  paidAt?: string | null;
-});
-
-export interface ProxyPayPaymentEvent {
-  transaction_id: number;
-  reference_id: number;
-  amount: string;
-  /** @nullable */
-  terminal_type?: string | null;
-  /** @nullable */
-  terminal_transaction_id?: number | null;
 }
 

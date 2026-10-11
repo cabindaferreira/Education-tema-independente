@@ -4,10 +4,32 @@ import { PageIntro } from '@/components/site-layout';
 
 export default function ContactsPage() {
   const [email, setEmail] = useState('');
-  const [joined, setJoined] = useState(false);
-  function joinNewsletter(event: FormEvent<HTMLFormElement>) {
+  const [signupState, setSignupState] = useState<'idle' | 'submitting' | 'success' | 'duplicate' | 'invalid' | 'error'>('idle');
+
+  async function joinNewsletter(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (email.trim()) setJoined(true);
+    setSignupState('submitting');
+
+    try {
+      const response = await fetch('/api/newsletter-signups', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const result = await response.json() as { status?: string; error?: string };
+
+      if (response.status === 201 && result.status === 'confirmation_sent') {
+        setSignupState('success');
+      } else if (response.status === 200 && result.status === 'already_subscribed') {
+        setSignupState('duplicate');
+      } else if (response.status === 400 && result.error === 'invalid_email') {
+        setSignupState('invalid');
+      } else {
+        setSignupState('error');
+      }
+    } catch {
+      setSignupState('error');
+    }
   }
   return <>
     <PageIntro eyebrow="Fale connosco" title="Contactos" description="Estamos disponíveis para esclarecer dúvidas sobre formações e espaços." />
@@ -19,10 +41,38 @@ export default function ContactsPage() {
     </div></section>
     <section className="newsletter"><div className="container newsletter-inner">
       <div><div className="eyebrow">Inspiração, de vez em quando</div><h2>Abra espaço para o próximo passo.</h2><p>Receba cursos novos, ideias úteis e histórias dos nossos alunos.</p></div>
-      <div>{joined ? <p className="form-status" role="status">Obrigado pelo interesse. Esta pré-visualização não guarda endereços de e-mail.</p> : <form className="newsletter-form" onSubmit={joinNewsletter}>
-        <label className="sr-only" htmlFor="newsletter-email">O seu endereço de e-mail</label><input id="newsletter-email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="O seu endereço de e-mail" required data-testid="input-newsletter-email" />
-        <button className="button button-teal" type="submit" data-testid="button-newsletter-submit">INSCREVER-ME <ArrowRight size={14} /></button>
-      </form>}{!joined && <p className="form-note">Pré-visualização — os endereços de e-mail não são guardados.</p>}</div>
+      <div>
+        <form className="newsletter-form" onSubmit={joinNewsletter}>
+          <label className="sr-only" htmlFor="newsletter-email">O seu endereço de e-mail</label>
+          <input
+            id="newsletter-email"
+            type="email"
+            value={email}
+            onChange={(event) => {
+              setEmail(event.target.value);
+              setSignupState('idle');
+            }}
+            placeholder="O seu endereço de e-mail"
+            required
+            maxLength={320}
+            disabled={signupState === 'submitting'}
+            aria-describedby="newsletter-status"
+            aria-invalid={signupState === 'invalid'}
+            data-testid="input-newsletter-email"
+          />
+          <button className="button button-teal" type="submit" disabled={signupState === 'submitting'} data-testid="button-newsletter-submit">
+            {signupState === 'submitting' ? 'A ENVIAR…' : 'INSCREVER-ME'} <ArrowRight size={14} />
+          </button>
+        </form>
+        <p className="form-note" id="newsletter-status" data-state={signupState} role="status" aria-live="polite">
+          {signupState === 'success' && 'Obrigado! Enviámos uma confirmação para o seu e-mail.'}
+          {signupState === 'duplicate' && 'Este endereço já está inscrito. Consulte o seu e-mail para encontrar a confirmação.'}
+          {signupState === 'invalid' && 'Introduza um endereço de e-mail válido.'}
+          {signupState === 'error' && 'Não foi possível concluir a inscrição agora. Tente novamente mais tarde.'}
+          {signupState === 'submitting' && 'A enviar o seu pedido de inscrição…'}
+          {signupState === 'idle' && 'Receberá um e-mail para confirmar a sua subscrição.'}
+        </p>
+      </div>
     </div></section>
   </>;
 }

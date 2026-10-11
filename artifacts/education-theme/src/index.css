@@ -238,9 +238,14 @@ button, input { font: inherit; }
 .newsletter-form input { width:235px;height:42px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.35);color:white;padding:0 13px;outline:none;font-size:10px; }
 .newsletter-form input::placeholder { color:#e5c8cb; }
 .newsletter-form input:focus { border-color:#f3aab2; }
+.newsletter-form input:disabled { opacity:.7;cursor:wait; }
+.newsletter-form input[aria-invalid="true"] { border-color:#ffb5bd; }
 .newsletter-form .button { white-space:nowrap; }
-.form-note { font-size:9px!important;color:#e3b8bd!important;margin-top:9px!important;text-align:right; }
+.newsletter-form .button:disabled { opacity:.7;cursor:wait; }
+.form-note { min-height:1.4em;font-size:9px!important;color:#e3b8bd!important;margin-top:9px!important;text-align:right; }
 .form-status { color:#ffdcdf!important;font-size:11px!important;max-width:340px; }
+.form-note[data-state="success"] { color:#d6f4e4!important; }
+.form-note[data-state="error"],.form-note[data-state="invalid"] { color:#ffd0d4!important; }
 .footer { background:#2d171b;color:#dec8ca;padding:44px 0 20px; }
 .footer-grid { display:grid;grid-template-columns:1.4fr .8fr .8fr 1fr;gap:35px;padding-bottom:32px; }
 .footer .brand { margin-bottom:13px; }

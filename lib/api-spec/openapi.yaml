@@ -18,6 +18,8 @@ tags:
     description: Course enrollment and ProxyPay checkout
   - name: auth
     description: Signed-in user profile
+  - name: newsletter
+    description: Newsletter signup operations
 paths:
   /healthz:
     get:
@@ -181,6 +183,42 @@ paths:
           description: Authentication required
         "404":
           description: Profile not synchronized yet
+  /newsletter-signups:
+    post:
+      operationId: subscribeToNewsletter
+      tags: [newsletter]
+      summary: Subscribe an email address to the newsletter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewsletterSignupInput"
+      responses:
+        "201":
+          description: Signup saved and confirmation email sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NewsletterSignupResponse"
+        "200":
+          description: Email address is already subscribed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NewsletterSignupResponse"
+        "400":
+          description: Email address is invalid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NewsletterSignupError"
+        "502":
+          description: Confirmation email could not be sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NewsletterSignupError"
 components:
   schemas:
     HealthStatus:
@@ -190,6 +228,28 @@ components:
           type: string
       required:
         - status
+    NewsletterSignupInput:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 320
+    NewsletterSignupResponse:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [confirmation_sent, already_subscribed]
+    NewsletterSignupError:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+          enum: [invalid_email, email_delivery_failed]
     UserProfile:
       type: object
       required: [id, email, firstName, lastName, createdAt, updatedAt]
@@ -474,4 +534,3 @@ components:
           type: ["string", "null"]
         terminal_transaction_id:
           type: ["integer", "null"]
-

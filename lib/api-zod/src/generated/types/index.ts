@@ -6,14 +6,12 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export * from './courseEnrollmentCheckout';
-export * from './courseEnrollmentInput';
-export * from './courseEnrollmentStatus';
-export * from './courseEnrollmentStatusConfirmationEmailStatus';
-export * from './courseId';
-export * from './coursePaymentStatus';
 export * from './healthStatus';
-export * from './proxyPayPaymentEvent';
+export * from './newsletterSignupError';
+export * from './newsletterSignupErrorError';
+export * from './newsletterSignupInput';
+export * from './newsletterSignupResponse';
+export * from './newsletterSignupResponseStatus';
 export * from './reservationPeriod';
 export * from './room';
 export * from './roomAvailability';
