@@ -6,11 +6,11 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export * from './getRoomAvailabilityParams';
 export * from './healthStatus';
 export * from './reservationPeriod';
 export * from './room';
 export * from './roomAvailability';
+export * from './roomAvailabilityInput';
 export * from './roomId';
 export * from './roomList';
 export * from './roomReservation';

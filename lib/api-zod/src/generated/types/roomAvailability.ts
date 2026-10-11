@@ -10,6 +10,10 @@ import type { RoomSlot } from './roomSlot';
 
 export interface RoomAvailability {
   roomId: RoomId;
-  date: Date;
+  /**
+     * Calendar date in YYYY-MM-DD format
+     * @pattern ^\d{4}-\d{2}-\d{2}$
+     */
+  date: string;
   slots: RoomSlot[];
 }

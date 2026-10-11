@@ -40,35 +40,17 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/RoomList"
-  /rooms/{roomId}/availability:
-    get:
-      operationId: getRoomAvailability
+  /room-availability:
+    post:
+      operationId: checkRoomAvailability
       tags: [rooms]
       summary: Get available booking slots for a room and date
-      parameters:
-        - name: roomId
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/RoomId"
-        - name: date
-          in: query
-          required: true
-          schema:
-            type: string
-            format: date
-        - name: period
-          in: query
-          required: true
-          schema:
-            $ref: "#/components/schemas/ReservationPeriod"
-        - name: durationHours
-          in: query
-          required: false
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 9
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoomAvailabilityInput"
       responses:
         "200":
           description: Available slots for the requested day
@@ -165,11 +147,28 @@ components:
           $ref: "#/components/schemas/RoomId"
         date:
           type: string
-          format: date
+          pattern: '^\d{4}-\d{2}-\d{2}$'
+          description: Calendar date in YYYY-MM-DD format
         slots:
           type: array
           items:
             $ref: "#/components/schemas/RoomSlot"
+    RoomAvailabilityInput:
+      type: object
+      required: [roomId, date, period]
+      properties:
+        roomId:
+          $ref: "#/components/schemas/RoomId"
+        date:
+          type: string
+          pattern: '^\d{4}-\d{2}-\d{2}$'
+          description: Calendar date in YYYY-MM-DD format
+        period:
+          $ref: "#/components/schemas/ReservationPeriod"
+        durationHours:
+          type: integer
+          minimum: 1
+          maximum: 9
     RoomReservationInput:
       type: object
       required: [roomId, date, slotId, period, name, nif]
@@ -178,7 +177,8 @@ components:
           $ref: "#/components/schemas/RoomId"
         date:
           type: string
-          format: date
+          pattern: '^\d{4}-\d{2}-\d{2}$'
+          description: Calendar date in YYYY-MM-DD format
         slotId:
           type: string
         period:
@@ -210,7 +210,8 @@ components:
           type: string
         date:
           type: string
-          format: date
+          pattern: '^\d{4}-\d{2}-\d{2}$'
+          description: Calendar date in YYYY-MM-DD format
         startTime:
           type: string
         endTime:

@@ -10,3 +10,4 @@ export type {
   RoomReservationInput,
   RoomSlot,
 } from "./generated/types";
+export * from './generated/types';

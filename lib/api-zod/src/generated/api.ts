@@ -35,23 +35,24 @@ export const ListRoomsResponse = zod.array(ListRoomsResponseItem)
 /**
  * @summary Get available booking slots for a room and date
  */
-export const GetRoomAvailabilityParams = zod.object({
-  "roomId": zod.enum(['sala-soba', 'sala-kilamba', 'sala-kudi', 'sala-ondjango'])
-})
-
-export const getRoomAvailabilityQueryDurationHoursMax = 9;
+export const checkRoomAvailabilityBodyDateRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+export const checkRoomAvailabilityBodyDurationHoursMax = 9;
 
 
 
-export const GetRoomAvailabilityQueryParams = zod.object({
-  "date": zod.date(),
-  "period": zod.enum(['standard', 'after_hours', 'session']),
-  "durationHours": zod.coerce.number().int().min(1).max(getRoomAvailabilityQueryDurationHoursMax).optional()
-})
-
-export const GetRoomAvailabilityResponse = zod.object({
+export const CheckRoomAvailabilityBody = zod.object({
   "roomId": zod.enum(['sala-soba', 'sala-kilamba', 'sala-kudi', 'sala-ondjango']),
-  "date": zod.coerce.date(),
+  "date": zod.string().regex(checkRoomAvailabilityBodyDateRegExp).describe('Calendar date in YYYY-MM-DD format'),
+  "period": zod.enum(['standard', 'after_hours', 'session']),
+  "durationHours": zod.number().int().min(1).max(checkRoomAvailabilityBodyDurationHoursMax).optional()
+})
+
+export const checkRoomAvailabilityResponseDateRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+
+
+export const CheckRoomAvailabilityResponse = zod.object({
+  "roomId": zod.enum(['sala-soba', 'sala-kilamba', 'sala-kudi', 'sala-ondjango']),
+  "date": zod.string().regex(checkRoomAvailabilityResponseDateRegExp).describe('Calendar date in YYYY-MM-DD format'),
   "slots": zod.array(zod.object({
   "id": zod.string(),
   "startTime": zod.string(),
@@ -66,6 +67,7 @@ export const GetRoomAvailabilityResponse = zod.object({
 /**
  * @summary Reserve an available room slot
  */
+export const createRoomReservationBodyDateRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
 export const createRoomReservationBodyDurationHoursMax = 9;
 
 export const createRoomReservationBodyNameMin = 2;
@@ -80,7 +82,7 @@ export const createRoomReservationBodyNifMax = 32;
 
 export const CreateRoomReservationBody = zod.object({
   "roomId": zod.enum(['sala-soba', 'sala-kilamba', 'sala-kudi', 'sala-ondjango']),
-  "date": zod.coerce.date(),
+  "date": zod.string().regex(createRoomReservationBodyDateRegExp).describe('Calendar date in YYYY-MM-DD format'),
   "slotId": zod.string(),
   "period": zod.enum(['standard', 'after_hours', 'session']),
   "durationHours": zod.number().int().min(1).max(createRoomReservationBodyDurationHoursMax).optional(),
@@ -89,11 +91,14 @@ export const CreateRoomReservationBody = zod.object({
   "nif": zod.string().min(createRoomReservationBodyNifMin).max(createRoomReservationBodyNifMax)
 })
 
+export const createRoomReservationResponseDateRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+
+
 export const CreateRoomReservationResponse = zod.object({
   "id": zod.number().int(),
   "roomId": zod.enum(['sala-soba', 'sala-kilamba', 'sala-kudi', 'sala-ondjango']),
   "roomName": zod.string(),
-  "date": zod.coerce.date(),
+  "date": zod.string().regex(createRoomReservationResponseDateRegExp).describe('Calendar date in YYYY-MM-DD format'),
   "startTime": zod.string(),
   "endTime": zod.string(),
   "durationMinutes": zod.number().int(),

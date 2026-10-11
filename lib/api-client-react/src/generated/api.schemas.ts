@@ -51,12 +51,35 @@ export interface RoomSlot {
 
 export interface RoomAvailability {
   roomId: RoomId;
+  /**
+     * Calendar date in YYYY-MM-DD format
+     * @pattern ^\d{4}-\d{2}-\d{2}$
+     */
   date: string;
   slots: RoomSlot[];
 }
 
+export interface RoomAvailabilityInput {
+  roomId: RoomId;
+  /**
+     * Calendar date in YYYY-MM-DD format
+     * @pattern ^\d{4}-\d{2}-\d{2}$
+     */
+  date: string;
+  period: ReservationPeriod;
+  /**
+     * @minimum 1
+     * @maximum 9
+     */
+  durationHours?: number;
+}
+
 export interface RoomReservationInput {
   roomId: RoomId;
+  /**
+     * Calendar date in YYYY-MM-DD format
+     * @pattern ^\d{4}-\d{2}-\d{2}$
+     */
   date: string;
   slotId: string;
   period: ReservationPeriod;
@@ -86,6 +109,10 @@ export interface RoomReservation {
   id: number;
   roomId: RoomId;
   roomName: string;
+  /**
+     * Calendar date in YYYY-MM-DD format
+     * @pattern ^\d{4}-\d{2}-\d{2}$
+     */
   date: string;
   startTime: string;
   endTime: string;
@@ -93,14 +120,4 @@ export interface RoomReservation {
   priceKz: number;
   status: string;
 }
-
-export type GetRoomAvailabilityParams = {
-date: string;
-period: ReservationPeriod;
-/**
- * @minimum 1
- * @maximum 9
- */
-durationHours?: number;
-};
 

@@ -20,10 +20,9 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  GetRoomAvailabilityParams,
   HealthStatus,
   RoomAvailability,
-  RoomId,
+  RoomAvailabilityInput,
   RoomList,
   RoomReservation,
   RoomReservationInput
@@ -211,34 +210,39 @@ export function useListRooms<TData = Awaited<ReturnType<typeof listRooms>>, TErr
 
 
 
-export const getGetRoomAvailabilityUrl = (roomId: RoomId,
-    params: GetRoomAvailabilityParams,) => {
-  const normalizedParams = new URLSearchParams();
+export const getCheckRoomAvailabilityUrl = () => {
 
-  Object.entries(params || {}).forEach(([key, value]) => {
 
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : String(value))
-    }
-  });
 
-  const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/rooms/${roomId}/availability?${stringifiedParams}` : `/api/rooms/${roomId}/availability`
+  return `/api/room-availability`
 }
 
 /**
  * @summary Get available booking slots for a room and date
  */
-export const getRoomAvailability = async (roomId: RoomId,
-    params: GetRoomAvailabilityParams, options?: Parameters<typeof customFetch>[1]): Promise<RoomAvailability> => {
+export const checkRoomAvailability = async (roomAvailabilityInput: RoomAvailabilityInput, options?: Parameters<typeof customFetch>[1]): Promise<RoomAvailability> => {
 
-  return customFetch<RoomAvailability>(getGetRoomAvailabilityUrl(roomId,params),
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<RoomAvailability>(getCheckRoomAvailabilityUrl(),
   {
     ...options,
-    method: 'GET'
-
-
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(roomAvailabilityInput)
   }
 );}
 
@@ -246,59 +250,53 @@ export const getRoomAvailability = async (roomId: RoomId,
 
 
 
-export const getGetRoomAvailabilityQueryKey = (roomId: RoomId,
-    params?: GetRoomAvailabilityParams,) => {
-    return [
-    `/api/rooms/${roomId}/availability`, ...(params ? [params] : [])
-    ] as const;
-    }
+export const getCheckRoomAvailabilityMutationKey = () => ['checkRoomAvailability'] as const;
 
+export const getCheckRoomAvailabilityMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof checkRoomAvailability>>, TError,CheckRoomAvailabilityMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof checkRoomAvailability>>, TError,CheckRoomAvailabilityMutationVariables, TContext> => {
 
-export const getGetRoomAvailabilityQueryOptions = <TData = Awaited<ReturnType<typeof getRoomAvailability>>, TError = ErrorType<void>>(roomId: RoomId,
-    params: GetRoomAvailabilityParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getRoomAvailability>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getGetRoomAvailabilityQueryKey(roomId,params);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getRoomAvailability>>> = ({ signal }) => getRoomAvailability(roomId,params, { signal, ...requestOptions });
+const mutationKey = getCheckRoomAvailabilityMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
 
 
 
 
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof checkRoomAvailability>>, CheckRoomAvailabilityMutationVariables> = (props) => {
+          const {data} = props ?? {};
 
-   return  { queryKey, queryFn, enabled: roomId !== null && roomId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getRoomAvailability>>, TError, TData> & { queryKey: QueryKey }
-}
-
-export type GetRoomAvailabilityQueryResult = NonNullable<Awaited<ReturnType<typeof getRoomAvailability>>>
-export type GetRoomAvailabilityQueryError = ErrorType<void>
+          return  checkRoomAvailability(data,requestOptions)
+        }
 
 
-/**
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CheckRoomAvailabilityMutationResult = NonNullable<Awaited<ReturnType<typeof checkRoomAvailability>>>
+    export type CheckRoomAvailabilityMutationBody = BodyType<RoomAvailabilityInput>
+    export type CheckRoomAvailabilityMutationError = ErrorType<void>
+    export type CheckRoomAvailabilityMutationVariables = {data: BodyType<RoomAvailabilityInput>}
+
+    /**
  * @summary Get available booking slots for a room and date
  */
-
-export function useGetRoomAvailability<TData = Awaited<ReturnType<typeof getRoomAvailability>>, TError = ErrorType<void>>(
- roomId: RoomId,
-    params: GetRoomAvailabilityParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getRoomAvailability>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
-
- ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-
-  const queryOptions = getGetRoomAvailabilityQueryOptions(roomId,params,options)
-
-  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
-
-  return withQueryKey(query, queryOptions.queryKey);
-}
-
-
-
-
-
-
+export const useCheckRoomAvailability = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof checkRoomAvailability>>, TError,CheckRoomAvailabilityMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof checkRoomAvailability>>,
+        TError,
+        CheckRoomAvailabilityMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCheckRoomAvailabilityMutationOptions(options));
+    }
 
 export const getCreateRoomReservationUrl = () => {
 

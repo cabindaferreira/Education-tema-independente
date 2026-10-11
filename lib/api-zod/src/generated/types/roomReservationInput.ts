@@ -10,7 +10,11 @@ import type { RoomId } from './roomId';
 
 export interface RoomReservationInput {
   roomId: RoomId;
-  date: Date;
+  /**
+     * Calendar date in YYYY-MM-DD format
+     * @pattern ^\d{4}-\d{2}-\d{2}$
+     */
+  date: string;
   slotId: string;
   period: ReservationPeriod;
   /**

@@ -11,7 +11,11 @@ export interface RoomReservation {
   id: number;
   roomId: RoomId;
   roomName: string;
-  date: Date;
+  /**
+     * Calendar date in YYYY-MM-DD format
+     * @pattern ^\d{4}-\d{2}-\d{2}$
+     */
+  date: string;
   startTime: string;
   endTime: string;
   durationMinutes: number;
