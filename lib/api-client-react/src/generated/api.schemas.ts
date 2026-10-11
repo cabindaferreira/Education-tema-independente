@@ -9,6 +9,19 @@ export interface HealthStatus {
   status: string;
 }
 
+export interface UserProfile {
+  /** Clerk user ID */
+  id: string;
+  /** @nullable */
+  email: string | null;
+  /** @nullable */
+  firstName: string | null;
+  /** @nullable */
+  lastName: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export type RoomId = typeof RoomId[keyof typeof RoomId];
 
 

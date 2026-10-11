@@ -14,6 +14,8 @@ tags:
     description: Room catalogue and booking availability
   - name: reservations
     description: Room reservation requests
+  - name: auth
+    description: Signed-in user profile
 paths:
   /healthz:
     get:
@@ -82,6 +84,35 @@ paths:
           description: Invalid reservation details
         "409":
           description: The selected slot is no longer available
+  /auth/profile:
+    post:
+      operationId: syncAuthProfile
+      tags: [auth]
+      summary: Create or refresh the signed-in user's application profile
+      responses:
+        "200":
+          description: Synchronized application profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "401":
+          description: Authentication required
+    get:
+      operationId: getAuthProfile
+      tags: [auth]
+      summary: Get the signed-in user's application profile
+      responses:
+        "200":
+          description: Application profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "401":
+          description: Authentication required
+        "404":
+          description: Profile not synchronized yet
 components:
   schemas:
     HealthStatus:
@@ -91,6 +122,25 @@ components:
           type: string
       required:
         - status
+    UserProfile:
+      type: object
+      required: [id, email, firstName, lastName, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+          description: Clerk user ID
+        email:
+          type: ["string", "null"]
+        firstName:
+          type: ["string", "null"]
+        lastName:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
     RoomId:
       type: string
       enum: [sala-soba, sala-kilamba, sala-kudi, sala-ondjango]

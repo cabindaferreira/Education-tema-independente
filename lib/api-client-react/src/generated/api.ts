@@ -25,7 +25,8 @@ import type {
   RoomAvailabilityInput,
   RoomList,
   RoomReservation,
-  RoomReservationInput
+  RoomReservationInput,
+  UserProfile
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -385,4 +386,155 @@ export const useCreateRoomReservation = <TError = ErrorType<void>,
       > => {
       return useMutation(getCreateRoomReservationMutationOptions(options));
     }
+
+export const getSyncAuthProfileUrl = () => {
+
+
+
+
+  return `/api/auth/profile`
+}
+
+/**
+ * @summary Create or refresh the signed-in user's application profile
+ */
+export const syncAuthProfile = async ( options?: Parameters<typeof customFetch>[1]): Promise<UserProfile> => {
+
+  return customFetch<UserProfile>(getSyncAuthProfileUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getSyncAuthProfileMutationKey = () => ['syncAuthProfile'] as const;
+
+export const getSyncAuthProfileMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof syncAuthProfile>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof syncAuthProfile>>, TError,void, TContext> => {
+
+const mutationKey = getSyncAuthProfileMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof syncAuthProfile>>, void> = () => {
+
+
+          return  syncAuthProfile(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SyncAuthProfileMutationResult = NonNullable<Awaited<ReturnType<typeof syncAuthProfile>>>
+
+    export type SyncAuthProfileMutationError = ErrorType<void>
+
+
+    /**
+ * @summary Create or refresh the signed-in user's application profile
+ */
+export const useSyncAuthProfile = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof syncAuthProfile>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof syncAuthProfile>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getSyncAuthProfileMutationOptions(options));
+    }
+
+export const getGetAuthProfileUrl = () => {
+
+
+
+
+  return `/api/auth/profile`
+}
+
+/**
+ * @summary Get the signed-in user's application profile
+ */
+export const getAuthProfile = async ( options?: Parameters<typeof customFetch>[1]): Promise<UserProfile> => {
+
+  return customFetch<UserProfile>(getGetAuthProfileUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAuthProfileQueryKey = () => {
+    return [
+    `/api/auth/profile`
+    ] as const;
+    }
+
+
+export const getGetAuthProfileQueryOptions = <TData = Awaited<ReturnType<typeof getAuthProfile>>, TError = ErrorType<void>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAuthProfile>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAuthProfileQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAuthProfile>>> = ({ signal }) => getAuthProfile({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAuthProfile>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAuthProfileQueryResult = NonNullable<Awaited<ReturnType<typeof getAuthProfile>>>
+export type GetAuthProfileQueryError = ErrorType<void>
+
+
+/**
+ * @summary Get the signed-in user's application profile
+ */
+
+export function useGetAuthProfile<TData = Awaited<ReturnType<typeof getAuthProfile>>, TError = ErrorType<void>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAuthProfile>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAuthProfileQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 

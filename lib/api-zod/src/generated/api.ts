@@ -107,3 +107,29 @@ export const CreateRoomReservationResponse = zod.object({
 })
 
 
+/**
+ * @summary Create or refresh the signed-in user's application profile
+ */
+export const SyncAuthProfileResponse = zod.object({
+  "id": zod.string().describe('Clerk user ID'),
+  "email": zod.string().nullable(),
+  "firstName": zod.string().nullable(),
+  "lastName": zod.string().nullable(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Get the signed-in user's application profile
+ */
+export const GetAuthProfileResponse = zod.object({
+  "id": zod.string().describe('Clerk user ID'),
+  "email": zod.string().nullable(),
+  "firstName": zod.string().nullable(),
+  "lastName": zod.string().nullable(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+

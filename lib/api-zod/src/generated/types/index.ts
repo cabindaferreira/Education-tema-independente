@@ -16,3 +16,4 @@ export * from './roomList';
 export * from './roomReservation';
 export * from './roomReservationInput';
 export * from './roomSlot';
+export * from './userProfile';

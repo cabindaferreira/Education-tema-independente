@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react';
+import { Show } from '@clerk/react';
 import { Link, useLocation } from 'wouter';
 import { ArrowRight, Clock3, Menu, Phone, X } from 'lucide-react';
 
@@ -48,6 +49,13 @@ export function SiteLayout({ children }: { children: ReactNode }) {
             {links.map(([label, href]) => (
               <Link key={href} href={href} onClick={closeMenu} aria-current={location === href ? 'page' : undefined} className={location === href ? 'active' : ''}>{label}</Link>
             ))}
+            <Show when="signed-out">
+              <Link href="/sign-in" onClick={closeMenu} className="nav-auth-link">Entrar</Link>
+              <Link href="/sign-up" onClick={closeMenu} className="nav-auth-link">Criar conta</Link>
+            </Show>
+            <Show when="signed-in">
+              <Link href="/conta" onClick={closeMenu} className="nav-auth-link">Minha conta</Link>
+            </Show>
             <Link className="nav-cta" href="/cursos" onClick={closeMenu}>VER FORMAÇÕES <ArrowRight size={13} /></Link>
           </nav>
         </div>
