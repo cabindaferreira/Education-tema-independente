@@ -1,0 +1,1 @@
+- [ImageMagick PGM output](image-tracing-pgm-output.md) — Check the PGM magic header; this runtime emitted ASCII P2 instead of binary P5.

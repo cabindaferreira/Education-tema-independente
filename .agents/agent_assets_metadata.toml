@@ -1,0 +1,16 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "aOpp28RCz2ilBCZmwNOfJ"
+uri = "file://artifacts/education-theme/public/favicon.svg"
+type = "image"
+title = "Logo Academia em SVG"
+description = "Símbolo vetorizado em fundo vermelho, pronto para usar no site."
+logical_id = "2415ef89-dc54-4515-a87b-1eaaeae661c7"
+content_hash = "sha256:f334ec7eb87bbac36f8ae5dc3cc2dc554663ecd572284a1c6d0759cade41a0ba"
+size = 2876
+mtime_ms = 1791686924877
+storage_uri = "gcs://replit-rams-assets-kirk/rams/assets/repl:7cb0c22d-6d2c-476d-ae08-c868b9919f1f/2415ef89-dc54-4515-a87b-1eaaeae661c7/6296fd89-aaeb-49b2-b370-c484c9bc409c"
+storage_version_token = "1791687092451193"
+content_type = "image/svg+xml"

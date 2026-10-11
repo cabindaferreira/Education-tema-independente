@@ -51,8 +51,8 @@ function App() {
 
   return (
     <main className="site-shell">
-      <section className="hero bg-[#FF0000]" id="home">
-        <div className="topline border-t-[#FF0000] border-r-[#FF0000] border-b-[#FF0000] border-l-[#FF0000]">
+      <section className="hero" id="home">
+        <div className="topline">
           <div className="container topline-inner">
             <a className="topbrand" href="#home" aria-label="Academia home">ACADEMIA<small>ONLINE EDUCATION &amp; LEARNING</small></a>
             <div className="top-details">
@@ -63,14 +63,14 @@ function App() {
           </div>
         </div>
         <header className="nav-wrap">
-          <div className="container nav bg-foreground">
-            <a className="brand" href="#home" onClick={closeMenu} aria-label="Academia home"><span className="brand-mark"><span>A</span></span><span>ACADEMIA</span></a>
+          <div className="container nav">
+            <a className="brand" href="#home" onClick={closeMenu} aria-label="Academia home"><span className="brand-mark"><img src="/favicon.svg" alt="" /></span><span>ACADEMIA</span></a>
             <button className="menu-toggle" type="button" aria-label={menuOpen ? 'Close navigation' : 'Open navigation'} aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)} data-testid="button-mobile-menu">
               {menuOpen ? <X size={23} /> : <Menu size={23} />}
             </button>
             <nav className={`nav-links ${menuOpen ? 'open' : ''}`} aria-label="Main navigation">
-              {navItems.map(([label, href]) => <a key={href} href={href} onClick={closeMenu} className="text-background">{label}</a>)}
-              <a className="nav-cta bg-[#FF0000]" href="#pricing" onClick={closeMenu}>GET CERTIFICATE <ArrowRight size={13} /></a>
+              {navItems.map(([label, href]) => <a key={href} href={href} onClick={closeMenu}>{label}</a>)}
+              <a className="nav-cta" href="#pricing" onClick={closeMenu}>GET CERTIFICATE <ArrowRight size={13} /></a>
             </nav>
           </div>
         </header>
@@ -80,7 +80,7 @@ function App() {
             <h1>Learn New Skills Online with Expert Teachers</h1>
             <p className="hero-copy">Practical courses in software, design, business and music, taught by people who do the work every day, with a certificate when you finish.</p>
             <div className="actions">
-              <a className="button button-teal bg-[#FF0000]" href="#courses">GET STARTED NOW! <ArrowRight size={14} /></a>
+              <a className="button button-teal" href="#courses">GET STARTED NOW! <ArrowRight size={14} /></a>
               <a className="button button-white" href="#courses">VIEW COURSE <ArrowRight size={14} /></a>
             </div>
           </div>
@@ -214,7 +214,7 @@ function App() {
       <footer className="footer" id="contact">
         <div className="container">
           <div className="footer-grid">
-            <div><a className="brand" href="#home"><span className="brand-mark"><span>A</span></span><span>ACADEMIA</span></a><p className="footer-brand-copy">Practical learning for curious people. Start where you are and see where you can go.</p></div>
+            <div><a className="brand" href="#home"><span className="brand-mark"><img src="/favicon.svg" alt="" /></span><span>ACADEMIA</span></a><p className="footer-brand-copy">Practical learning for curious people. Start where you are and see where you can go.</p></div>
             <div><h4>Explore</h4><div className="footer-links"><a href="#benefits">Why Academia</a><a href="#courses">All courses</a><a href="#categories">Course categories</a><a href="#pricing">Plans &amp; pricing</a></div></div>
             <div><h4>Academia</h4><div className="footer-links"><a href="#team">Our learners</a><a href="#journal">The journal</a><a href="#newsletter">Newsletter</a><a href="#home">Back to top</a></div></div>
             <div><h4>Get in touch</h4><div className="footer-links"><a href="mailto:hello@academia.example">hello@academia.example</a><a href="tel:+15550142730">+1 (555) 014-2730</a><a href="#contact">Monday - Friday, 8am-8pm</a></div></div>
