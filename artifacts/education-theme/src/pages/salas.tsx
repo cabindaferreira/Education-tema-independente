@@ -90,12 +90,12 @@ export default function RoomsPage() {
 
   return <>
     <PageIntro eyebrow="Espaços Academia Procenter" title="Uma sala certa para cada encontro." description="Conheça os nossos espaços, compare capacidade e facilidades e consulte os horários realmente disponíveis." />
-    <section className="section categories"><div className="container">
+    <section className="section categories mt-[-130px] mb-[-130px]"><div className="container">
       {roomsQuery.isLoading ? <div className="room-grid" aria-label="A carregar salas" data-testid="status-rooms-loading">{[0, 1, 2, 3].map((item) => <div className="room-skeleton" key={item}><div /><span /><span /><span /></div>)}</div>
         : roomsQuery.isError ? <div className="rooms-state rooms-error" role="alert" data-testid="status-rooms-error"><strong>Não foi possível carregar as salas.</strong><p>Verifique a ligação e tente novamente.</p><button className="button button-outline" type="button" onClick={() => roomsQuery.refetch()} data-testid="button-retry-rooms">TENTAR NOVAMENTE</button></div>
         : !roomsQuery.data?.length ? <div className="rooms-state" data-testid="status-rooms-empty"><strong>Não há salas disponíveis neste momento.</strong><p>Volte a consultar mais tarde ou contacte a Academia.</p></div>
         : <div className="room-grid">{roomsQuery.data.map((room) => <article className="room-card" key={room.id} data-testid={`card-room-${room.id}`}>
-          <div className="room-image-wrap"><img className="room-image" src={room.image} alt={`Imagem de ${room.name}`} loading="lazy" data-testid={`img-room-${room.id}`} /><span className="room-capacity" data-testid={`text-room-capacity-${room.id}`}><Users size={15} /> Até {room.capacity} lugares</span></div>
+          <div className="room-image-wrap"><img className={`room-image ${room.id === 'sala-kilamba' ? 'mt-[-13px] mb-[-13px]' : ''}`} src={room.image} alt={`Imagem de ${room.name}`} loading="lazy" data-testid={`img-room-${room.id}`} /><span className="room-capacity" data-testid={`text-room-capacity-${room.id}`}><Users size={15} /> Até {room.capacity} lugares</span></div>
           <div className="room-content"><div className="room-title-row"><span className="room-kicker">ACADEMIA PROCENTER</span><span className="room-id">{room.id}</span></div><h3 data-testid={`text-room-name-${room.id}`}>{room.name}</h3><p className="room-description" data-testid={`text-room-description-${room.id}`}>{room.description}</p>
             <div className="room-facilities"><h4>Facilidades</h4><ul>{room.facilities.map((facility, index) => <li key={`${room.id}-${facility}`} data-testid={`text-room-facility-${room.id}-${index}`}><Check size={14} />{facility}</li>)}</ul></div>
             {!!room.rateDetails.length && <div className="room-rates"><span>Informação de tarifas</span><ul>{room.rateDetails.map((detail, index) => <li key={`${room.id}-rate-${index}`} data-testid={`text-room-rate-${room.id}-${index}`}>{detail}</li>)}</ul></div>}
