@@ -42,7 +42,7 @@ export default function HomePage() {
           <h1>Aprenda novas competências online com professores experientes</h1>
           <p className="hero-copy">Cursos práticos de tecnologia, design, negócios e música, orientados por profissionais. Aprenda ao seu ritmo e receba um certificado no final.</p>
           <div className="actions">
-            <Link className="button button-teal" href="/cursos">COMECE AGORA <ArrowRight size={14} /></Link>
+            <Link className="button button-teal bg-[#FF0101]" href="/cursos">COMECE AGORA <ArrowRight size={14} /></Link>
             <Link className="button button-white" href="/cursos">VER CURSOS <ArrowRight size={14} /></Link>
           </div>
         </div></div>
