@@ -38,6 +38,38 @@ export interface NewsletterSignupError {
   error: NewsletterSignupErrorError;
 }
 
+export interface NewsletterUnsubscribeInput {
+  /**
+     * @minLength 64
+     * @maxLength 64
+     * @pattern ^[a-f0-9]{64}$
+     */
+  token: string;
+}
+
+export type NewsletterUnsubscribeResponseStatus = typeof NewsletterUnsubscribeResponseStatus[keyof typeof NewsletterUnsubscribeResponseStatus];
+
+
+export const NewsletterUnsubscribeResponseStatus = {
+  unsubscribed: 'unsubscribed',
+  already_unsubscribed: 'already_unsubscribed',
+} as const;
+
+export interface NewsletterUnsubscribeResponse {
+  status: NewsletterUnsubscribeResponseStatus;
+}
+
+export type NewsletterUnsubscribeErrorError = typeof NewsletterUnsubscribeErrorError[keyof typeof NewsletterUnsubscribeErrorError];
+
+
+export const NewsletterUnsubscribeErrorError = {
+  invalid_unsubscribe_token: 'invalid_unsubscribe_token',
+} as const;
+
+export interface NewsletterUnsubscribeError {
+  error: NewsletterUnsubscribeErrorError;
+}
+
 export interface UserProfile {
   /** Clerk user ID */
   id: string;

@@ -24,6 +24,7 @@ import { AccountPage } from '@/pages/conta';
 import StaffReservationsPage from '@/pages/equipa-reservas';
 import StaffRoomSettingsPage from '@/pages/equipa-salas';
 import { SignInPage, SignUpPage } from '@/pages/auth';
+import NewsletterUnsubscribePage from '@/pages/newsletter-unsubscribe';
 import NotFound from '@/pages/not-found';
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -159,6 +160,7 @@ function AppRoutes() {
       <Switch>
         <Route path="/sign-in/*?" component={SignInPage} />
         <Route path="/sign-up/*?" component={SignUpPage} />
+        <Route path="/unsubscribe"><PublicPage><NewsletterUnsubscribePage /></PublicPage></Route>
         <Route path="/equipa/reservas" component={StaffReservationsPage} />
         <Route path="/equipa/salas" component={StaffRoomSettingsPage} />
         <Route path="/conta" component={AccountPage} />

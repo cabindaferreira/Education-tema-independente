@@ -777,3 +777,23 @@ export const SubscribeToNewsletterResponse = zod.object({
 })
 
 
+/**
+ * The token is stored as a hash. Opening the email link does not unsubscribe; the recipient must confirm the request.
+ * @summary Unsubscribe from the newsletter with an emailed token
+ */
+export const unsubscribeFromNewsletterBodyTokenMin = 64;
+export const unsubscribeFromNewsletterBodyTokenMax = 64;
+
+
+export const unsubscribeFromNewsletterBodyTokenRegExp = new RegExp('^[a-f0-9]{64}$');
+
+
+export const UnsubscribeFromNewsletterBody = zod.object({
+  "token": zod.string().min(unsubscribeFromNewsletterBodyTokenMin).max(unsubscribeFromNewsletterBodyTokenMax).regex(unsubscribeFromNewsletterBodyTokenRegExp)
+})
+
+export const UnsubscribeFromNewsletterResponse = zod.object({
+  "status": zod.enum(['unsubscribed', 'already_unsubscribed'])
+})
+
+
