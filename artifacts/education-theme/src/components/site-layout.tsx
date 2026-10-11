@@ -139,7 +139,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
         </div>
       </div>
       <header className="nav-wrap">
-        <div className="container nav">
+        <div className="container nav text-[#FF0101]">
           <Link
             className="brand"
             href="/"
@@ -171,7 +171,11 @@ export function SiteLayout({ children }: { children: ReactNode }) {
                 href={href}
                 onClick={closeMenu}
                 aria-current={location === href ? "page" : undefined}
-                className={location === href ? "active" : ""}
+                className={
+                  location === href
+                    ? "active border-t-[#FF0101] border-r-[#FF0101] border-b-[#FF0101] border-l-[#FF0101]"
+                    : ""
+                }
               >
                 {label}
               </Link>
