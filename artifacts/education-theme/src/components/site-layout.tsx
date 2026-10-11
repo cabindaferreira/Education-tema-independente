@@ -21,6 +21,55 @@ export function SiteLayout({ children }: { children: ReactNode }) {
     window.scrollTo({ top: 0, behavior: 'auto' });
   }, [location]);
 
+  useEffect(() => {
+    const shell = document.querySelector<HTMLElement>('.site-shell');
+    if (!shell) return;
+
+    shell.classList.remove('route-enter');
+    void shell.offsetHeight;
+    shell.classList.add('route-enter');
+
+    const timer = window.setTimeout(() => shell.classList.remove('route-enter'), 560);
+    return () => {
+      window.clearTimeout(timer);
+      shell.classList.remove('route-enter');
+    };
+  }, [location]);
+
+  useEffect(() => {
+    const shell = document.querySelector<HTMLElement>('.site-shell');
+    if (!shell) return;
+
+    const targets = Array.from(shell.querySelectorAll<HTMLElement>(
+      '.site-shell > .section, .site-shell > .benefits, .site-shell > .home-note, ' +
+      '.site-shell > .newsletter, .benefit-grid, .stats, .course-grid, .room-grid, ' +
+      '.category-grid, .journal-grid, .pricing-grid, .testimonial-grid, .contact-grid',
+    ));
+    targets.forEach((target) => target.classList.add('scroll-reveal'));
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion || !('IntersectionObserver' in window)) {
+      targets.forEach((target) => target.classList.add('is-visible'));
+      return () => targets.forEach((target) => target.classList.remove('scroll-reveal', 'is-visible'));
+    }
+
+    shell.classList.add('motion-ready');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.04, rootMargin: '0px 0px -6% 0px' });
+
+    targets.forEach((target) => observer.observe(target));
+    return () => {
+      observer.disconnect();
+      shell.classList.remove('motion-ready');
+      targets.forEach((target) => target.classList.remove('scroll-reveal', 'is-visible'));
+    };
+  }, [location]);
+
   const closeMenu = () => setMenuOpen(false);
 
   return (
