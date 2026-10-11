@@ -197,6 +197,14 @@ export function SiteLayout({ children }: { children: ReactNode }) {
               </Link>
             </Show>
             <Show when="signed-in">
+              <Link
+                href="/equipa/reservas"
+                onClick={closeMenu}
+                className="nav-auth-link"
+                data-testid="link-staff-reservations"
+              >
+                Reservas da equipa
+              </Link>
               <Link href="/conta" onClick={closeMenu} className="nav-auth-link">
                 Minha conta
               </Link>
