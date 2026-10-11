@@ -8,6 +8,11 @@
 
 export * from './courseEnrollmentCheckout';
 export * from './courseEnrollmentInput';
+export * from './courseEnrollmentRequestError';
+export * from './courseEnrollmentRequestErrorError';
+export * from './courseEnrollmentRequestInput';
+export * from './courseEnrollmentRequestResponse';
+export * from './courseEnrollmentRequestResponseStatus';
 export * from './courseEnrollmentStatus';
 export * from './courseEnrollmentStatusConfirmationEmailStatus';
 export * from './courseId';

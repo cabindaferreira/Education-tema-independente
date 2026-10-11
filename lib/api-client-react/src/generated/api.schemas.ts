@@ -175,6 +175,24 @@ export const CourseId = {
   'recursos-humanos': 'recursos-humanos',
 } as const;
 
+export interface CourseEnrollmentRequestInput {
+  courseId: CourseId;
+  /**
+     * @minLength 2
+     * @maxLength 120
+     */
+  fullName: string;
+  /**
+     * @minLength 7
+     * @maxLength 24
+     * @pattern ^\+?[\d\s().-]+$
+     */
+  phone: string;
+  /** @maxLength 320 */
+  email: string;
+  privacyAccepted: true;
+}
+
 export interface CourseEnrollmentInput {
   courseId: CourseId;
   /**
@@ -273,3 +291,24 @@ export interface ProxyPayPaymentEvent {
   terminal_transaction_id?: number | null;
 }
 
+
+export type CourseEnrollmentRequestResponseStatus = typeof CourseEnrollmentRequestResponseStatus[keyof typeof CourseEnrollmentRequestResponseStatus];
+
+export interface CourseEnrollmentRequestResponse {
+  status: CourseEnrollmentRequestResponseStatus;
+}
+
+export type CourseEnrollmentRequestErrorError = typeof CourseEnrollmentRequestErrorError[keyof typeof CourseEnrollmentRequestErrorError];
+
+export const CourseEnrollmentRequestErrorError = {
+  invalid_request: 'invalid_request',
+  email_delivery_failed: 'email_delivery_failed',
+} as const;
+
+export interface CourseEnrollmentRequestError {
+  error: CourseEnrollmentRequestErrorError;
+}
+
+export const CourseEnrollmentRequestResponseStatus = {
+  received: 'received',
+} as const;

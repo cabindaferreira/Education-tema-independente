@@ -112,6 +112,36 @@ paths:
           description: ProxyPay could not create the payment reference
         "503":
           description: Payment service is not configured
+  /course-enrollment-requests:
+    post:
+      operationId: createCourseEnrollmentRequest
+      tags: [course-enrollments]
+      summary: Send a course enrollment request to the Academy
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CourseEnrollmentRequestInput"
+      responses:
+        "201":
+          description: Request delivered to the Academy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseEnrollmentRequestResponse"
+        "400":
+          description: Invalid request details or missing privacy acknowledgement
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseEnrollmentRequestError"
+        "502":
+          description: Request email could not be delivered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseEnrollmentRequestError"
   /course-enrollments/{id}:
     get:
       operationId: getCourseEnrollmentStatus
@@ -409,6 +439,42 @@ components:
         - gestao-comercial
         - gestao-empresas
         - recursos-humanos
+    CourseEnrollmentRequestInput:
+      type: object
+      required: [courseId, fullName, phone, email, privacyAccepted]
+      properties:
+        courseId:
+          $ref: "#/components/schemas/CourseId"
+        fullName:
+          type: string
+          minLength: 2
+          maxLength: 120
+        phone:
+          type: string
+          minLength: 7
+          maxLength: 24
+          pattern: '^\+?[\d\s().-]+$'
+        email:
+          type: string
+          format: email
+          maxLength: 320
+        privacyAccepted:
+          type: boolean
+          enum: [true]
+    CourseEnrollmentRequestResponse:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [received]
+    CourseEnrollmentRequestError:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+          enum: [invalid_request, email_delivery_failed]
     CourseEnrollmentInput:
       type: object
       required:

@@ -3,6 +3,7 @@ import healthRouter from "./health";
 import roomsRouter from "./rooms";
 import authRouter from "./auth";
 import courseEnrollmentsRouter from "./course-enrollments";
+import courseEnrollmentRequestsRouter from "./course-enrollment-requests";
 import newsletterRouter from "./newsletter";
 
 const router: IRouter = Router();
@@ -10,6 +11,7 @@ const router: IRouter = Router();
 router.use(healthRouter);
 router.use(roomsRouter);
 router.use(courseEnrollmentsRouter);
+router.use(courseEnrollmentRequestsRouter);
 router.use(authRouter);
 router.use(newsletterRouter);
 

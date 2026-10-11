@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { ArrowRight, BadgeCheck, BookOpen, Clock3 } from 'lucide-react';
-import { Link } from 'wouter';
 import { PageIntro } from '@/components/site-layout';
+import { CourseEnrollmentRequestDialog } from '@/components/course-enrollment-request-dialog';
+import type { CourseEnrollmentRequestInput } from '@workspace/api-client-react';
 
-const courses = [
+const courses: { id: CourseEnrollmentRequestInput['courseId']; title: string; image: string; description: string; price: string; duration: string }[] = [
   { id: 'crm', title: 'Estágio Formativo em CRM', image: '/images/courses/crm.jpg', description: 'Desenvolva competências práticas para gerir o relacionamento com clientes e apoiar as rotinas comerciais.', price: '100.000 Kz', duration: 'Estágio de 3 meses' },
   { id: 'tesouraria', title: 'Estágio Formativo em Tesouraria', image: '/images/courses/tesouraria.jpg', description: 'Aprenda a acompanhar operações de tesouraria, organizar registos e apoiar o controlo financeiro.', price: '100.000 Kz', duration: 'Estágio de 3 meses' },
   { id: 'lideranca-equipas', title: 'Liderança e Gestão de Equipas', image: '/images/courses/lideranca-equipas.jpg', description: 'Prepare-se para coordenar equipas, comunicar objetivos e apoiar a execução do trabalho.', price: '100.000 Kz', duration: 'Estágio de 3 meses' },
@@ -14,6 +15,7 @@ const courses = [
 
 export default function CoursesPage() {
   const [showAll, setShowAll] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState<(typeof courses)[number] | null>(null);
   const visibleCourses = showAll ? courses : courses.slice(0, 3);
   return (
     <>
@@ -26,12 +28,30 @@ export default function CoursesPage() {
               <h3>{course.title}</h3><p>{course.description}</p>
               <ul className="course-highlights"><li><BadgeCheck size={15} /><span>Certificado reconhecido pelo INEFOP</span></li><li><BookOpen size={15} /><span>Manual de apoio incluído</span></li></ul>
               <div className="course-bottom"><span>Investimento total</span><strong>{course.price}</strong></div>
-              <Link className="course-cta" href={`/inscricao/${course.id}`}>Inscrever-me <ArrowRight size={14} /></Link>
+              <button
+                className="course-cta"
+                type="button"
+                onClick={() => setSelectedCourse(course)}
+                aria-haspopup="dialog"
+                data-testid={`button-course-request-${course.id}`}
+              >
+                Pedir inscrição <ArrowRight size={14} />
+              </button>
             </div>
           </article>
         ))}</div>
         <div className="course-more"><button className="button button-outline" type="button" aria-expanded={showAll} aria-controls="course-grid" onClick={() => setShowAll((value) => !value)}>{showAll ? 'VER MENOS' : 'VER MAIS CURSOS'}<ArrowRight className={showAll ? 'course-more-icon expanded' : 'course-more-icon'} size={14} /></button></div>
       </div></section>
+      {selectedCourse && (
+        <CourseEnrollmentRequestDialog
+          key={selectedCourse.id}
+          course={selectedCourse}
+          open
+          onOpenChange={(open) => {
+            if (!open) setSelectedCourse(null);
+          }}
+        />
+      )}
     </>
   );
 }
