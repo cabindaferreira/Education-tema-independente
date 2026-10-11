@@ -5,34 +5,34 @@ import {
 } from 'lucide-react';
 
 const navItems = [
-  ['Home', '#home'], ['All Courses', '#courses'], ['About', '#benefits'],
-  ['Team', '#team'], ['Pricing', '#pricing'], ['Journal', '#journal'], ['Contact', '#contact'],
+  ['Início', '#home'], ['Cursos', '#courses'], ['Salas', '#categories'],
+  ['Eventos', '#events'], ['Contactos', '#contact'], ['Sobre Nós', '#benefits'],
 ];
 
 const courses = [
-  { category: 'DESIGN', title: 'The Complete UX Design Course', meta: '18 lessons · 6 weeks', price: '$49', rating: '4.9', art: 'art-design', icon: PenTool, description: 'Create thoughtful digital products, from first sketch to polished prototype.' },
-  { category: 'BUSINESS', title: 'Small Business, Big Ideas', meta: '24 lessons · 8 weeks', price: '$69', rating: '4.8', art: 'art-business', icon: BriefcaseBusiness, description: 'Turn your good idea into a business built to grow on your terms.' },
-  { category: 'TECHNOLOGY', title: 'Code Your First Website', meta: '32 lessons · 10 weeks', price: '$59', rating: '4.9', art: 'art-tech', icon: Code2, description: 'Learn the web essentials and make a place for your ideas online.' },
-  { category: 'MARKETING', title: 'Make Your Brand Matter', meta: '16 lessons · 5 weeks', price: '$45', rating: '4.7', art: 'art-marketing', icon: Compass, description: 'Find your voice and connect with the people who need your work.' },
-  { category: 'PHOTOGRAPHY', title: 'Photography in Everyday Life', meta: '20 lessons · 6 weeks', price: '$39', rating: '4.8', art: 'art-photo', icon: Camera, description: 'See light differently and make more meaningful photographs.' },
-  { category: 'WELLBEING', title: 'A Mindful Workday', meta: '12 lessons · 4 weeks', price: '$35', rating: '4.9', art: 'art-wellness', icon: HeartPulse, description: 'Build calmer, more sustainable habits for the working week.' },
+  { category: 'DESIGN', title: 'Curso Completo de Design UX', meta: '18 aulas · 6 semanas', price: '$49', rating: '4.9', art: 'art-design', icon: PenTool, description: 'Crie produtos digitais claros, desde o primeiro esboço até ao protótipo final.' },
+  { category: 'NEGÓCIOS', title: 'Pequenos Negócios, Grandes Ideias', meta: '24 aulas · 8 semanas', price: '$69', rating: '4.8', art: 'art-business', icon: BriefcaseBusiness, description: 'Transforme uma boa ideia num negócio preparado para crescer ao seu ritmo.' },
+  { category: 'TECNOLOGIA', title: 'Crie o Seu Primeiro Site', meta: '32 aulas · 10 semanas', price: '$59', rating: '4.9', art: 'art-tech', icon: Code2, description: 'Aprenda os fundamentos da web e dê espaço às suas ideias online.' },
+  { category: 'MARKETING', title: 'Dê Destaque à Sua Marca', meta: '16 aulas · 5 semanas', price: '$45', rating: '4.7', art: 'art-marketing', icon: Compass, description: 'Encontre a voz da sua marca e chegue às pessoas que precisam do seu trabalho.' },
+  { category: 'FOTOGRAFIA', title: 'Fotografia no Dia a Dia', meta: '20 aulas · 6 semanas', price: '$39', rating: '4.8', art: 'art-photo', icon: Camera, description: 'Descubra a luz de outra forma e crie fotografias mais expressivas.' },
+  { category: 'BEM-ESTAR', title: 'Um Dia de Trabalho com Equilíbrio', meta: '12 aulas · 4 semanas', price: '$35', rating: '4.9', art: 'art-wellness', icon: HeartPulse, description: 'Crie hábitos de trabalho mais tranquilos e sustentáveis.' },
 ];
 
 const categories = [
-  { name: 'Design & Creativity', count: '24 courses', icon: Palette },
-  { name: 'Business & Leadership', count: '18 courses', icon: BriefcaseBusiness },
-  { name: 'Technology & Coding', count: '16 courses', icon: Code2 },
-  { name: 'Photography', count: '12 courses', icon: Camera },
-  { name: 'Personal Development', count: '21 courses', icon: Compass },
-  { name: 'Health & Wellbeing', count: '14 courses', icon: HeartPulse },
-  { name: 'Teaching & Learning', count: '9 courses', icon: GraduationCap },
-  { name: 'Writing & Communication', count: '11 courses', icon: BookOpen },
+  { name: 'Design e Criatividade', count: '24 cursos', icon: Palette },
+  { name: 'Negócios e Liderança', count: '18 cursos', icon: BriefcaseBusiness },
+  { name: 'Tecnologia e Programação', count: '16 cursos', icon: Code2 },
+  { name: 'Fotografia', count: '12 cursos', icon: Camera },
+  { name: 'Desenvolvimento Pessoal', count: '21 cursos', icon: Compass },
+  { name: 'Saúde e Bem-Estar', count: '14 cursos', icon: HeartPulse },
+  { name: 'Ensino e Aprendizagem', count: '9 cursos', icon: GraduationCap },
+  { name: 'Escrita e Comunicação', count: '11 cursos', icon: BookOpen },
 ];
 
 const plans = [
-  { name: 'Starter', summary: 'A little learning goes a long way.', price: '$0', period: 'forever', features: ['Access to free courses', 'Learn at your own pace', 'Community discussion access'], action: 'START LEARNING', featured: false },
-  { name: 'Explorer', summary: 'For your next big idea.', price: '$19', period: 'per month', features: ['Unlimited course access', 'Certificates of completion', 'Downloadable resources', 'Teacher Q&A sessions'], action: 'CHOOSE EXPLORER', featured: true },
-  { name: 'All Access', summary: 'Make learning part of your life.', price: '$149', period: 'per year', features: ['Everything in Explorer', 'Save 35% with annual access', 'Priority teacher feedback', 'New classes added monthly'], action: 'GET ALL ACCESS', featured: false },
+  { name: 'Iniciante', summary: 'Cada passo na aprendizagem conta.', price: '$0', period: 'para sempre', features: ['Acesso a cursos gratuitos', 'Aprenda ao seu ritmo', 'Acesso à comunidade'], action: 'COMEÇAR A APRENDER', featured: false },
+  { name: 'Explorador', summary: 'Para a sua próxima grande ideia.', price: '$19', period: 'por mês', features: ['Acesso ilimitado aos cursos', 'Certificados de conclusão', 'Materiais para descarregar', 'Sessões de perguntas com docentes'], action: 'ESCOLHER EXPLORADOR', featured: true },
+  { name: 'Acesso Total', summary: 'Aprender pode fazer parte da sua vida.', price: '$149', period: 'por ano', features: ['Tudo incluído no plano Explorador', 'Poupe 35% com o plano anual', 'Acompanhamento prioritário', 'Novos cursos todos os meses'], action: 'OBTER ACESSO TOTAL', featured: false },
 ];
 
 function App() {
@@ -54,34 +54,34 @@ function App() {
       <section className="hero" id="home">
         <div className="topline">
           <div className="container topline-inner">
-            <a className="topbrand" href="#home" aria-label="Academia home">ACADEMIA<small>ONLINE EDUCATION &amp; LEARNING</small></a>
+            <a className="topbrand" href="#home" aria-label="Página inicial da Academia">ACADEMIA<small>FORMAÇÃO ONLINE &amp; APRENDIZAGEM</small></a>
             <div className="top-details">
-              <div className="top-detail"><Clock3 size={20} /><span>Monday - Friday<br /><strong>8:00AM-8:00PM</strong></span></div>
-              <a className="top-detail" href="tel:+15550142730" style={{ color: 'inherit', textDecoration: 'none' }}><Phone size={19} /><span>Call Us<br /><strong>+1 (555) 014-2730</strong></span></a>
-              <div className="socials" aria-label="Social links"><a href="#contact" aria-label="Facebook">f</a><a href="#contact" aria-label="X">x</a><a href="#contact" aria-label="Instagram">ig</a><a href="#contact" aria-label="LinkedIn">in</a></div>
+              <div className="top-detail"><Clock3 size={20} /><span>Segunda a sexta<br /><strong>08h00–20h00</strong></span></div>
+              <a className="top-detail" href="tel:+15550142730" style={{ color: 'inherit', textDecoration: 'none' }}><Phone size={19} /><span>Ligue-nos<br /><strong>+1 (555) 014-2730</strong></span></a>
+              <div className="socials" aria-label="Redes sociais"><a href="#contact" aria-label="Facebook">f</a><a href="#contact" aria-label="X">x</a><a href="#contact" aria-label="Instagram">ig</a><a href="#contact" aria-label="LinkedIn">in</a></div>
             </div>
           </div>
         </div>
         <header className="nav-wrap">
           <div className="container nav">
-            <a className="brand" href="#home" onClick={closeMenu} aria-label="Academia home"><span className="brand-mark"><img src="/favicon.svg" alt="" /></span><span>ACADEMIA</span></a>
-            <button className="menu-toggle" type="button" aria-label={menuOpen ? 'Close navigation' : 'Open navigation'} aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)} data-testid="button-mobile-menu">
+            <a className="brand" href="#home" onClick={closeMenu} aria-label="Página inicial da Academia"><span className="brand-mark"><img src="/favicon.svg" alt="" /></span><span>ACADEMIA</span></a>
+            <button className="menu-toggle" type="button" aria-label={menuOpen ? 'Fechar navegação' : 'Abrir navegação'} aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)} data-testid="button-mobile-menu">
               {menuOpen ? <X size={23} /> : <Menu size={23} />}
             </button>
-            <nav className={`nav-links ${menuOpen ? 'open' : ''}`} aria-label="Main navigation">
+            <nav className={`nav-links ${menuOpen ? 'open' : ''}`} aria-label="Navegação principal">
               {navItems.map(([label, href]) => <a key={href} href={href} onClick={closeMenu}>{label}</a>)}
-              <a className="nav-cta" href="#pricing" onClick={closeMenu}>GET CERTIFICATE <ArrowRight size={13} /></a>
+              <a className="nav-cta" href="#pricing" onClick={closeMenu}>OBTER CERTIFICADO <ArrowRight size={13} /></a>
             </nav>
           </div>
         </header>
         <div className="container">
           <div className="hero-content">
-            <div className="eyebrow">Welcome to Academia</div>
-            <h1>Learn New Skills Online with Expert Teachers</h1>
-            <p className="hero-copy">Practical courses in software, design, business and music, taught by people who do the work every day, with a certificate when you finish.</p>
+            <div className="eyebrow">Bem-vindo à Academia</div>
+            <h1>Aprenda novas competências online com professores experientes</h1>
+            <p className="hero-copy">Cursos práticos de tecnologia, design, negócios e música, orientados por profissionais. Aprenda ao seu ritmo e receba um certificado no final.</p>
             <div className="actions">
-              <a className="button button-teal" href="#courses">GET STARTED NOW! <ArrowRight size={14} /></a>
-              <a className="button button-white" href="#courses">VIEW COURSE <ArrowRight size={14} /></a>
+              <a className="button button-teal" href="#courses">COMECE AGORA <ArrowRight size={14} /></a>
+              <a className="button button-white" href="#courses">VER CURSOS <ArrowRight size={14} /></a>
             </div>
           </div>
         </div>
@@ -90,29 +90,29 @@ function App() {
       <section className="benefits" id="benefits">
         <div className="container">
           <div className="section-heading">
-            <div className="eyebrow">A better way to learn</div>
-            <h2>Real skills for the life you’re living.</h2>
-            <p>Learn something useful, from people who know it well. Fit new ideas around your life and bring your next plans within reach.</p>
+            <div className="eyebrow">Sobre a Academia</div>
+            <h2>Competências úteis para o dia a dia.</h2>
+            <p>Aprenda algo útil com quem conhece o tema. Integre novas ideias no seu dia a dia e aproxime-se dos seus próximos objetivos.</p>
           </div>
           <div className="benefit-grid">
-            <article className="benefit"><div className="benefit-icon"><BookOpen size={22} /></div><h3>Learn practical skills</h3><p>Every course is designed around the things you can do with what you learn.</p></article>
-            <article className="benefit"><div className="benefit-icon"><UsersRound size={22} /></div><h3>Learn from the experts</h3><p>Get guidance from generous teachers who use these skills in their work every day.</p></article>
-            <article className="benefit"><div className="benefit-icon"><GraduationCap size={23} /></div><h3>Earn a certificate</h3><p>Celebrate your progress with a certificate that shows what you’ve accomplished.</p></article>
+            <article className="benefit"><div className="benefit-icon"><BookOpen size={22} /></div><h3>Aprenda competências práticas</h3><p>Todos os cursos ajudam a pôr em prática aquilo que aprendeu.</p></article>
+            <article className="benefit"><div className="benefit-icon"><UsersRound size={22} /></div><h3>Aprenda com especialistas</h3><p>Receba orientação de profissionais que usam estas competências no dia a dia.</p></article>
+            <article className="benefit"><div className="benefit-icon"><GraduationCap size={23} /></div><h3>Obtenha um certificado</h3><p>Assinale o seu progresso com um certificado que reconhece o que alcançou.</p></article>
           </div>
-          <div className="stats" aria-label="Academia at a glance">
-            <div className="stat"><strong>12,480+</strong><span>Happy learners</span></div>
-            <div className="stat"><strong>86</strong><span>Expert teachers</span></div>
-            <div className="stat"><strong>240+</strong><span>Online courses</span></div>
-            <div className="stat"><strong>4.8/5</strong><span>Learner rating</span></div>
+          <div className="stats" aria-label="A Academia em números">
+            <div className="stat"><strong>12 480+</strong><span>Alunos satisfeitos</span></div>
+            <div className="stat"><strong>86</strong><span>Docentes especialistas</span></div>
+            <div className="stat"><strong>240+</strong><span>Cursos online</span></div>
+            <div className="stat"><strong>4,8/5</strong><span>Avaliação dos alunos</span></div>
           </div>
         </div>
       </section>
       <section className="section courses" id="courses">
         <div className="container">
           <div className="section-heading compact">
-            <div className="eyebrow">Learn something new</div>
-            <h2>Popular online courses</h2>
-            <p>Fresh skills, thoughtful teachers, and room to grow at your own pace.</p>
+            <div className="eyebrow">Aprenda algo novo</div>
+            <h2>Cursos online em destaque</h2>
+            <p>Novas competências, bons professores e espaço para crescer ao seu ritmo.</p>
           </div>
           <div className="course-grid">
             {courses.map((course, index) => {
@@ -122,20 +122,20 @@ function App() {
                 <div className="course-body">
                   <div className="course-meta"><span>{course.meta}</span><span className="course-rating"><Star size={11} fill="currentColor" /> {course.rating}</span></div>
                   <h3>{course.title}</h3><p>{course.description}</p>
-                  <div className="course-bottom"><span>By Academia teachers</span><strong>{course.price} <small>/ course</small></strong></div>
+                  <div className="course-bottom"><span>Com docentes da Academia</span><strong>{course.price} <small>/ curso</small></strong></div>
                 </div>
               </article>;
             })}
           </div>
-          <div className="center-link"><a className="button button-teal" href="#categories">BROWSE ALL COURSES <ArrowRight size={14} /></a></div>
+          <div className="center-link"><a className="button button-teal" href="#categories">VER TODAS AS SALAS <ArrowRight size={14} /></a></div>
         </div>
       </section>
       <section className="section categories" id="categories">
         <div className="container">
           <div className="section-heading compact">
-            <div className="eyebrow">Find your direction</div>
-            <h2>Explore by category</h2>
-            <p>Follow a curiosity, build on what you know, or take a fresh path entirely.</p>
+            <div className="eyebrow">Salas de aprendizagem</div>
+            <h2>Explore as nossas salas</h2>
+            <p>Explore um tema novo, desenvolva o que já sabe ou comece um caminho diferente.</p>
           </div>
           <div className="category-grid">
             {categories.map((category) => {
@@ -148,48 +148,48 @@ function App() {
       <section className="section testimonials" id="team">
         <div className="container">
           <div className="section-heading compact">
-            <div className="eyebrow">A community that gets it</div>
-            <h2>Good things happen when you keep learning.</h2>
+            <div className="eyebrow">Uma comunidade que aprende em conjunto</div>
+            <h2>Continuar a aprender abre novas possibilidades.</h2>
           </div>
           <div className="testimonial-grid">
             <article className="quote-main">
               <div className="quote-mark">“</div>
-              <div className="stars" aria-label="5 out of 5 stars">★★★★★</div>
-              <blockquote>I came to Academia wanting to change careers, but I found much more than a course. My teacher made every big idea feel possible, and I finished with work I’m genuinely proud to show.</blockquote>
-              <div className="person"><div className="avatar">JM</div><div><strong>Jordan Mitchell</strong><span>UX Design graduate</span></div></div>
+              <div className="stars" aria-label="5 de 5 estrelas">★★★★★</div>
+              <blockquote>Cheguei à Academia para mudar de carreira e encontrei muito mais do que um curso. A docente ajudou-me a acreditar nas minhas ideias e terminei com um projeto de que me orgulho.</blockquote>
+              <div className="person"><div className="avatar">JM</div><div><strong>Jordan Mitchell</strong><span>Finalista de Design UX</span></div></div>
             </article>
             <article className="quote-side">
-              <div className="stars" aria-label="5 out of 5 stars">★★★★★</div>
-              <blockquote>“Finally, learning that fits around real life. I could pick it up after work, ask questions, and use what I learned the very next day.”</blockquote>
-              <div className="person"><div className="avatar">AS</div><div><strong>Amara Singh</strong><span>Small Business learner</span></div></div>
+              <div className="stars" aria-label="5 de 5 estrelas">★★★★★</div>
+              <blockquote>“Finalmente, uma aprendizagem que cabe na vida real. Pude estudar depois do trabalho, esclarecer dúvidas e aplicar o que aprendi logo no dia seguinte.”</blockquote>
+              <div className="person"><div className="avatar">AS</div><div><strong>Amara Singh</strong><span>Aluna de Pequenos Negócios</span></div></div>
             </article>
           </div>
         </div>
       </section>
-      <section className="section journal" id="journal">
+      <section className="section journal" id="events">
         <div className="container">
           <div className="section-heading compact">
-            <div className="eyebrow">Notes for the curious</div>
-            <h2>From the Academia journal</h2>
-            <p>Ideas, advice, and thoughtful reminders for whatever you’re learning next.</p>
+            <div className="eyebrow">Aprender em conjunto</div>
+            <h2>Eventos da Academia</h2>
+            <p>Oficinas, aulas abertas e encontros com especialistas. As datas serão anunciadas em breve.</p>
           </div>
           <div className="journal-grid">
-            <article className="journal-card"><div className="journal-art journal-one"><span>Learning</span></div><div className="journal-body"><div className="journal-meta">MAY 21, 2025 &nbsp;·&nbsp; 5 MIN READ</div><h3>It’s never too late to learn something new</h3><p>A few ways to make space for learning, at any age and any stage.</p><a className="read-more" href="#newsletter">READ THE STORY <ArrowRight size={12} /></a></div></article>
-            <article className="journal-card"><div className="journal-art journal-two"><span>Career</span></div><div className="journal-body"><div className="journal-meta">MAY 12, 2025 &nbsp;·&nbsp; 4 MIN READ</div><h3>Small steps toward a more creative career</h3><p>Build momentum with approachable ideas you can try this week.</p><a className="read-more" href="#newsletter">READ THE STORY <ArrowRight size={12} /></a></div></article>
-            <article className="journal-card"><div className="journal-art journal-three"><span>Teaching</span></div><div className="journal-body"><div className="journal-meta">APRIL 28, 2025 &nbsp;·&nbsp; 6 MIN READ</div><h3>Meet the teachers who make learning click</h3><p>What great teaching looks like when it begins with real people.</p><a className="read-more" href="#newsletter">READ THE STORY <ArrowRight size={12} /></a></div></article>
+            <article className="journal-card"><div className="journal-art journal-one"><span>Oficina</span></div><div className="journal-body"><div className="journal-meta">ONLINE · DATA A ANUNCIAR</div><h3>Design UX: da ideia ao protótipo</h3><p>Uma sessão prática para transformar uma ideia numa experiência digital clara.</p><a className="read-more" href="#contact">SABER MAIS <ArrowRight size={12} /></a></div></article>
+            <article className="journal-card"><div className="journal-art journal-two"><span>Aula aberta</span></div><div className="journal-body"><div className="journal-meta">ONLINE · DATA A ANUNCIAR</div><h3>Os primeiros passos na programação</h3><p>Descubra os fundamentos da web numa aula acessível a quem está a começar.</p><a className="read-more" href="#contact">SABER MAIS <ArrowRight size={12} /></a></div></article>
+            <article className="journal-card"><div className="journal-art journal-three"><span>Conversa</span></div><div className="journal-body"><div className="journal-meta">ONLINE · DATA A ANUNCIAR</div><h3>Conversa com docentes da Academia</h3><p>Conheça os nossos especialistas e coloque as suas questões sobre os cursos.</p><a className="read-more" href="#contact">SABER MAIS <ArrowRight size={12} /></a></div></article>
           </div>
         </div>
       </section>
       <section className="section pricing" id="pricing">
         <div className="container">
           <div className="section-heading compact">
-            <div className="eyebrow">Learning on your terms</div>
-            <h2>A plan for wherever you’re starting.</h2>
-            <p>Start for free, then choose the kind of learning that works for you.</p>
+            <div className="eyebrow">Aprenda ao seu ritmo</div>
+            <h2>Um plano para cada etapa.</h2>
+            <p>Comece gratuitamente e escolha a forma de aprender que melhor se adapta a si.</p>
           </div>
           <div className="pricing-grid">
             {plans.map((plan) => <article key={plan.name} className={`price-card ${plan.featured ? 'featured' : ''}`}>
-              {plan.featured && <span className="popular-pill">Most popular</span>}
+              {plan.featured && <span className="popular-pill">Mais popular</span>}
               <h3>{plan.name}</h3><p>{plan.summary}</p>
               <div className="price">{plan.price}<small> / {plan.period}</small></div>
               <ul>{plan.features.map((feature) => <li key={feature}><Check size={14} />{feature}</li>)}</ul>
@@ -200,26 +200,26 @@ function App() {
       </section>
       <section className="newsletter" id="newsletter">
         <div className="container newsletter-inner">
-          <div><div className="eyebrow">A little inspiration, now and then</div><h2>Make room for what’s next.</h2><p>Get new courses, useful ideas, and learner stories in your inbox.</p></div>
+          <div><div className="eyebrow">Inspiração, de vez em quando</div><h2>Abra espaço para o próximo passo.</h2><p>Receba cursos novos, ideias úteis e histórias dos nossos alunos.</p></div>
           <div>
-            {joined ? <p className="form-status" role="status">Thanks for your interest. This preview does not save email addresses.</p> : <form className="newsletter-form" onSubmit={joinNewsletter}>
-              <label className="sr-only" htmlFor="newsletter-email">Your email address</label>
-              <input id="newsletter-email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="Your email address" required data-testid="input-newsletter-email" />
-              <button className="button button-teal" type="submit" data-testid="button-newsletter-submit">SIGN ME UP <ArrowRight size={14} /></button>
+            {joined ? <p className="form-status" role="status">Obrigado pelo interesse. Esta pré-visualização não guarda endereços de e-mail.</p> : <form className="newsletter-form" onSubmit={joinNewsletter}>
+              <label className="sr-only" htmlFor="newsletter-email">O seu endereço de e-mail</label>
+              <input id="newsletter-email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="O seu endereço de e-mail" required data-testid="input-newsletter-email" />
+              <button className="button button-teal" type="submit" data-testid="button-newsletter-submit">INSCREVER-ME <ArrowRight size={14} /></button>
             </form>}
-            {!joined && <p className="form-note">Preview only — email addresses are not saved.</p>}
+            {!joined && <p className="form-note">Pré-visualização — os endereços de e-mail não são guardados.</p>}
           </div>
         </div>
       </section>
       <footer className="footer" id="contact">
         <div className="container">
           <div className="footer-grid">
-            <div><a className="brand" href="#home"><span className="brand-mark"><img src="/favicon.svg" alt="" /></span><span>ACADEMIA</span></a><p className="footer-brand-copy">Practical learning for curious people. Start where you are and see where you can go.</p></div>
-            <div><h4>Explore</h4><div className="footer-links"><a href="#benefits">Why Academia</a><a href="#courses">All courses</a><a href="#categories">Course categories</a><a href="#pricing">Plans &amp; pricing</a></div></div>
-            <div><h4>Academia</h4><div className="footer-links"><a href="#team">Our learners</a><a href="#journal">The journal</a><a href="#newsletter">Newsletter</a><a href="#home">Back to top</a></div></div>
-            <div><h4>Get in touch</h4><div className="footer-links"><a href="mailto:hello@academia.example">hello@academia.example</a><a href="tel:+15550142730">+1 (555) 014-2730</a><a href="#contact">Monday - Friday, 8am-8pm</a></div></div>
+            <div><a className="brand" href="#home"><span className="brand-mark"><img src="/favicon.svg" alt="" /></span><span>ACADEMIA</span></a><p className="footer-brand-copy">Aprendizagem prática para pessoas curiosas. Comece onde está e descubra até onde pode chegar.</p></div>
+            <div><h4>Explorar</h4><div className="footer-links"><a href="#benefits">Sobre nós</a><a href="#courses">Cursos</a><a href="#categories">Salas de aprendizagem</a><a href="#pricing">Planos e preços</a></div></div>
+            <div><h4>Academia</h4><div className="footer-links"><a href="#team">Os nossos alunos</a><a href="#events">Eventos</a><a href="#newsletter">Boletim informativo</a><a href="#home">Voltar ao início</a></div></div>
+            <div><h4>Contactos</h4><div className="footer-links"><a href="mailto:hello@academia.example">hello@academia.example</a><a href="tel:+15550142730">+1 (555) 014-2730</a><a href="#contact">Segunda a sexta, 08h–20h</a></div></div>
           </div>
-          <div className="footer-bottom"><span>© 2025 Academia. Learning belongs to everyone.</span><span>Learn well. <a href="#home">Live curious.</a></span></div>
+          <div className="footer-bottom"><span>© 2025 Academia. A aprendizagem é para todos.</span><span>Aprenda bem. <a href="#home">Mantenha a curiosidade.</a></span></div>
         </div>
       </footer>
     </main>
