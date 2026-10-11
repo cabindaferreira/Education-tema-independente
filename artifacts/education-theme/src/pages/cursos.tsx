@@ -20,7 +20,7 @@ export default function CoursesPage() {
   return (
     <>
       <PageIntro eyebrow="Formações profissionais" title="Encontre a sua próxima formação" description="Inscrição gratuita, estágio de três meses e certificado de conclusão reconhecido pelo INEFOP." />
-      <section className="section courses ml-[9px] mr-[9px] pl-[0px] pr-[0px] pt-[10px] pb-[10px] mt-[-40px] mb-[-40px]"><div className="container">
+      <section className="section courses ml-[9px] mr-[9px] pl-[0px] pr-[0px] pt-[10px] pb-[10px] mt-[-130px] mb-[-130px]"><div className="container">
         <div className="course-grid" id="course-grid">{visibleCourses.map((course, index) => (
           <article className="course-card" key={course.title} data-testid={`card-course-${index}`}>
             <div className="course-art"><img src={course.image} alt={`Cartaz do curso ${course.title}`} /></div>
