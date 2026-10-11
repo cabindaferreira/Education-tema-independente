@@ -32,6 +32,13 @@ const courses = [
     duration: 'Estágio de 3 meses',
   },
   {
+    title: 'Estágio Formativo em Gestão Comercial',
+    image: '/images/courses/gestao-comercial.jpg',
+    description: 'Desenvolva competências práticas em gestão de vendas, acompanhamento comercial e relação com clientes.',
+    price: '100.000 Kz',
+    duration: 'Estágio de 3 meses',
+  },
+  {
     title: 'Gestão e Administração de Empresas',
     image: '/images/courses/gestao-empresas.jpg',
     description: 'Conheça práticas de planeamento, organização e gestão das atividades de uma empresa.',
@@ -60,8 +67,10 @@ const categories = [
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showAllCourses, setShowAllCourses] = useState(false);
   const [email, setEmail] = useState('');
   const [joined, setJoined] = useState(false);
+  const visibleCourses = showAllCourses ? courses : courses.slice(0, 3);
 
   function closeMenu() {
     setMenuOpen(false);
@@ -117,8 +126,8 @@ function App() {
             <h2>Encontre a sua próxima formação</h2>
             <p>Inscrição gratuita, estágio de três meses e certificado de conclusão reconhecido pelo INEFOP.</p>
           </div>
-          <div className="course-grid">
-            {courses.map((course, index) => (
+          <div className="course-grid" id="course-grid">
+            {visibleCourses.map((course, index) => (
               <article className="course-card" key={course.title} data-testid={`card-course-${index}`}>
                 <div className="course-art">
                   <img src={course.image} alt={`Cartaz do curso ${course.title}`} loading="eager" />
@@ -144,6 +153,18 @@ function App() {
                 </div>
               </article>
             ))}
+          </div>
+          <div className="course-more">
+            <button
+              className="button button-outline"
+              type="button"
+              aria-expanded={showAllCourses}
+              aria-controls="course-grid"
+              onClick={() => setShowAllCourses((current) => !current)}
+            >
+              {showAllCourses ? 'VER MENOS' : 'VER MAIS CURSOS'}
+              <ArrowRight className={showAllCourses ? 'course-more-icon expanded' : 'course-more-icon'} size={14} />
+            </button>
           </div>
         </div>
       </section>
