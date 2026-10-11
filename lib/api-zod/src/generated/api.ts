@@ -108,6 +108,105 @@ export const CreateRoomReservationResponse = zod.object({
 
 
 /**
+ * @summary Create a course enrollment and payment reference
+ */
+export const createCourseEnrollmentBodyFullNameMin = 2;
+export const createCourseEnrollmentBodyFullNameMax = 160;
+
+export const createCourseEnrollmentBodyIdentityNumberMin = 3;
+export const createCourseEnrollmentBodyIdentityNumberMax = 40;
+
+export const createCourseEnrollmentBodyNationalityMin = 2;
+export const createCourseEnrollmentBodyNationalityMax = 80;
+
+export const createCourseEnrollmentBodyPhoneMin = 6;
+export const createCourseEnrollmentBodyPhoneMax = 40;
+
+export const createCourseEnrollmentBodyEmailMax = 254;
+
+export const createCourseEnrollmentBodyAddressMin = 3;
+export const createCourseEnrollmentBodyAddressMax = 240;
+
+export const createCourseEnrollmentBodyMunicipalityMin = 2;
+export const createCourseEnrollmentBodyMunicipalityMax = 100;
+
+export const createCourseEnrollmentBodyProvinceMin = 2;
+export const createCourseEnrollmentBodyProvinceMax = 100;
+
+export const createCourseEnrollmentBodyProfessionMin = 2;
+export const createCourseEnrollmentBodyProfessionMax = 120;
+
+export const createCourseEnrollmentBodyMaritalStatusMin = 2;
+export const createCourseEnrollmentBodyMaritalStatusMax = 40;
+
+
+
+export const CreateCourseEnrollmentBody = zod.object({
+  "courseId": zod.enum(['crm', 'tesouraria', 'lideranca-equipas', 'gestao-comercial', 'gestao-empresas', 'recursos-humanos']),
+  "fullName": zod.string().min(createCourseEnrollmentBodyFullNameMin).max(createCourseEnrollmentBodyFullNameMax),
+  "birthDate": zod.coerce.date(),
+  "identityNumber": zod.string().min(createCourseEnrollmentBodyIdentityNumberMin).max(createCourseEnrollmentBodyIdentityNumberMax),
+  "nationality": zod.string().min(createCourseEnrollmentBodyNationalityMin).max(createCourseEnrollmentBodyNationalityMax),
+  "phone": zod.string().min(createCourseEnrollmentBodyPhoneMin).max(createCourseEnrollmentBodyPhoneMax),
+  "email": zod.string().email().max(createCourseEnrollmentBodyEmailMax),
+  "address": zod.string().min(createCourseEnrollmentBodyAddressMin).max(createCourseEnrollmentBodyAddressMax),
+  "municipality": zod.string().min(createCourseEnrollmentBodyMunicipalityMin).max(createCourseEnrollmentBodyMunicipalityMax),
+  "province": zod.string().min(createCourseEnrollmentBodyProvinceMin).max(createCourseEnrollmentBodyProvinceMax),
+  "profession": zod.string().min(createCourseEnrollmentBodyProfessionMin).max(createCourseEnrollmentBodyProfessionMax),
+  "maritalStatus": zod.string().min(createCourseEnrollmentBodyMaritalStatusMin).max(createCourseEnrollmentBodyMaritalStatusMax),
+  "privacyAccepted": zod.literal(true)
+})
+
+export const CreateCourseEnrollmentResponse = zod.object({
+  "id": zod.string().uuid(),
+  "courseId": zod.enum(['crm', 'tesouraria', 'lideranca-equipas', 'gestao-comercial', 'gestao-empresas', 'recursos-humanos']),
+  "courseTitle": zod.string(),
+  "amountKz": zod.number().int(),
+  "paymentEntity": zod.string(),
+  "paymentReference": zod.string(),
+  "paymentStatus": zod.enum(['pending', 'paid', 'review_required', 'expired']),
+  "expiresAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Get public payment status for an enrollment
+ */
+export const GetCourseEnrollmentStatusParams = zod.object({
+  "id": zod.coerce.string().uuid()
+})
+
+export const GetCourseEnrollmentStatusResponse = zod.object({
+  "id": zod.string().uuid(),
+  "courseId": zod.enum(['crm', 'tesouraria', 'lideranca-equipas', 'gestao-comercial', 'gestao-empresas', 'recursos-humanos']),
+  "courseTitle": zod.string(),
+  "amountKz": zod.number().int(),
+  "paymentEntity": zod.string(),
+  "paymentReference": zod.string(),
+  "paymentStatus": zod.enum(['pending', 'paid', 'review_required', 'expired']),
+  "expiresAt": zod.coerce.date()
+}).and(zod.object({
+  "confirmationEmailStatus": zod.enum(['pending', 'sent']),
+  "paidAt": zod.coerce.date().nullish()
+}))
+
+
+/**
+ * The signature is verified against the raw request body before processing.
+ * @summary Receive a signed ProxyPay payment notification
+ */
+export const ReceiveProxyPayPaymentBody = zod.object({
+  "transaction_id": zod.number().int(),
+  "reference_id": zod.number().int(),
+  "amount": zod.string(),
+  "terminal_type": zod.string().nullish(),
+  "terminal_transaction_id": zod.number().int().nullish()
+})
+
+export const ReceiveProxyPayPaymentResponse = zod.unknown()
+
+
+/**
  * @summary Create or refresh the signed-in user's application profile
  */
 export const SyncAuthProfileResponse = zod.object({

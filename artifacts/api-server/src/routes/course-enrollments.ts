@@ -128,6 +128,20 @@ router.post("/course-enrollments", async (req, res): Promise<void> => {
         email: typeof req.body.email === "string" ? req.body.email.trim() : req.body.email,
       }
     : req.body;
+  const submittedBirthDate =
+    candidate && typeof candidate === "object" && typeof candidate.birthDate === "string"
+      ? candidate.birthDate
+      : "";
+  const submittedBirthDateTimestamp = new Date(`${submittedBirthDate}T00:00:00Z`).getTime();
+  const isValidBirthDate =
+    /^\d{4}-\d{2}-\d{2}$/.test(submittedBirthDate)
+    && !Number.isNaN(submittedBirthDateTimestamp)
+    && new Date(submittedBirthDateTimestamp).toISOString().slice(0, 10) === submittedBirthDate;
+  if (!isValidBirthDate) {
+    res.status(400).json({ error: "Indique uma data de nascimento válida." });
+    return;
+  }
+
   const parsed = CreateCourseEnrollmentBody.safeParse(candidate);
   if (!parsed.success) {
     res.status(400).json({ error: "Preencha todos os dados da ficha de inscrição." });
@@ -138,11 +152,13 @@ router.post("/course-enrollments", async (req, res): Promise<void> => {
   const course = COURSE_CATALOG[input.courseId];
   const fullName = input.fullName.trim();
   const identityNumber = input.identityNumber.trim();
-  const birthDate = input.birthDate;
+  const birthDate = submittedBirthDate;
+  const birthDateTimestamp = submittedBirthDateTimestamp;
   if (
     fullName.length < 2
     || identityNumber.length < 3
-    || new Date(`${birthDate}T00:00:00Z`).getTime() > Date.now()
+    || Number.isNaN(birthDateTimestamp)
+    || birthDateTimestamp > Date.now()
   ) {
     res.status(400).json({ error: "Verifique o nome, o documento de identificação e a data de nascimento." });
     return;

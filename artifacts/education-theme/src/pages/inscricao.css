@@ -1,5 +1,5 @@
-.course-enrollment-section {
-  padding: 34px 0 76px;
+.section.course-enrollment-section {
+  padding: 180px 0 76px;
 }
 
 .enrollment-container {
@@ -557,8 +557,8 @@
 }
 
 @media (max-width: 680px) {
-  .course-enrollment-section {
-    padding: 24px 0 50px;
+  .section.course-enrollment-section {
+    padding: 148px 0 50px;
   }
 
   .enrollment-layout {

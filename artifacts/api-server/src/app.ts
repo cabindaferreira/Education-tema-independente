@@ -37,7 +37,7 @@ app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
 app.use(cors({ credentials: true, origin: true }));
 app.use(express.json({
   verify: (req, _res, buffer) => {
-    if (req.originalUrl.startsWith("/api/proxypay/webhook")) {
+    if (req.url?.startsWith("/api/proxypay/webhook")) {
       (req as typeof req & { rawBody?: Buffer }).rawBody = Buffer.from(buffer);
     }
   },

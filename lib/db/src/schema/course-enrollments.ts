@@ -8,6 +8,8 @@ import {
   uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
+import { createInsertSchema } from "drizzle-zod";
+import { z } from "zod/v4";
 
 export const courseEnrollmentsTable = pgTable(
   "course_enrollments",
@@ -48,3 +50,9 @@ export const courseEnrollmentsTable = pgTable(
 );
 
 export type CourseEnrollmentRecord = typeof courseEnrollmentsTable.$inferSelect;
+export const insertCourseEnrollmentSchema = createInsertSchema(courseEnrollmentsTable).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertCourseEnrollment = z.infer<typeof insertCourseEnrollmentSchema>;

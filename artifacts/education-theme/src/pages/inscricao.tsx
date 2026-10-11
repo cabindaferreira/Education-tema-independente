@@ -187,8 +187,8 @@ export default function CourseEnrollmentPage() {
     return (
       <section className="section course-enrollment-section">
         <div className="container enrollment-container">
-          <Link className="enrollment-back" href="/cursos"><ArrowLeft size={15} /> Voltar aos cursos</Link>
           <div className="payment-panel">
+            <Link className="enrollment-back" href="/cursos"><ArrowLeft size={15} /> Voltar aos cursos</Link>
             <div className="payment-heading">
               <span className={`payment-state-icon ${paid ? 'is-paid' : reviewRequired || expired ? 'is-attention' : ''}`}>
                 {paid ? <CheckCircle2 size={28} /> : reviewRequired || expired ? <AlertCircle size={28} /> : <Clock3 size={28} />}
@@ -258,9 +258,9 @@ export default function CourseEnrollmentPage() {
   return (
     <section className="section course-enrollment-section">
       <div className="container enrollment-container">
-        <Link className="enrollment-back" href="/cursos"><ArrowLeft size={15} /> Voltar aos cursos</Link>
         <div className="enrollment-layout">
           <div className="enrollment-main">
+            <Link className="enrollment-back" href="/cursos"><ArrowLeft size={15} /> Voltar aos cursos</Link>
             <div className="enrollment-eyebrow">Ficha de inscrição</div>
             <h1>Inscreva-se no curso</h1>
             <p className="enrollment-lead">Preencha os seus dados. Depois, geramos a referência de pagamento do curso.</p>
