@@ -67,35 +67,6 @@ paths:
         "400":
           description: Invalid date, room, or booking period
   /room-reservations:
-    get:
-      operationId: listRoomReservations
-      tags: [reservations]
-      summary: List room reservations for academy staff
-      parameters:
-        - name: roomId
-          in: query
-          required: true
-          schema:
-            $ref: "#/components/schemas/RoomId"
-        - name: date
-          in: query
-          required: true
-          schema:
-            type: string
-            pattern: '^\d{4}-\d{2}-\d{2}$'
-      responses:
-        "200":
-          description: Reservations for the selected room and date without tax identification numbers
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/RoomStaffReservationList"
-        "400":
-          description: Invalid room or date
-        "401":
-          description: Sign-in required
-        "403":
-          description: Staff access required
     post:
       operationId: createRoomReservation
       tags: [reservations]
@@ -117,33 +88,6 @@ paths:
           description: Invalid reservation details
         "409":
           description: The selected slot is no longer available
-  /room-reservations/{id}/cancel:
-    patch:
-      operationId: cancelRoomReservation
-      tags: [reservations]
-      summary: Cancel a room reservation as academy staff
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            minimum: 1
-      responses:
-        "200":
-          description: Reservation cancelled
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/RoomStaffReservation"
-        "400":
-          description: Invalid reservation identifier
-        "401":
-          description: Sign-in required
-        "403":
-          description: Staff access required
-        "404":
-          description: Reservation not found
   /course-enrollments:
     post:
       operationId: createCourseEnrollment
@@ -486,38 +430,6 @@ components:
           type: integer
         status:
           type: string
-    RoomStaffReservation:
-      type: object
-      required: [id, roomId, roomName, date, startTime, endTime, durationMinutes, priceKz, status, name, company]
-      properties:
-        id:
-          type: integer
-        roomId:
-          $ref: "#/components/schemas/RoomId"
-        roomName:
-          type: string
-        date:
-          type: string
-          pattern: '^\d{4}-\d{2}-\d{2}$'
-        startTime:
-          type: string
-        endTime:
-          type: string
-        durationMinutes:
-          type: integer
-        priceKz:
-          type: integer
-        status:
-          type: string
-          enum: [confirmed, cancelled]
-        name:
-          type: string
-        company:
-          type: ["string", "null"]
-    RoomStaffReservationList:
-      type: array
-      items:
-        $ref: "#/components/schemas/RoomStaffReservation"
     CourseId:
       type: string
       enum:

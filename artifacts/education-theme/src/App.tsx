@@ -21,7 +21,6 @@ import EventsPage from '@/pages/eventos';
 import ContactsPage from '@/pages/contactos';
 import AboutPage from '@/pages/sobre-nos';
 import { AccountPage } from '@/pages/conta';
-import StaffReservationsPage from '@/pages/equipa-reservas';
 import { SignInPage, SignUpPage } from '@/pages/auth';
 import NotFound from '@/pages/not-found';
 
@@ -158,7 +157,6 @@ function AppRoutes() {
       <Switch>
         <Route path="/sign-in/*?" component={SignInPage} />
         <Route path="/sign-up/*?" component={SignUpPage} />
-        <Route path="/equipa/reservas" component={StaffReservationsPage} />
         <Route path="/conta" component={AccountPage} />
         <Route path="/" component={PublicHome} />
         <Route path="/cursos"><PublicPage><CoursesPage /></PublicPage></Route>

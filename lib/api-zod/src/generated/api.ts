@@ -39,7 +39,6 @@ export const checkRoomAvailabilityBodyDateRegExp = new RegExp('^\\d{4}-\\d{2}-\\
 export const checkRoomAvailabilityBodyDurationHoursMax = 9;
 
 
-
 export const CheckRoomAvailabilityBody = zod.object({
   "roomId": zod.enum(['sala-soba', 'sala-kilamba', 'sala-kudi', 'sala-ondjango']),
   "date": zod.string().regex(checkRoomAvailabilityBodyDateRegExp).describe('Calendar date in YYYY-MM-DD format'),
@@ -65,36 +64,6 @@ export const CheckRoomAvailabilityResponse = zod.object({
 
 
 /**
- * @summary List room reservations for academy staff
- */
-export const listRoomReservationsQueryDateRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
-
-
-export const ListRoomReservationsQueryParams = zod.object({
-  "roomId": zod.enum(['sala-soba', 'sala-kilamba', 'sala-kudi', 'sala-ondjango']),
-  "date": zod.coerce.string().regex(listRoomReservationsQueryDateRegExp)
-})
-
-export const listRoomReservationsResponseDateRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
-
-
-export const ListRoomReservationsResponseItem = zod.object({
-  "id": zod.number().int(),
-  "roomId": zod.enum(['sala-soba', 'sala-kilamba', 'sala-kudi', 'sala-ondjango']),
-  "roomName": zod.string(),
-  "date": zod.string().regex(listRoomReservationsResponseDateRegExp),
-  "startTime": zod.string(),
-  "endTime": zod.string(),
-  "durationMinutes": zod.number().int(),
-  "priceKz": zod.number().int(),
-  "status": zod.enum(['confirmed', 'cancelled']),
-  "name": zod.string(),
-  "company": zod.string().nullable()
-})
-export const ListRoomReservationsResponse = zod.array(ListRoomReservationsResponseItem)
-
-
-/**
  * @summary Reserve an available room slot
  */
 export const createRoomReservationBodyDateRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
@@ -107,7 +76,6 @@ export const createRoomReservationBodyCompanyMax = 160;
 
 export const createRoomReservationBodyNifMin = 3;
 export const createRoomReservationBodyNifMax = 32;
-
 
 
 export const CreateRoomReservationBody = zod.object({
@@ -134,34 +102,6 @@ export const CreateRoomReservationResponse = zod.object({
   "durationMinutes": zod.number().int(),
   "priceKz": zod.number().int(),
   "status": zod.string()
-})
-
-
-/**
- * @summary Cancel a room reservation as academy staff
- */
-
-
-
-export const CancelRoomReservationParams = zod.object({
-  "id": zod.coerce.number().int().min(1)
-})
-
-export const cancelRoomReservationResponseDateRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
-
-
-export const CancelRoomReservationResponse = zod.object({
-  "id": zod.number().int(),
-  "roomId": zod.enum(['sala-soba', 'sala-kilamba', 'sala-kudi', 'sala-ondjango']),
-  "roomName": zod.string(),
-  "date": zod.string().regex(cancelRoomReservationResponseDateRegExp),
-  "startTime": zod.string(),
-  "endTime": zod.string(),
-  "durationMinutes": zod.number().int(),
-  "priceKz": zod.number().int(),
-  "status": zod.enum(['confirmed', 'cancelled']),
-  "name": zod.string(),
-  "company": zod.string().nullable()
 })
 
 
@@ -198,7 +138,6 @@ export const createCourseEnrollmentBodyMaritalStatusMin = 2;
 export const createCourseEnrollmentBodyMaritalStatusMax = 40;
 
 
-
 export const CreateCourseEnrollmentBody = zod.object({
   "courseId": zod.enum(['crm', 'tesouraria', 'lideranca-equipas', 'gestao-comercial', 'gestao-empresas', 'recursos-humanos']),
   "fullName": zod.string().min(createCourseEnrollmentBodyFullNameMin).max(createCourseEnrollmentBodyFullNameMax),
@@ -226,33 +165,10 @@ export const CreateCourseEnrollmentResponse = zod.object({
   "expiresAt": zod.coerce.date()
 })
 
-
 /**
  * @summary Send a course enrollment request to the Academy
  */
 export const createCourseEnrollmentRequestBodyFullNameMin = 2;
-export const createCourseEnrollmentRequestBodyFullNameMax = 120;
-
-export const createCourseEnrollmentRequestBodyPhoneMin = 7;
-export const createCourseEnrollmentRequestBodyPhoneMax = 24;
-
-
-export const createCourseEnrollmentRequestBodyPhoneRegExp = new RegExp('^\\+?[\\d\\s().-]+$');
-export const createCourseEnrollmentRequestBodyEmailMax = 320;
-
-
-
-export const CreateCourseEnrollmentRequestBody = zod.object({
-  "courseId": zod.enum(['crm', 'tesouraria', 'lideranca-equipas', 'gestao-comercial', 'gestao-empresas', 'recursos-humanos']),
-  "fullName": zod.string().min(createCourseEnrollmentRequestBodyFullNameMin).max(createCourseEnrollmentRequestBodyFullNameMax),
-  "phone": zod.string().min(createCourseEnrollmentRequestBodyPhoneMin).max(createCourseEnrollmentRequestBodyPhoneMax).regex(createCourseEnrollmentRequestBodyPhoneRegExp),
-  "email": zod.string().email().max(createCourseEnrollmentRequestBodyEmailMax),
-  "privacyAccepted": zod.literal(true)
-})
-
-export const CreateCourseEnrollmentRequestResponse = zod.object({
-  "status": zod.enum(['received'])
-})
 
 
 /**
@@ -324,7 +240,6 @@ export const GetAuthProfileResponse = zod.object({
 export const subscribeToNewsletterBodyEmailMax = 320;
 
 
-
 export const SubscribeToNewsletterBody = zod.object({
   "email": zod.string().email().max(subscribeToNewsletterBodyEmailMax)
 })
@@ -332,3 +247,26 @@ export const SubscribeToNewsletterBody = zod.object({
 export const SubscribeToNewsletterResponse = zod.object({
   "status": zod.enum(['confirmation_sent', 'already_subscribed'])
 })
+
+
+export const CreateCourseEnrollmentRequestResponse = zod.object({
+  "status": zod.enum(['received'])
+})
+
+export const CreateCourseEnrollmentRequestBody = zod.object({
+  "courseId": zod.enum(['crm', 'tesouraria', 'lideranca-equipas', 'gestao-comercial', 'gestao-empresas', 'recursos-humanos']),
+  "fullName": zod.string().min(createCourseEnrollmentRequestBodyFullNameMin).max(createCourseEnrollmentRequestBodyFullNameMax),
+  "phone": zod.string().min(createCourseEnrollmentRequestBodyPhoneMin).max(createCourseEnrollmentRequestBodyPhoneMax).regex(createCourseEnrollmentRequestBodyPhoneRegExp),
+  "email": zod.string().email().max(createCourseEnrollmentRequestBodyEmailMax),
+  "privacyAccepted": zod.literal(true)
+})
+
+export const createCourseEnrollmentRequestBodyFullNameMax = 120;
+
+export const createCourseEnrollmentRequestBodyPhoneMax = 24;
+
+export const createCourseEnrollmentRequestBodyEmailMax = 320;
+
+export const createCourseEnrollmentRequestBodyPhoneMin = 7;
+
+export const createCourseEnrollmentRequestBodyPhoneRegExp = new RegExp('^\\+?[\\d\\s().-]+$');
