@@ -1,0 +1,63 @@
+.staff-settings { --setting-ink:#36282a;--setting-muted:#817674;--setting-red:#b51f30;--setting-paper:#f6f2eb;min-height:100dvh;background:radial-gradient(ellipse at 88% 0%,rgba(194,91,93,.07),transparent 28rem),var(--setting-paper);color:var(--setting-ink); }
+.staff-settings-topbar { min-height:67px;padding:0 max(calc((100vw - 1220px)/2),28px);display:flex;align-items:center;justify-content:space-between;gap:20px;background:#321b20;color:#fff8f3; }
+.staff-settings-brand { display:inline-flex;align-items:center;gap:10px;color:inherit;text-decoration:none;font:800 13px var(--app-font-display);letter-spacing:.06em; }
+.staff-settings-brand img { width:31px;height:31px;border-radius:5px; }
+.staff-settings-brand small { display:block;margin-top:4px;color:#d9bfc0;font:700 7px var(--app-font-sans);letter-spacing:.16em; }
+.staff-settings-topbar>span { display:flex;align-items:center;gap:9px;color:#d6c4c1;font-size:10px; }
+.staff-settings-topbar>span i { width:7px;height:7px;border-radius:50%;background:#97c3a4; }
+.staff-settings-back { display:flex;align-items:center;gap:7px;color:#f0dedb;text-decoration:none;font-size:10px;font-weight:700; }
+.staff-settings-main { width:min(1100px,calc(100% - 56px));margin:auto;padding:26px 0 54px; }
+.staff-settings-breadcrumb { display:flex;align-items:center;gap:9px;color:#9c8e89;font-size:10px; }
+.staff-settings-breadcrumb a { color:#897a76;text-decoration:none; }
+.staff-settings-breadcrumb strong { color:#504144; }
+.staff-settings-heading { display:flex;align-items:center;justify-content:space-between;gap:20px;padding:39px 0 27px; }
+.staff-settings-heading>div>p:last-child { max-width:710px;margin:8px 0 0;color:#7f7471;font-size:12px;line-height:1.6; }
+.staff-settings-heading>svg { color:#6c8b70; }
+.staff-settings-overline { display:flex;align-items:center;gap:8px;margin:0;color:#a42a36;font-size:9px;font-weight:800;letter-spacing:.16em; }
+.staff-settings-overline span { width:16px;height:2px;background:var(--setting-red); }
+.staff-settings-heading h1 { margin:9px 0 6px;color:#38282b;font:800 clamp(29px,4vw,39px)/1.13 var(--app-font-display);letter-spacing:-.05em; }
+.staff-settings-room-grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px; }
+.staff-settings-room,.staff-settings-holidays { padding:20px;background:#fffdf9;border:1px solid #e8ded7;box-shadow:0 7px 22px rgba(61,35,35,.035); }
+.staff-settings-room-title,.staff-settings-holiday-heading { display:flex;align-items:center;gap:11px;margin-bottom:17px; }
+.staff-settings-room-title>span,.staff-settings-holiday-heading>span { width:37px;height:37px;display:grid;place-items:center;flex:none;background:#f8e9e6;color:#a52a37; }
+.staff-settings-room-title small,.staff-settings-holiday-heading small { color:#a42a36;font-size:8px;font-weight:800;letter-spacing:.15em; }
+.staff-settings-room-title h2,.staff-settings-holiday-heading h2 { margin:3px 0 0;color:#483638;font:700 17px var(--app-font-display); }
+.staff-settings-field-grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 13px; }
+.staff-settings-field { display:grid;gap:5px;color:#847774;font-size:9px;font-weight:700;letter-spacing:.025em; }
+.staff-settings-field input { width:100%;height:37px;padding:0 10px;border:1px solid #e8dfd9;border-radius:0;background:#fff;color:#463638;font:500 11px var(--app-font-sans);outline:none; }
+.staff-settings-field input:focus { border-color:#c8626b;box-shadow:0 0 0 3px rgba(184,44,58,.1); }
+.staff-settings-hint { margin:13px 0 0;color:#928680;font-size:9px;line-height:1.55; }
+.staff-settings-holidays { margin-top:17px; }
+.staff-settings-holiday-heading { align-items:flex-start; }
+.staff-settings-holiday-heading h2 { font-size:19px; }
+.staff-settings-holiday-heading p { margin:5px 0 0;color:#897e79;font-size:10px;line-height:1.5; }
+.staff-settings-holiday-add { display:grid;grid-template-columns:minmax(220px,1fr) minmax(190px,.7fr) auto;align-items:end;gap:10px;max-width:700px; }
+.staff-settings-holiday-add label { grid-column:1/-1;margin-bottom:-5px;color:#847774;font-size:9px;font-weight:700; }
+.staff-settings-holiday-add input { height:38px;padding:0 10px;border:1px solid #e8dfd9;background:#fff;color:#463638;font:500 11px var(--app-font-sans); }
+.staff-settings-holiday-add button,.staff-settings-save-row button { min-height:38px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 13px;border:0;background:#a92735;color:#fff;font:700 10px var(--app-font-sans);cursor:pointer; }
+.staff-settings-holiday-add button:disabled,.staff-settings-save-row button:disabled { opacity:.52;cursor:not-allowed; }
+.staff-settings-holiday-list { display:flex;flex-wrap:wrap;gap:8px;margin-top:17px; }
+.staff-settings-holiday-chip { display:flex;align-items:center;gap:7px;min-height:32px;padding:0 5px 0 10px;border:1px solid #eadfda;background:#fffaf7;color:#594548;font-size:10px; }
+.staff-settings-holiday-chip button { width:25px;height:25px;display:grid;place-items:center;border:0;background:transparent;color:#a12a36;cursor:pointer; }
+.staff-settings-empty-holidays { margin:0;color:#897e79;font-size:10px; }
+.staff-settings-save-row { display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:17px;padding:14px 17px;background:#3b2428;color:#d9c7c2;font-size:10px; }
+.staff-settings-save-row button { min-height:40px;padding:0 17px;white-space:nowrap; }
+.staff-settings-save-row button:not(:disabled):hover,.staff-settings-holiday-add button:not(:disabled):hover { background:#831e2a; }
+.staff-settings-alert,.staff-settings-success { display:flex;align-items:center;gap:10px;margin:0 0 16px;padding:13px 15px;font-size:11px;line-height:1.55; }
+.staff-settings-alert { border:1px solid #e9c7c5;background:#f9e9e7;color:#71363a; }
+.staff-settings-alert p { margin:3px 0 0; }
+.staff-settings-success { border:1px solid #d5e3d4;background:#edf4ec;color:#496c54; }
+.staff-settings-gate { display:grid;place-items:center;padding:24px; }
+.staff-settings-gate-card { max-width:440px;padding:38px;background:#fffdf9;border:1px solid #e8ded7;text-align:center; }
+.staff-settings-gate-card>svg { color:#a52a37; }
+.staff-settings-gate-card .staff-settings-overline { justify-content:center;margin-top:15px; }
+.staff-settings-gate-card h1 { color:#38282b;font:800 25px var(--app-font-display); }
+.staff-settings-gate-card p { color:#817674;font-size:11px;line-height:1.6; }
+.staff-settings-gate-card>a { display:inline-flex;margin-top:10px;padding:11px 17px;background:#a92735;color:white;text-decoration:none;font-size:10px;font-weight:700; }
+.staff-settings-loading { width:min(800px,calc(100% - 48px));margin:90px auto;padding:24px;background:#fffdf9;color:#817674;font-size:12px; }
+.staff-settings-spinner { width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:staff-settings-spin .8s linear infinite; }
+.staff-settings-footer { min-height:58px;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:0 max(calc((100vw - 1100px)/2),28px);border-top:1px solid #e8ded7;color:#948781;font-size:8px;letter-spacing:.06em; }
+.staff-settings-footer span:first-child { color:#83535a;font-weight:800;letter-spacing:.12em; }
+@keyframes staff-settings-spin { to { transform:rotate(360deg); } }
+@media(max-width:760px) { .staff-settings-room-grid { grid-template-columns:1fr; } }
+@media(max-width:600px) { .staff-settings-topbar { min-height:60px;padding:0 17px; }.staff-settings-topbar>span { display:none; }.staff-settings-main { width:calc(100% - 34px);padding-top:20px; }.staff-settings-heading { padding:30px 0 22px; }.staff-settings-room,.staff-settings-holidays { padding:15px; }.staff-settings-field-grid { gap:10px; }.staff-settings-holiday-add { grid-template-columns:1fr; }.staff-settings-holiday-add label { grid-column:auto;margin-bottom:-4px; }.staff-settings-holiday-add button { justify-self:start; }.staff-settings-save-row { align-items:stretch;flex-direction:column; }.staff-settings-save-row button { width:100%; }.staff-settings-footer { padding:0 17px;font-size:7px; } }

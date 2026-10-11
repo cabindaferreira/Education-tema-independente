@@ -1,6 +1,67 @@
 import type { ReservationPeriod, Room, RoomId, RoomSlot } from "@workspace/api-zod";
 
-export const rooms: Room[] = [
+export type RoomBookingRules = {
+  standardStartTime: string;
+  standardEndTime: string;
+  standardMinimumHours: number;
+  standardHourlyRate: number;
+  standardShortStayHourlyRate: number;
+  standardDiscountFromHours: number;
+  afterHoursStartTime: string;
+  afterHoursEndTime: string;
+  afterHoursPriceKz: number;
+  sessionMorningStartTime: string;
+  sessionMorningEndTime: string;
+  sessionAfternoonStartTime: string;
+  sessionAfternoonEndTime: string;
+  weekdaySessionPriceKz: number;
+  holidaySessionPriceKz: number;
+};
+
+export type RoomBookingSettings = {
+  roomRules: Record<RoomId, RoomBookingRules>;
+  holidayDates: string[];
+};
+
+export const defaultRoomBookingSettings: RoomBookingSettings = {
+  roomRules: {
+    "sala-soba": {
+      standardStartTime: "08:00", standardEndTime: "17:00", standardMinimumHours: 6,
+      standardHourlyRate: 5_000, standardShortStayHourlyRate: 5_000, standardDiscountFromHours: 6,
+      afterHoursStartTime: "17:00", afterHoursEndTime: "20:00", afterHoursPriceKz: 10_500,
+      sessionMorningStartTime: "07:00", sessionMorningEndTime: "12:00",
+      sessionAfternoonStartTime: "12:30", sessionAfternoonEndTime: "17:00",
+      weekdaySessionPriceKz: 35_000, holidaySessionPriceKz: 60_000,
+    },
+    "sala-kilamba": {
+      standardStartTime: "08:00", standardEndTime: "17:00", standardMinimumHours: 6,
+      standardHourlyRate: 4_500, standardShortStayHourlyRate: 4_500, standardDiscountFromHours: 6,
+      afterHoursStartTime: "17:00", afterHoursEndTime: "20:00", afterHoursPriceKz: 10_500,
+      sessionMorningStartTime: "07:00", sessionMorningEndTime: "12:00",
+      sessionAfternoonStartTime: "12:30", sessionAfternoonEndTime: "17:00",
+      weekdaySessionPriceKz: 35_000, holidaySessionPriceKz: 60_000,
+    },
+    "sala-kudi": {
+      standardStartTime: "08:00", standardEndTime: "17:00", standardMinimumHours: 1,
+      standardHourlyRate: 3_500, standardShortStayHourlyRate: 5_000, standardDiscountFromHours: 6,
+      afterHoursStartTime: "17:00", afterHoursEndTime: "20:00", afterHoursPriceKz: 7_500,
+      sessionMorningStartTime: "07:00", sessionMorningEndTime: "12:00",
+      sessionAfternoonStartTime: "12:30", sessionAfternoonEndTime: "17:00",
+      weekdaySessionPriceKz: 35_000, holidaySessionPriceKz: 60_000,
+    },
+    "sala-ondjango": {
+      standardStartTime: "08:00", standardEndTime: "17:00", standardMinimumHours: 1,
+      standardHourlyRate: 5_000, standardShortStayHourlyRate: 5_000, standardDiscountFromHours: 6,
+      afterHoursStartTime: "17:00", afterHoursEndTime: "20:00", afterHoursPriceKz: 10_500,
+      sessionMorningStartTime: "07:00", sessionMorningEndTime: "12:00",
+      sessionAfternoonStartTime: "12:30", sessionAfternoonEndTime: "17:00",
+      weekdaySessionPriceKz: 35_000, holidaySessionPriceKz: 60_000,
+    },
+  },
+  holidayDates: [],
+};
+
+const roomDetails: Omit<Room, "rateDetails">[] = [
   {
     id: "sala-soba",
     name: "Sala Soba",
@@ -16,10 +77,6 @@ export const rooms: Room[] = [
       "Iluminação contemporânea",
       "Cadeiras executivas confortáveis",
     ],
-    rateDetails: [
-      "Seg. a sex., 08h00–17h00: 5.000 Kz/h (mínimo de 6 horas).",
-      "Pós-laboral, seg. a sex., 17h00–20h00: 10.500 Kz por 3 horas.",
-    ],
   },
   {
     id: "sala-kilamba",
@@ -33,10 +90,6 @@ export const rooms: Room[] = [
       "Projetor",
       "Quadro branco e flipchart",
       "Apoio técnico e manutenção",
-    ],
-    rateDetails: [
-      "Seg. a sex., 08h00–17h00: 4.500 Kz/h (mínimo de 6 horas).",
-      "Pós-laboral, seg. a sex., 17h00–20h00: 10.500 Kz por 3 horas.",
     ],
   },
   {
@@ -52,11 +105,6 @@ export const rooms: Room[] = [
       "Quadro branco e flipchart",
       "Internet",
       "Apoio técnico e manutenção",
-    ],
-    rateDetails: [
-      "Seg. a sex., 08h00–17h00: 3.500 Kz/h a partir de 6 horas.",
-      "Reservas inferiores a 6 horas: 5.000 Kz/h.",
-      "Pós-laboral, seg. a sex., 17h00–20h00: 7.500 Kz por 3 horas.",
     ],
   },
   {
@@ -74,14 +122,10 @@ export const rooms: Room[] = [
       "Sistema de som e microfone",
       "Apoio técnico e manutenção",
     ],
-    rateDetails: [
-      "Seg. a sex., 07h00–12h00 ou 12h30–17h00: 35.000 Kz por sessão.",
-      "Fins de semana e feriados, nos mesmos horários: 60.000 Kz por sessão.",
-    ],
   },
 ];
 
-const roomIds = new Set<RoomId>(rooms.map((room) => room.id));
+const roomIds = new Set<RoomId>(roomDetails.map((room) => room.id));
 const luandaTimeZone = "Africa/Luanda";
 
 function dateFromCalendarString(value: string): Date | null {
@@ -154,25 +198,23 @@ function shiftDate(date: Date, days: number): Date {
   return shifted;
 }
 
-function isAngolaPublicHoliday(value: string, date: Date): boolean {
-  const fixedHolidays = new Set([
-    `${date.getUTCFullYear()}-01-01`,
-    `${date.getUTCFullYear()}-02-04`,
-    `${date.getUTCFullYear()}-03-08`,
-    `${date.getUTCFullYear()}-04-04`,
-    `${date.getUTCFullYear()}-05-01`,
-    `${date.getUTCFullYear()}-09-17`,
-    `${date.getUTCFullYear()}-11-02`,
-    `${date.getUTCFullYear()}-11-11`,
-    `${date.getUTCFullYear()}-12-25`,
-  ]);
-  const easter = easterSunday(date.getUTCFullYear());
-  const movableHolidays = new Set([
+function holidaysForYear(year: number): string[] {
+  const fixedHolidays = [
+    `${year}-01-01`, `${year}-02-04`, `${year}-03-08`, `${year}-04-04`,
+    `${year}-05-01`, `${year}-09-17`, `${year}-11-02`, `${year}-11-11`, `${year}-12-25`,
+  ];
+  const easter = easterSunday(year);
+  const movableHolidays = [
     toDateKey(shiftDate(easter, -47)),
     toDateKey(shiftDate(easter, -2)),
-  ]);
-  return fixedHolidays.has(value) || movableHolidays.has(value);
+  ];
+  return [...fixedHolidays, ...movableHolidays];
 }
+
+for (let year = 2024; year <= 2040; year += 1) {
+  defaultRoomBookingSettings.holidayDates.push(...holidaysForYear(year));
+}
+defaultRoomBookingSettings.holidayDates.sort();
 
 function padTimePart(value: number): string {
   return String(value).padStart(2, "0");
@@ -203,22 +245,54 @@ export function hasRoom(roomId: string): roomId is RoomId {
   return roomIds.has(roomId as RoomId);
 }
 
-export function getRoom(roomId: RoomId): Room {
-  return rooms.find((room) => room.id === roomId)!;
+export function getRoom(roomId: RoomId): Omit<Room, "rateDetails"> {
+  return roomDetails.find((room) => room.id === roomId)!;
+}
+
+function formatRate(value: number): string {
+  return new Intl.NumberFormat("pt-AO", { maximumFractionDigits: 0 }).format(value);
+}
+
+function displayTime(value: string): string {
+  return value.replace(":", "h");
+}
+
+export function getRooms(settings: RoomBookingSettings): Room[] {
+  return roomDetails.map((room) => {
+    const rules = settings.roomRules[room.id];
+    const rateDetails = room.id === "sala-ondjango"
+      ? [
+          `Seg. a sex., ${displayTime(rules.sessionMorningStartTime)}–${displayTime(rules.sessionMorningEndTime)} ou ${displayTime(rules.sessionAfternoonStartTime)}–${displayTime(rules.sessionAfternoonEndTime)}: ${formatRate(rules.weekdaySessionPriceKz)} Kz por sessão.`,
+          `Fins de semana e feriados, nos mesmos horários: ${formatRate(rules.holidaySessionPriceKz)} Kz por sessão.`,
+        ]
+      : [
+          `Seg. a sex., ${displayTime(rules.standardStartTime)}–${displayTime(rules.standardEndTime)}: ${formatRate(rules.standardHourlyRate)} Kz/h (mínimo de ${rules.standardMinimumHours} ${rules.standardMinimumHours === 1 ? "hora" : "horas"}).`,
+          ...(room.id === "sala-kudi"
+            ? [`Reservas inferiores a ${rules.standardDiscountFromHours} horas: ${formatRate(rules.standardShortStayHourlyRate)} Kz/h.`]
+            : []),
+          `Pós-laboral, seg. a sex., ${displayTime(rules.afterHoursStartTime)}–${displayTime(rules.afterHoursEndTime)}: ${formatRate(rules.afterHoursPriceKz)} Kz por sessão.`,
+        ];
+    return { ...room, rateDetails };
+  });
 }
 
 export function isValidRoomPeriod(
   roomId: RoomId,
   period: ReservationPeriod,
   durationHours?: number,
+  settings: RoomBookingSettings = defaultRoomBookingSettings,
 ): boolean {
   if (roomId === "sala-ondjango") return period === "session";
   if (period === "session") return false;
-  if (period === "after_hours") return true;
+  if (period === "after_hours") {
+    const rules = settings.roomRules[roomId];
+    return timeToMinutes(rules.afterHoursStartTime) < timeToMinutes(rules.afterHoursEndTime);
+  }
   if (!Number.isInteger(durationHours) || durationHours === undefined) return false;
   if (durationHours < 1 || durationHours > 9) return false;
-  if (roomId === "sala-kudi") return true;
-  return durationHours >= 6;
+  const rules = settings.roomRules[roomId];
+  return durationHours >= rules.standardMinimumHours
+    && timeToMinutes(rules.standardStartTime) < timeToMinutes(rules.standardEndTime);
 }
 
 export function buildRoomSlots(
@@ -226,45 +300,46 @@ export function buildRoomSlots(
   bookingDate: string,
   period: ReservationPeriod,
   durationHours?: number,
+  settings: RoomBookingSettings = defaultRoomBookingSettings,
 ): RoomSlot[] {
   const date = dateFromCalendarString(bookingDate);
-  if (!date || !isTodayOrFuture(bookingDate) || !isValidRoomPeriod(roomId, period, durationHours)) {
+  if (!date || !isTodayOrFuture(bookingDate) || !isValidRoomPeriod(roomId, period, durationHours, settings)) {
     return [];
   }
 
   const dayOfWeek = date.getUTCDay();
   const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-  const isHoliday = isAngolaPublicHoliday(bookingDate, date);
+  const isHoliday = settings.holidayDates.includes(bookingDate);
+  const rules = settings.roomRules[roomId];
 
   if (roomId === "sala-ondjango") {
     if (period !== "session") return [];
-    const price = isWeekend || isHoliday ? 60_000 : 35_000;
+    const price = isWeekend || isHoliday ? rules.holidaySessionPriceKz : rules.weekdaySessionPriceKz;
     return [
-      makeSlot("ondjango-morning", 7 * 60, 5 * 60, price, "session"),
-      makeSlot("ondjango-afternoon", 12 * 60 + 30, 4 * 60 + 30, price, "session"),
+      makeSlot(`ondjango-morning-${rules.sessionMorningStartTime}-${rules.sessionMorningEndTime}-${price}`, timeToMinutes(rules.sessionMorningStartTime), timeToMinutes(rules.sessionMorningEndTime) - timeToMinutes(rules.sessionMorningStartTime), price, "session"),
+      makeSlot(`ondjango-afternoon-${rules.sessionAfternoonStartTime}-${rules.sessionAfternoonEndTime}-${price}`, timeToMinutes(rules.sessionAfternoonStartTime), timeToMinutes(rules.sessionAfternoonEndTime) - timeToMinutes(rules.sessionAfternoonStartTime), price, "session"),
     ];
   }
 
   if (isWeekend || isHoliday) return [];
   if (period === "after_hours") {
-    const priceByRoom: Record<Exclude<RoomId, "sala-ondjango">, number> = {
-      "sala-soba": 10_500,
-      "sala-kilamba": 10_500,
-      "sala-kudi": 7_500,
-    };
-    return [makeSlot(`${roomId}-after-hours`, 17 * 60, 3 * 60, priceByRoom[roomId], "after_hours")];
+    const start = timeToMinutes(rules.afterHoursStartTime);
+    const end = timeToMinutes(rules.afterHoursEndTime);
+    return [makeSlot(`${roomId}-after-hours-${rules.afterHoursStartTime}-${rules.afterHoursEndTime}-${rules.afterHoursPriceKz}`, start, end - start, rules.afterHoursPriceKz, "after_hours")];
   }
 
   if (period !== "standard" || durationHours === undefined) return [];
-  const hourlyRate = roomId === "sala-soba" ? 5_000 : roomId === "sala-kilamba" ? 4_500 : 0;
-  const kudiHourlyRate = durationHours >= 6 ? 3_500 : 5_000;
-  const priceKz = (roomId === "sala-kudi" ? kudiHourlyRate : hourlyRate) * durationHours;
+  const hourlyRate = roomId === "sala-kudi" && durationHours < rules.standardDiscountFromHours
+    ? rules.standardShortStayHourlyRate
+    : rules.standardHourlyRate;
+  const priceKz = hourlyRate * durationHours;
   const durationMinutes = durationHours * 60;
-  const dayEnd = 17 * 60;
+  const dayStart = timeToMinutes(rules.standardStartTime);
+  const dayEnd = timeToMinutes(rules.standardEndTime);
   const slots: RoomSlot[] = [];
 
-  for (let start = 8 * 60; start + durationMinutes <= dayEnd; start += 60) {
-    slots.push(makeSlot(`${roomId}-standard-${formatMinutes(start)}-${durationHours}h`, start, durationMinutes, priceKz, "standard"));
+  for (let start = dayStart; start + durationMinutes <= dayEnd; start += 60) {
+    slots.push(makeSlot(`${roomId}-standard-${formatMinutes(start)}-${durationHours}h-${priceKz}`, start, durationMinutes, priceKz, "standard"));
   }
 
   return slots;

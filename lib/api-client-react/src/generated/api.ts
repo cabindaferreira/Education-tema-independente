@@ -27,15 +27,19 @@ import type {
   CourseEnrollmentRequestResponse,
   CourseEnrollmentStatus,
   HealthStatus,
+  ListRoomReservationsParams,
   NewsletterSignupError,
   NewsletterSignupInput,
   NewsletterSignupResponse,
   ProxyPayPaymentEvent,
   RoomAvailability,
   RoomAvailabilityInput,
+  RoomBookingSettings,
   RoomList,
   RoomReservation,
   RoomReservationInput,
+  RoomStaffReservation,
+  RoomStaffReservationList,
   UserProfile
 } from './api.schemas';
 
@@ -221,6 +225,171 @@ export function useListRooms<TData = Awaited<ReturnType<typeof listRooms>>, TErr
 
 
 
+export const getGetRoomBookingSettingsUrl = () => {
+
+
+
+
+  return `/api/room-booking-settings`
+}
+
+/**
+ * @summary Get current room booking prices and schedules for academy staff
+ */
+export const getRoomBookingSettings = async ( options?: Parameters<typeof customFetch>[1]): Promise<RoomBookingSettings> => {
+
+  return customFetch<RoomBookingSettings>(getGetRoomBookingSettingsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetRoomBookingSettingsQueryKey = () => {
+    return [
+    `/api/room-booking-settings`
+    ] as const;
+    }
+
+
+export const getGetRoomBookingSettingsQueryOptions = <TData = Awaited<ReturnType<typeof getRoomBookingSettings>>, TError = ErrorType<void>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getRoomBookingSettings>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetRoomBookingSettingsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getRoomBookingSettings>>> = ({ signal }) => getRoomBookingSettings({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getRoomBookingSettings>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetRoomBookingSettingsQueryResult = NonNullable<Awaited<ReturnType<typeof getRoomBookingSettings>>>
+export type GetRoomBookingSettingsQueryError = ErrorType<void>
+
+
+/**
+ * @summary Get current room booking prices and schedules for academy staff
+ */
+
+export function useGetRoomBookingSettings<TData = Awaited<ReturnType<typeof getRoomBookingSettings>>, TError = ErrorType<void>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getRoomBookingSettings>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetRoomBookingSettingsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getUpdateRoomBookingSettingsUrl = () => {
+
+
+
+
+  return `/api/room-booking-settings`
+}
+
+/**
+ * @summary Replace room booking prices, schedules, and holiday dates
+ */
+export const updateRoomBookingSettings = async (roomBookingSettings: RoomBookingSettings, options?: Parameters<typeof customFetch>[1]): Promise<RoomBookingSettings> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<RoomBookingSettings>(getUpdateRoomBookingSettingsUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(roomBookingSettings)
+  }
+);}
+
+
+
+
+
+export const getUpdateRoomBookingSettingsMutationKey = () => ['updateRoomBookingSettings'] as const;
+
+export const getUpdateRoomBookingSettingsMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateRoomBookingSettings>>, TError,UpdateRoomBookingSettingsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateRoomBookingSettings>>, TError,UpdateRoomBookingSettingsMutationVariables, TContext> => {
+
+const mutationKey = getUpdateRoomBookingSettingsMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateRoomBookingSettings>>, UpdateRoomBookingSettingsMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  updateRoomBookingSettings(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateRoomBookingSettingsMutationResult = NonNullable<Awaited<ReturnType<typeof updateRoomBookingSettings>>>
+    export type UpdateRoomBookingSettingsMutationBody = BodyType<RoomBookingSettings>
+    export type UpdateRoomBookingSettingsMutationError = ErrorType<void>
+    export type UpdateRoomBookingSettingsMutationVariables = {data: BodyType<RoomBookingSettings>}
+
+    /**
+ * @summary Replace room booking prices, schedules, and holiday dates
+ */
+export const useUpdateRoomBookingSettings = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateRoomBookingSettings>>, TError,UpdateRoomBookingSettingsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateRoomBookingSettings>>,
+        TError,
+        UpdateRoomBookingSettingsMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdateRoomBookingSettingsMutationOptions(options));
+    }
+
 export const getCheckRoomAvailabilityUrl = () => {
 
 
@@ -309,6 +478,90 @@ export const useCheckRoomAvailability = <TError = ErrorType<void>,
       return useMutation(getCheckRoomAvailabilityMutationOptions(options));
     }
 
+export const getListRoomReservationsUrl = (params: ListRoomReservationsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/room-reservations?${stringifiedParams}` : `/api/room-reservations`
+}
+
+/**
+ * @summary List room reservations for academy staff
+ */
+export const listRoomReservations = async (params: ListRoomReservationsParams, options?: Parameters<typeof customFetch>[1]): Promise<RoomStaffReservationList> => {
+
+  return customFetch<RoomStaffReservationList>(getListRoomReservationsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListRoomReservationsQueryKey = (params?: ListRoomReservationsParams,) => {
+    return [
+    `/api/room-reservations`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListRoomReservationsQueryOptions = <TData = Awaited<ReturnType<typeof listRoomReservations>>, TError = ErrorType<void>>(params: ListRoomReservationsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listRoomReservations>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListRoomReservationsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listRoomReservations>>> = ({ signal }) => listRoomReservations(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listRoomReservations>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListRoomReservationsQueryResult = NonNullable<Awaited<ReturnType<typeof listRoomReservations>>>
+export type ListRoomReservationsQueryError = ErrorType<void>
+
+
+/**
+ * @summary List room reservations for academy staff
+ */
+
+export function useListRoomReservations<TData = Awaited<ReturnType<typeof listRoomReservations>>, TError = ErrorType<void>>(
+ params: ListRoomReservationsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listRoomReservations>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListRoomReservationsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
 export const getCreateRoomReservationUrl = () => {
 
 
@@ -395,6 +648,80 @@ export const useCreateRoomReservation = <TError = ErrorType<void>,
         TContext
       > => {
       return useMutation(getCreateRoomReservationMutationOptions(options));
+    }
+
+export const getCancelRoomReservationUrl = (id: number,) => {
+
+
+
+
+  return `/api/room-reservations/${id}/cancel`
+}
+
+/**
+ * @summary Cancel a room reservation as academy staff
+ */
+export const cancelRoomReservation = async (id: number, options?: Parameters<typeof customFetch>[1]): Promise<RoomStaffReservation> => {
+
+  return customFetch<RoomStaffReservation>(getCancelRoomReservationUrl(id),
+  {
+    ...options,
+    method: 'PATCH'
+
+
+  }
+);}
+
+
+
+
+
+export const getCancelRoomReservationMutationKey = () => ['cancelRoomReservation'] as const;
+
+export const getCancelRoomReservationMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelRoomReservation>>, TError,CancelRoomReservationMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof cancelRoomReservation>>, TError,CancelRoomReservationMutationVariables, TContext> => {
+
+const mutationKey = getCancelRoomReservationMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof cancelRoomReservation>>, CancelRoomReservationMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  cancelRoomReservation(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CancelRoomReservationMutationResult = NonNullable<Awaited<ReturnType<typeof cancelRoomReservation>>>
+
+    export type CancelRoomReservationMutationError = ErrorType<void>
+    export type CancelRoomReservationMutationVariables = {id: number}
+
+    /**
+ * @summary Cancel a room reservation as academy staff
+ */
+export const useCancelRoomReservation = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelRoomReservation>>, TError,CancelRoomReservationMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof cancelRoomReservation>>,
+        TError,
+        CancelRoomReservationMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCancelRoomReservationMutationOptions(options));
     }
 
 export const getCreateCourseEnrollmentUrl = () => {

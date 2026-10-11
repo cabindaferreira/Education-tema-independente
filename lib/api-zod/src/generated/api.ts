@@ -33,10 +33,454 @@ export const ListRoomsResponse = zod.array(ListRoomsResponseItem)
 
 
 /**
+ * @summary Get current room booking prices and schedules for academy staff
+ */
+export const getRoomBookingSettingsResponseRoomRulesSalaSobaStandardStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const getRoomBookingSettingsResponseRoomRulesSalaSobaStandardEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const getRoomBookingSettingsResponseRoomRulesSalaSobaStandardMinimumHoursMax = 9;
+
+
+
+export const getRoomBookingSettingsResponseRoomRulesSalaSobaStandardDiscountFromHoursMax = 9;
+
+export const getRoomBookingSettingsResponseRoomRulesSalaSobaAfterHoursStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const getRoomBookingSettingsResponseRoomRulesSalaSobaAfterHoursEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+
+export const getRoomBookingSettingsResponseRoomRulesSalaSobaSessionMorningStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const getRoomBookingSettingsResponseRoomRulesSalaSobaSessionMorningEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const getRoomBookingSettingsResponseRoomRulesSalaSobaSessionAfternoonStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const getRoomBookingSettingsResponseRoomRulesSalaSobaSessionAfternoonEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+
+
+export const getRoomBookingSettingsResponseRoomRulesSalaKilambaStandardStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const getRoomBookingSettingsResponseRoomRulesSalaKilambaStandardEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const getRoomBookingSettingsResponseRoomRulesSalaKilambaStandardMinimumHoursMax = 9;
+
+
+
+export const getRoomBookingSettingsResponseRoomRulesSalaKilambaStandardDiscountFromHoursMax = 9;
+
+export const getRoomBookingSettingsResponseRoomRulesSalaKilambaAfterHoursStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const getRoomBookingSettingsResponseRoomRulesSalaKilambaAfterHoursEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+
+export const getRoomBookingSettingsResponseRoomRulesSalaKilambaSessionMorningStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const getRoomBookingSettingsResponseRoomRulesSalaKilambaSessionMorningEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const getRoomBookingSettingsResponseRoomRulesSalaKilambaSessionAfternoonStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const getRoomBookingSettingsResponseRoomRulesSalaKilambaSessionAfternoonEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+
+
+export const getRoomBookingSettingsResponseRoomRulesSalaKudiStandardStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const getRoomBookingSettingsResponseRoomRulesSalaKudiStandardEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const getRoomBookingSettingsResponseRoomRulesSalaKudiStandardMinimumHoursMax = 9;
+
+
+
+export const getRoomBookingSettingsResponseRoomRulesSalaKudiStandardDiscountFromHoursMax = 9;
+
+export const getRoomBookingSettingsResponseRoomRulesSalaKudiAfterHoursStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const getRoomBookingSettingsResponseRoomRulesSalaKudiAfterHoursEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+
+export const getRoomBookingSettingsResponseRoomRulesSalaKudiSessionMorningStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const getRoomBookingSettingsResponseRoomRulesSalaKudiSessionMorningEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const getRoomBookingSettingsResponseRoomRulesSalaKudiSessionAfternoonStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const getRoomBookingSettingsResponseRoomRulesSalaKudiSessionAfternoonEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+
+
+export const getRoomBookingSettingsResponseRoomRulesSalaOndjangoStandardStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const getRoomBookingSettingsResponseRoomRulesSalaOndjangoStandardEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const getRoomBookingSettingsResponseRoomRulesSalaOndjangoStandardMinimumHoursMax = 9;
+
+
+
+export const getRoomBookingSettingsResponseRoomRulesSalaOndjangoStandardDiscountFromHoursMax = 9;
+
+export const getRoomBookingSettingsResponseRoomRulesSalaOndjangoAfterHoursStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const getRoomBookingSettingsResponseRoomRulesSalaOndjangoAfterHoursEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+
+export const getRoomBookingSettingsResponseRoomRulesSalaOndjangoSessionMorningStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const getRoomBookingSettingsResponseRoomRulesSalaOndjangoSessionMorningEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const getRoomBookingSettingsResponseRoomRulesSalaOndjangoSessionAfternoonStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const getRoomBookingSettingsResponseRoomRulesSalaOndjangoSessionAfternoonEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+
+
+export const getRoomBookingSettingsResponseHolidayDatesItemRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+
+
+export const GetRoomBookingSettingsResponse = zod.object({
+  "roomRules": zod.object({
+  "sala-soba": zod.object({
+  "standardStartTime": zod.string().regex(getRoomBookingSettingsResponseRoomRulesSalaSobaStandardStartTimeRegExp),
+  "standardEndTime": zod.string().regex(getRoomBookingSettingsResponseRoomRulesSalaSobaStandardEndTimeRegExp),
+  "standardMinimumHours": zod.number().int().min(1).max(getRoomBookingSettingsResponseRoomRulesSalaSobaStandardMinimumHoursMax),
+  "standardHourlyRate": zod.number().int().min(1),
+  "standardShortStayHourlyRate": zod.number().int().min(1),
+  "standardDiscountFromHours": zod.number().int().min(1).max(getRoomBookingSettingsResponseRoomRulesSalaSobaStandardDiscountFromHoursMax),
+  "afterHoursStartTime": zod.string().regex(getRoomBookingSettingsResponseRoomRulesSalaSobaAfterHoursStartTimeRegExp),
+  "afterHoursEndTime": zod.string().regex(getRoomBookingSettingsResponseRoomRulesSalaSobaAfterHoursEndTimeRegExp),
+  "afterHoursPriceKz": zod.number().int().min(1),
+  "sessionMorningStartTime": zod.string().regex(getRoomBookingSettingsResponseRoomRulesSalaSobaSessionMorningStartTimeRegExp),
+  "sessionMorningEndTime": zod.string().regex(getRoomBookingSettingsResponseRoomRulesSalaSobaSessionMorningEndTimeRegExp),
+  "sessionAfternoonStartTime": zod.string().regex(getRoomBookingSettingsResponseRoomRulesSalaSobaSessionAfternoonStartTimeRegExp),
+  "sessionAfternoonEndTime": zod.string().regex(getRoomBookingSettingsResponseRoomRulesSalaSobaSessionAfternoonEndTimeRegExp),
+  "weekdaySessionPriceKz": zod.number().int().min(1),
+  "holidaySessionPriceKz": zod.number().int().min(1)
+}),
+  "sala-kilamba": zod.object({
+  "standardStartTime": zod.string().regex(getRoomBookingSettingsResponseRoomRulesSalaKilambaStandardStartTimeRegExp),
+  "standardEndTime": zod.string().regex(getRoomBookingSettingsResponseRoomRulesSalaKilambaStandardEndTimeRegExp),
+  "standardMinimumHours": zod.number().int().min(1).max(getRoomBookingSettingsResponseRoomRulesSalaKilambaStandardMinimumHoursMax),
+  "standardHourlyRate": zod.number().int().min(1),
+  "standardShortStayHourlyRate": zod.number().int().min(1),
+  "standardDiscountFromHours": zod.number().int().min(1).max(getRoomBookingSettingsResponseRoomRulesSalaKilambaStandardDiscountFromHoursMax),
+  "afterHoursStartTime": zod.string().regex(getRoomBookingSettingsResponseRoomRulesSalaKilambaAfterHoursStartTimeRegExp),
+  "afterHoursEndTime": zod.string().regex(getRoomBookingSettingsResponseRoomRulesSalaKilambaAfterHoursEndTimeRegExp),
+  "afterHoursPriceKz": zod.number().int().min(1),
+  "sessionMorningStartTime": zod.string().regex(getRoomBookingSettingsResponseRoomRulesSalaKilambaSessionMorningStartTimeRegExp),
+  "sessionMorningEndTime": zod.string().regex(getRoomBookingSettingsResponseRoomRulesSalaKilambaSessionMorningEndTimeRegExp),
+  "sessionAfternoonStartTime": zod.string().regex(getRoomBookingSettingsResponseRoomRulesSalaKilambaSessionAfternoonStartTimeRegExp),
+  "sessionAfternoonEndTime": zod.string().regex(getRoomBookingSettingsResponseRoomRulesSalaKilambaSessionAfternoonEndTimeRegExp),
+  "weekdaySessionPriceKz": zod.number().int().min(1),
+  "holidaySessionPriceKz": zod.number().int().min(1)
+}),
+  "sala-kudi": zod.object({
+  "standardStartTime": zod.string().regex(getRoomBookingSettingsResponseRoomRulesSalaKudiStandardStartTimeRegExp),
+  "standardEndTime": zod.string().regex(getRoomBookingSettingsResponseRoomRulesSalaKudiStandardEndTimeRegExp),
+  "standardMinimumHours": zod.number().int().min(1).max(getRoomBookingSettingsResponseRoomRulesSalaKudiStandardMinimumHoursMax),
+  "standardHourlyRate": zod.number().int().min(1),
+  "standardShortStayHourlyRate": zod.number().int().min(1),
+  "standardDiscountFromHours": zod.number().int().min(1).max(getRoomBookingSettingsResponseRoomRulesSalaKudiStandardDiscountFromHoursMax),
+  "afterHoursStartTime": zod.string().regex(getRoomBookingSettingsResponseRoomRulesSalaKudiAfterHoursStartTimeRegExp),
+  "afterHoursEndTime": zod.string().regex(getRoomBookingSettingsResponseRoomRulesSalaKudiAfterHoursEndTimeRegExp),
+  "afterHoursPriceKz": zod.number().int().min(1),
+  "sessionMorningStartTime": zod.string().regex(getRoomBookingSettingsResponseRoomRulesSalaKudiSessionMorningStartTimeRegExp),
+  "sessionMorningEndTime": zod.string().regex(getRoomBookingSettingsResponseRoomRulesSalaKudiSessionMorningEndTimeRegExp),
+  "sessionAfternoonStartTime": zod.string().regex(getRoomBookingSettingsResponseRoomRulesSalaKudiSessionAfternoonStartTimeRegExp),
+  "sessionAfternoonEndTime": zod.string().regex(getRoomBookingSettingsResponseRoomRulesSalaKudiSessionAfternoonEndTimeRegExp),
+  "weekdaySessionPriceKz": zod.number().int().min(1),
+  "holidaySessionPriceKz": zod.number().int().min(1)
+}),
+  "sala-ondjango": zod.object({
+  "standardStartTime": zod.string().regex(getRoomBookingSettingsResponseRoomRulesSalaOndjangoStandardStartTimeRegExp),
+  "standardEndTime": zod.string().regex(getRoomBookingSettingsResponseRoomRulesSalaOndjangoStandardEndTimeRegExp),
+  "standardMinimumHours": zod.number().int().min(1).max(getRoomBookingSettingsResponseRoomRulesSalaOndjangoStandardMinimumHoursMax),
+  "standardHourlyRate": zod.number().int().min(1),
+  "standardShortStayHourlyRate": zod.number().int().min(1),
+  "standardDiscountFromHours": zod.number().int().min(1).max(getRoomBookingSettingsResponseRoomRulesSalaOndjangoStandardDiscountFromHoursMax),
+  "afterHoursStartTime": zod.string().regex(getRoomBookingSettingsResponseRoomRulesSalaOndjangoAfterHoursStartTimeRegExp),
+  "afterHoursEndTime": zod.string().regex(getRoomBookingSettingsResponseRoomRulesSalaOndjangoAfterHoursEndTimeRegExp),
+  "afterHoursPriceKz": zod.number().int().min(1),
+  "sessionMorningStartTime": zod.string().regex(getRoomBookingSettingsResponseRoomRulesSalaOndjangoSessionMorningStartTimeRegExp),
+  "sessionMorningEndTime": zod.string().regex(getRoomBookingSettingsResponseRoomRulesSalaOndjangoSessionMorningEndTimeRegExp),
+  "sessionAfternoonStartTime": zod.string().regex(getRoomBookingSettingsResponseRoomRulesSalaOndjangoSessionAfternoonStartTimeRegExp),
+  "sessionAfternoonEndTime": zod.string().regex(getRoomBookingSettingsResponseRoomRulesSalaOndjangoSessionAfternoonEndTimeRegExp),
+  "weekdaySessionPriceKz": zod.number().int().min(1),
+  "holidaySessionPriceKz": zod.number().int().min(1)
+})
+}),
+  "holidayDates": zod.array(zod.string().regex(getRoomBookingSettingsResponseHolidayDatesItemRegExp))
+})
+
+
+/**
+ * @summary Replace room booking prices, schedules, and holiday dates
+ */
+export const updateRoomBookingSettingsBodyRoomRulesSalaSobaStandardStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsBodyRoomRulesSalaSobaStandardEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsBodyRoomRulesSalaSobaStandardMinimumHoursMax = 9;
+
+
+
+export const updateRoomBookingSettingsBodyRoomRulesSalaSobaStandardDiscountFromHoursMax = 9;
+
+export const updateRoomBookingSettingsBodyRoomRulesSalaSobaAfterHoursStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsBodyRoomRulesSalaSobaAfterHoursEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+
+export const updateRoomBookingSettingsBodyRoomRulesSalaSobaSessionMorningStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsBodyRoomRulesSalaSobaSessionMorningEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsBodyRoomRulesSalaSobaSessionAfternoonStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsBodyRoomRulesSalaSobaSessionAfternoonEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+
+
+export const updateRoomBookingSettingsBodyRoomRulesSalaKilambaStandardStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsBodyRoomRulesSalaKilambaStandardEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsBodyRoomRulesSalaKilambaStandardMinimumHoursMax = 9;
+
+
+
+export const updateRoomBookingSettingsBodyRoomRulesSalaKilambaStandardDiscountFromHoursMax = 9;
+
+export const updateRoomBookingSettingsBodyRoomRulesSalaKilambaAfterHoursStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsBodyRoomRulesSalaKilambaAfterHoursEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+
+export const updateRoomBookingSettingsBodyRoomRulesSalaKilambaSessionMorningStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsBodyRoomRulesSalaKilambaSessionMorningEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsBodyRoomRulesSalaKilambaSessionAfternoonStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsBodyRoomRulesSalaKilambaSessionAfternoonEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+
+
+export const updateRoomBookingSettingsBodyRoomRulesSalaKudiStandardStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsBodyRoomRulesSalaKudiStandardEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsBodyRoomRulesSalaKudiStandardMinimumHoursMax = 9;
+
+
+
+export const updateRoomBookingSettingsBodyRoomRulesSalaKudiStandardDiscountFromHoursMax = 9;
+
+export const updateRoomBookingSettingsBodyRoomRulesSalaKudiAfterHoursStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsBodyRoomRulesSalaKudiAfterHoursEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+
+export const updateRoomBookingSettingsBodyRoomRulesSalaKudiSessionMorningStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsBodyRoomRulesSalaKudiSessionMorningEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsBodyRoomRulesSalaKudiSessionAfternoonStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsBodyRoomRulesSalaKudiSessionAfternoonEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+
+
+export const updateRoomBookingSettingsBodyRoomRulesSalaOndjangoStandardStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsBodyRoomRulesSalaOndjangoStandardEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsBodyRoomRulesSalaOndjangoStandardMinimumHoursMax = 9;
+
+
+
+export const updateRoomBookingSettingsBodyRoomRulesSalaOndjangoStandardDiscountFromHoursMax = 9;
+
+export const updateRoomBookingSettingsBodyRoomRulesSalaOndjangoAfterHoursStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsBodyRoomRulesSalaOndjangoAfterHoursEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+
+export const updateRoomBookingSettingsBodyRoomRulesSalaOndjangoSessionMorningStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsBodyRoomRulesSalaOndjangoSessionMorningEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsBodyRoomRulesSalaOndjangoSessionAfternoonStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsBodyRoomRulesSalaOndjangoSessionAfternoonEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+
+
+export const updateRoomBookingSettingsBodyHolidayDatesItemRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+
+
+export const UpdateRoomBookingSettingsBody = zod.object({
+  "roomRules": zod.object({
+  "sala-soba": zod.object({
+  "standardStartTime": zod.string().regex(updateRoomBookingSettingsBodyRoomRulesSalaSobaStandardStartTimeRegExp),
+  "standardEndTime": zod.string().regex(updateRoomBookingSettingsBodyRoomRulesSalaSobaStandardEndTimeRegExp),
+  "standardMinimumHours": zod.number().int().min(1).max(updateRoomBookingSettingsBodyRoomRulesSalaSobaStandardMinimumHoursMax),
+  "standardHourlyRate": zod.number().int().min(1),
+  "standardShortStayHourlyRate": zod.number().int().min(1),
+  "standardDiscountFromHours": zod.number().int().min(1).max(updateRoomBookingSettingsBodyRoomRulesSalaSobaStandardDiscountFromHoursMax),
+  "afterHoursStartTime": zod.string().regex(updateRoomBookingSettingsBodyRoomRulesSalaSobaAfterHoursStartTimeRegExp),
+  "afterHoursEndTime": zod.string().regex(updateRoomBookingSettingsBodyRoomRulesSalaSobaAfterHoursEndTimeRegExp),
+  "afterHoursPriceKz": zod.number().int().min(1),
+  "sessionMorningStartTime": zod.string().regex(updateRoomBookingSettingsBodyRoomRulesSalaSobaSessionMorningStartTimeRegExp),
+  "sessionMorningEndTime": zod.string().regex(updateRoomBookingSettingsBodyRoomRulesSalaSobaSessionMorningEndTimeRegExp),
+  "sessionAfternoonStartTime": zod.string().regex(updateRoomBookingSettingsBodyRoomRulesSalaSobaSessionAfternoonStartTimeRegExp),
+  "sessionAfternoonEndTime": zod.string().regex(updateRoomBookingSettingsBodyRoomRulesSalaSobaSessionAfternoonEndTimeRegExp),
+  "weekdaySessionPriceKz": zod.number().int().min(1),
+  "holidaySessionPriceKz": zod.number().int().min(1)
+}),
+  "sala-kilamba": zod.object({
+  "standardStartTime": zod.string().regex(updateRoomBookingSettingsBodyRoomRulesSalaKilambaStandardStartTimeRegExp),
+  "standardEndTime": zod.string().regex(updateRoomBookingSettingsBodyRoomRulesSalaKilambaStandardEndTimeRegExp),
+  "standardMinimumHours": zod.number().int().min(1).max(updateRoomBookingSettingsBodyRoomRulesSalaKilambaStandardMinimumHoursMax),
+  "standardHourlyRate": zod.number().int().min(1),
+  "standardShortStayHourlyRate": zod.number().int().min(1),
+  "standardDiscountFromHours": zod.number().int().min(1).max(updateRoomBookingSettingsBodyRoomRulesSalaKilambaStandardDiscountFromHoursMax),
+  "afterHoursStartTime": zod.string().regex(updateRoomBookingSettingsBodyRoomRulesSalaKilambaAfterHoursStartTimeRegExp),
+  "afterHoursEndTime": zod.string().regex(updateRoomBookingSettingsBodyRoomRulesSalaKilambaAfterHoursEndTimeRegExp),
+  "afterHoursPriceKz": zod.number().int().min(1),
+  "sessionMorningStartTime": zod.string().regex(updateRoomBookingSettingsBodyRoomRulesSalaKilambaSessionMorningStartTimeRegExp),
+  "sessionMorningEndTime": zod.string().regex(updateRoomBookingSettingsBodyRoomRulesSalaKilambaSessionMorningEndTimeRegExp),
+  "sessionAfternoonStartTime": zod.string().regex(updateRoomBookingSettingsBodyRoomRulesSalaKilambaSessionAfternoonStartTimeRegExp),
+  "sessionAfternoonEndTime": zod.string().regex(updateRoomBookingSettingsBodyRoomRulesSalaKilambaSessionAfternoonEndTimeRegExp),
+  "weekdaySessionPriceKz": zod.number().int().min(1),
+  "holidaySessionPriceKz": zod.number().int().min(1)
+}),
+  "sala-kudi": zod.object({
+  "standardStartTime": zod.string().regex(updateRoomBookingSettingsBodyRoomRulesSalaKudiStandardStartTimeRegExp),
+  "standardEndTime": zod.string().regex(updateRoomBookingSettingsBodyRoomRulesSalaKudiStandardEndTimeRegExp),
+  "standardMinimumHours": zod.number().int().min(1).max(updateRoomBookingSettingsBodyRoomRulesSalaKudiStandardMinimumHoursMax),
+  "standardHourlyRate": zod.number().int().min(1),
+  "standardShortStayHourlyRate": zod.number().int().min(1),
+  "standardDiscountFromHours": zod.number().int().min(1).max(updateRoomBookingSettingsBodyRoomRulesSalaKudiStandardDiscountFromHoursMax),
+  "afterHoursStartTime": zod.string().regex(updateRoomBookingSettingsBodyRoomRulesSalaKudiAfterHoursStartTimeRegExp),
+  "afterHoursEndTime": zod.string().regex(updateRoomBookingSettingsBodyRoomRulesSalaKudiAfterHoursEndTimeRegExp),
+  "afterHoursPriceKz": zod.number().int().min(1),
+  "sessionMorningStartTime": zod.string().regex(updateRoomBookingSettingsBodyRoomRulesSalaKudiSessionMorningStartTimeRegExp),
+  "sessionMorningEndTime": zod.string().regex(updateRoomBookingSettingsBodyRoomRulesSalaKudiSessionMorningEndTimeRegExp),
+  "sessionAfternoonStartTime": zod.string().regex(updateRoomBookingSettingsBodyRoomRulesSalaKudiSessionAfternoonStartTimeRegExp),
+  "sessionAfternoonEndTime": zod.string().regex(updateRoomBookingSettingsBodyRoomRulesSalaKudiSessionAfternoonEndTimeRegExp),
+  "weekdaySessionPriceKz": zod.number().int().min(1),
+  "holidaySessionPriceKz": zod.number().int().min(1)
+}),
+  "sala-ondjango": zod.object({
+  "standardStartTime": zod.string().regex(updateRoomBookingSettingsBodyRoomRulesSalaOndjangoStandardStartTimeRegExp),
+  "standardEndTime": zod.string().regex(updateRoomBookingSettingsBodyRoomRulesSalaOndjangoStandardEndTimeRegExp),
+  "standardMinimumHours": zod.number().int().min(1).max(updateRoomBookingSettingsBodyRoomRulesSalaOndjangoStandardMinimumHoursMax),
+  "standardHourlyRate": zod.number().int().min(1),
+  "standardShortStayHourlyRate": zod.number().int().min(1),
+  "standardDiscountFromHours": zod.number().int().min(1).max(updateRoomBookingSettingsBodyRoomRulesSalaOndjangoStandardDiscountFromHoursMax),
+  "afterHoursStartTime": zod.string().regex(updateRoomBookingSettingsBodyRoomRulesSalaOndjangoAfterHoursStartTimeRegExp),
+  "afterHoursEndTime": zod.string().regex(updateRoomBookingSettingsBodyRoomRulesSalaOndjangoAfterHoursEndTimeRegExp),
+  "afterHoursPriceKz": zod.number().int().min(1),
+  "sessionMorningStartTime": zod.string().regex(updateRoomBookingSettingsBodyRoomRulesSalaOndjangoSessionMorningStartTimeRegExp),
+  "sessionMorningEndTime": zod.string().regex(updateRoomBookingSettingsBodyRoomRulesSalaOndjangoSessionMorningEndTimeRegExp),
+  "sessionAfternoonStartTime": zod.string().regex(updateRoomBookingSettingsBodyRoomRulesSalaOndjangoSessionAfternoonStartTimeRegExp),
+  "sessionAfternoonEndTime": zod.string().regex(updateRoomBookingSettingsBodyRoomRulesSalaOndjangoSessionAfternoonEndTimeRegExp),
+  "weekdaySessionPriceKz": zod.number().int().min(1),
+  "holidaySessionPriceKz": zod.number().int().min(1)
+})
+}),
+  "holidayDates": zod.array(zod.string().regex(updateRoomBookingSettingsBodyHolidayDatesItemRegExp))
+})
+
+export const updateRoomBookingSettingsResponseRoomRulesSalaSobaStandardStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsResponseRoomRulesSalaSobaStandardEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsResponseRoomRulesSalaSobaStandardMinimumHoursMax = 9;
+
+
+
+export const updateRoomBookingSettingsResponseRoomRulesSalaSobaStandardDiscountFromHoursMax = 9;
+
+export const updateRoomBookingSettingsResponseRoomRulesSalaSobaAfterHoursStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsResponseRoomRulesSalaSobaAfterHoursEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+
+export const updateRoomBookingSettingsResponseRoomRulesSalaSobaSessionMorningStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsResponseRoomRulesSalaSobaSessionMorningEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsResponseRoomRulesSalaSobaSessionAfternoonStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsResponseRoomRulesSalaSobaSessionAfternoonEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+
+
+export const updateRoomBookingSettingsResponseRoomRulesSalaKilambaStandardStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsResponseRoomRulesSalaKilambaStandardEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsResponseRoomRulesSalaKilambaStandardMinimumHoursMax = 9;
+
+
+
+export const updateRoomBookingSettingsResponseRoomRulesSalaKilambaStandardDiscountFromHoursMax = 9;
+
+export const updateRoomBookingSettingsResponseRoomRulesSalaKilambaAfterHoursStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsResponseRoomRulesSalaKilambaAfterHoursEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+
+export const updateRoomBookingSettingsResponseRoomRulesSalaKilambaSessionMorningStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsResponseRoomRulesSalaKilambaSessionMorningEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsResponseRoomRulesSalaKilambaSessionAfternoonStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsResponseRoomRulesSalaKilambaSessionAfternoonEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+
+
+export const updateRoomBookingSettingsResponseRoomRulesSalaKudiStandardStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsResponseRoomRulesSalaKudiStandardEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsResponseRoomRulesSalaKudiStandardMinimumHoursMax = 9;
+
+
+
+export const updateRoomBookingSettingsResponseRoomRulesSalaKudiStandardDiscountFromHoursMax = 9;
+
+export const updateRoomBookingSettingsResponseRoomRulesSalaKudiAfterHoursStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsResponseRoomRulesSalaKudiAfterHoursEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+
+export const updateRoomBookingSettingsResponseRoomRulesSalaKudiSessionMorningStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsResponseRoomRulesSalaKudiSessionMorningEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsResponseRoomRulesSalaKudiSessionAfternoonStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsResponseRoomRulesSalaKudiSessionAfternoonEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+
+
+export const updateRoomBookingSettingsResponseRoomRulesSalaOndjangoStandardStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsResponseRoomRulesSalaOndjangoStandardEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsResponseRoomRulesSalaOndjangoStandardMinimumHoursMax = 9;
+
+
+
+export const updateRoomBookingSettingsResponseRoomRulesSalaOndjangoStandardDiscountFromHoursMax = 9;
+
+export const updateRoomBookingSettingsResponseRoomRulesSalaOndjangoAfterHoursStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsResponseRoomRulesSalaOndjangoAfterHoursEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+
+export const updateRoomBookingSettingsResponseRoomRulesSalaOndjangoSessionMorningStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsResponseRoomRulesSalaOndjangoSessionMorningEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsResponseRoomRulesSalaOndjangoSessionAfternoonStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const updateRoomBookingSettingsResponseRoomRulesSalaOndjangoSessionAfternoonEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+
+
+export const updateRoomBookingSettingsResponseHolidayDatesItemRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+
+
+export const UpdateRoomBookingSettingsResponse = zod.object({
+  "roomRules": zod.object({
+  "sala-soba": zod.object({
+  "standardStartTime": zod.string().regex(updateRoomBookingSettingsResponseRoomRulesSalaSobaStandardStartTimeRegExp),
+  "standardEndTime": zod.string().regex(updateRoomBookingSettingsResponseRoomRulesSalaSobaStandardEndTimeRegExp),
+  "standardMinimumHours": zod.number().int().min(1).max(updateRoomBookingSettingsResponseRoomRulesSalaSobaStandardMinimumHoursMax),
+  "standardHourlyRate": zod.number().int().min(1),
+  "standardShortStayHourlyRate": zod.number().int().min(1),
+  "standardDiscountFromHours": zod.number().int().min(1).max(updateRoomBookingSettingsResponseRoomRulesSalaSobaStandardDiscountFromHoursMax),
+  "afterHoursStartTime": zod.string().regex(updateRoomBookingSettingsResponseRoomRulesSalaSobaAfterHoursStartTimeRegExp),
+  "afterHoursEndTime": zod.string().regex(updateRoomBookingSettingsResponseRoomRulesSalaSobaAfterHoursEndTimeRegExp),
+  "afterHoursPriceKz": zod.number().int().min(1),
+  "sessionMorningStartTime": zod.string().regex(updateRoomBookingSettingsResponseRoomRulesSalaSobaSessionMorningStartTimeRegExp),
+  "sessionMorningEndTime": zod.string().regex(updateRoomBookingSettingsResponseRoomRulesSalaSobaSessionMorningEndTimeRegExp),
+  "sessionAfternoonStartTime": zod.string().regex(updateRoomBookingSettingsResponseRoomRulesSalaSobaSessionAfternoonStartTimeRegExp),
+  "sessionAfternoonEndTime": zod.string().regex(updateRoomBookingSettingsResponseRoomRulesSalaSobaSessionAfternoonEndTimeRegExp),
+  "weekdaySessionPriceKz": zod.number().int().min(1),
+  "holidaySessionPriceKz": zod.number().int().min(1)
+}),
+  "sala-kilamba": zod.object({
+  "standardStartTime": zod.string().regex(updateRoomBookingSettingsResponseRoomRulesSalaKilambaStandardStartTimeRegExp),
+  "standardEndTime": zod.string().regex(updateRoomBookingSettingsResponseRoomRulesSalaKilambaStandardEndTimeRegExp),
+  "standardMinimumHours": zod.number().int().min(1).max(updateRoomBookingSettingsResponseRoomRulesSalaKilambaStandardMinimumHoursMax),
+  "standardHourlyRate": zod.number().int().min(1),
+  "standardShortStayHourlyRate": zod.number().int().min(1),
+  "standardDiscountFromHours": zod.number().int().min(1).max(updateRoomBookingSettingsResponseRoomRulesSalaKilambaStandardDiscountFromHoursMax),
+  "afterHoursStartTime": zod.string().regex(updateRoomBookingSettingsResponseRoomRulesSalaKilambaAfterHoursStartTimeRegExp),
+  "afterHoursEndTime": zod.string().regex(updateRoomBookingSettingsResponseRoomRulesSalaKilambaAfterHoursEndTimeRegExp),
+  "afterHoursPriceKz": zod.number().int().min(1),
+  "sessionMorningStartTime": zod.string().regex(updateRoomBookingSettingsResponseRoomRulesSalaKilambaSessionMorningStartTimeRegExp),
+  "sessionMorningEndTime": zod.string().regex(updateRoomBookingSettingsResponseRoomRulesSalaKilambaSessionMorningEndTimeRegExp),
+  "sessionAfternoonStartTime": zod.string().regex(updateRoomBookingSettingsResponseRoomRulesSalaKilambaSessionAfternoonStartTimeRegExp),
+  "sessionAfternoonEndTime": zod.string().regex(updateRoomBookingSettingsResponseRoomRulesSalaKilambaSessionAfternoonEndTimeRegExp),
+  "weekdaySessionPriceKz": zod.number().int().min(1),
+  "holidaySessionPriceKz": zod.number().int().min(1)
+}),
+  "sala-kudi": zod.object({
+  "standardStartTime": zod.string().regex(updateRoomBookingSettingsResponseRoomRulesSalaKudiStandardStartTimeRegExp),
+  "standardEndTime": zod.string().regex(updateRoomBookingSettingsResponseRoomRulesSalaKudiStandardEndTimeRegExp),
+  "standardMinimumHours": zod.number().int().min(1).max(updateRoomBookingSettingsResponseRoomRulesSalaKudiStandardMinimumHoursMax),
+  "standardHourlyRate": zod.number().int().min(1),
+  "standardShortStayHourlyRate": zod.number().int().min(1),
+  "standardDiscountFromHours": zod.number().int().min(1).max(updateRoomBookingSettingsResponseRoomRulesSalaKudiStandardDiscountFromHoursMax),
+  "afterHoursStartTime": zod.string().regex(updateRoomBookingSettingsResponseRoomRulesSalaKudiAfterHoursStartTimeRegExp),
+  "afterHoursEndTime": zod.string().regex(updateRoomBookingSettingsResponseRoomRulesSalaKudiAfterHoursEndTimeRegExp),
+  "afterHoursPriceKz": zod.number().int().min(1),
+  "sessionMorningStartTime": zod.string().regex(updateRoomBookingSettingsResponseRoomRulesSalaKudiSessionMorningStartTimeRegExp),
+  "sessionMorningEndTime": zod.string().regex(updateRoomBookingSettingsResponseRoomRulesSalaKudiSessionMorningEndTimeRegExp),
+  "sessionAfternoonStartTime": zod.string().regex(updateRoomBookingSettingsResponseRoomRulesSalaKudiSessionAfternoonStartTimeRegExp),
+  "sessionAfternoonEndTime": zod.string().regex(updateRoomBookingSettingsResponseRoomRulesSalaKudiSessionAfternoonEndTimeRegExp),
+  "weekdaySessionPriceKz": zod.number().int().min(1),
+  "holidaySessionPriceKz": zod.number().int().min(1)
+}),
+  "sala-ondjango": zod.object({
+  "standardStartTime": zod.string().regex(updateRoomBookingSettingsResponseRoomRulesSalaOndjangoStandardStartTimeRegExp),
+  "standardEndTime": zod.string().regex(updateRoomBookingSettingsResponseRoomRulesSalaOndjangoStandardEndTimeRegExp),
+  "standardMinimumHours": zod.number().int().min(1).max(updateRoomBookingSettingsResponseRoomRulesSalaOndjangoStandardMinimumHoursMax),
+  "standardHourlyRate": zod.number().int().min(1),
+  "standardShortStayHourlyRate": zod.number().int().min(1),
+  "standardDiscountFromHours": zod.number().int().min(1).max(updateRoomBookingSettingsResponseRoomRulesSalaOndjangoStandardDiscountFromHoursMax),
+  "afterHoursStartTime": zod.string().regex(updateRoomBookingSettingsResponseRoomRulesSalaOndjangoAfterHoursStartTimeRegExp),
+  "afterHoursEndTime": zod.string().regex(updateRoomBookingSettingsResponseRoomRulesSalaOndjangoAfterHoursEndTimeRegExp),
+  "afterHoursPriceKz": zod.number().int().min(1),
+  "sessionMorningStartTime": zod.string().regex(updateRoomBookingSettingsResponseRoomRulesSalaOndjangoSessionMorningStartTimeRegExp),
+  "sessionMorningEndTime": zod.string().regex(updateRoomBookingSettingsResponseRoomRulesSalaOndjangoSessionMorningEndTimeRegExp),
+  "sessionAfternoonStartTime": zod.string().regex(updateRoomBookingSettingsResponseRoomRulesSalaOndjangoSessionAfternoonStartTimeRegExp),
+  "sessionAfternoonEndTime": zod.string().regex(updateRoomBookingSettingsResponseRoomRulesSalaOndjangoSessionAfternoonEndTimeRegExp),
+  "weekdaySessionPriceKz": zod.number().int().min(1),
+  "holidaySessionPriceKz": zod.number().int().min(1)
+})
+}),
+  "holidayDates": zod.array(zod.string().regex(updateRoomBookingSettingsResponseHolidayDatesItemRegExp))
+})
+
+
+/**
  * @summary Get available booking slots for a room and date
  */
 export const checkRoomAvailabilityBodyDateRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
 export const checkRoomAvailabilityBodyDurationHoursMax = 9;
+
 
 
 export const CheckRoomAvailabilityBody = zod.object({
@@ -64,6 +508,36 @@ export const CheckRoomAvailabilityResponse = zod.object({
 
 
 /**
+ * @summary List room reservations for academy staff
+ */
+export const listRoomReservationsQueryDateRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+
+
+export const ListRoomReservationsQueryParams = zod.object({
+  "roomId": zod.enum(['sala-soba', 'sala-kilamba', 'sala-kudi', 'sala-ondjango']),
+  "date": zod.coerce.string().regex(listRoomReservationsQueryDateRegExp)
+})
+
+export const listRoomReservationsResponseDateRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+
+
+export const ListRoomReservationsResponseItem = zod.object({
+  "id": zod.number().int(),
+  "roomId": zod.enum(['sala-soba', 'sala-kilamba', 'sala-kudi', 'sala-ondjango']),
+  "roomName": zod.string(),
+  "date": zod.string().regex(listRoomReservationsResponseDateRegExp),
+  "startTime": zod.string(),
+  "endTime": zod.string(),
+  "durationMinutes": zod.number().int(),
+  "priceKz": zod.number().int(),
+  "status": zod.enum(['confirmed', 'cancelled']),
+  "name": zod.string(),
+  "company": zod.string().nullable()
+})
+export const ListRoomReservationsResponse = zod.array(ListRoomReservationsResponseItem)
+
+
+/**
  * @summary Reserve an available room slot
  */
 export const createRoomReservationBodyDateRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
@@ -76,6 +550,7 @@ export const createRoomReservationBodyCompanyMax = 160;
 
 export const createRoomReservationBodyNifMin = 3;
 export const createRoomReservationBodyNifMax = 32;
+
 
 
 export const CreateRoomReservationBody = zod.object({
@@ -102,6 +577,34 @@ export const CreateRoomReservationResponse = zod.object({
   "durationMinutes": zod.number().int(),
   "priceKz": zod.number().int(),
   "status": zod.string()
+})
+
+
+/**
+ * @summary Cancel a room reservation as academy staff
+ */
+
+
+
+export const CancelRoomReservationParams = zod.object({
+  "id": zod.coerce.number().int().min(1)
+})
+
+export const cancelRoomReservationResponseDateRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+
+
+export const CancelRoomReservationResponse = zod.object({
+  "id": zod.number().int(),
+  "roomId": zod.enum(['sala-soba', 'sala-kilamba', 'sala-kudi', 'sala-ondjango']),
+  "roomName": zod.string(),
+  "date": zod.string().regex(cancelRoomReservationResponseDateRegExp),
+  "startTime": zod.string(),
+  "endTime": zod.string(),
+  "durationMinutes": zod.number().int(),
+  "priceKz": zod.number().int(),
+  "status": zod.enum(['confirmed', 'cancelled']),
+  "name": zod.string(),
+  "company": zod.string().nullable()
 })
 
 
@@ -138,6 +641,7 @@ export const createCourseEnrollmentBodyMaritalStatusMin = 2;
 export const createCourseEnrollmentBodyMaritalStatusMax = 40;
 
 
+
 export const CreateCourseEnrollmentBody = zod.object({
   "courseId": zod.enum(['crm', 'tesouraria', 'lideranca-equipas', 'gestao-comercial', 'gestao-empresas', 'recursos-humanos']),
   "fullName": zod.string().min(createCourseEnrollmentBodyFullNameMin).max(createCourseEnrollmentBodyFullNameMax),
@@ -165,10 +669,33 @@ export const CreateCourseEnrollmentResponse = zod.object({
   "expiresAt": zod.coerce.date()
 })
 
+
 /**
  * @summary Send a course enrollment request to the Academy
  */
 export const createCourseEnrollmentRequestBodyFullNameMin = 2;
+export const createCourseEnrollmentRequestBodyFullNameMax = 120;
+
+export const createCourseEnrollmentRequestBodyPhoneMin = 7;
+export const createCourseEnrollmentRequestBodyPhoneMax = 24;
+
+
+export const createCourseEnrollmentRequestBodyPhoneRegExp = new RegExp('^\\+?[\\d\\s().-]+$');
+export const createCourseEnrollmentRequestBodyEmailMax = 320;
+
+
+
+export const CreateCourseEnrollmentRequestBody = zod.object({
+  "courseId": zod.enum(['crm', 'tesouraria', 'lideranca-equipas', 'gestao-comercial', 'gestao-empresas', 'recursos-humanos']),
+  "fullName": zod.string().min(createCourseEnrollmentRequestBodyFullNameMin).max(createCourseEnrollmentRequestBodyFullNameMax),
+  "phone": zod.string().min(createCourseEnrollmentRequestBodyPhoneMin).max(createCourseEnrollmentRequestBodyPhoneMax).regex(createCourseEnrollmentRequestBodyPhoneRegExp),
+  "email": zod.string().email().max(createCourseEnrollmentRequestBodyEmailMax),
+  "privacyAccepted": zod.literal(true)
+})
+
+export const CreateCourseEnrollmentRequestResponse = zod.object({
+  "status": zod.enum(['received'])
+})
 
 
 /**
@@ -240,6 +767,7 @@ export const GetAuthProfileResponse = zod.object({
 export const subscribeToNewsletterBodyEmailMax = 320;
 
 
+
 export const SubscribeToNewsletterBody = zod.object({
   "email": zod.string().email().max(subscribeToNewsletterBodyEmailMax)
 })
@@ -249,24 +777,3 @@ export const SubscribeToNewsletterResponse = zod.object({
 })
 
 
-export const CreateCourseEnrollmentRequestResponse = zod.object({
-  "status": zod.enum(['received'])
-})
-
-export const CreateCourseEnrollmentRequestBody = zod.object({
-  "courseId": zod.enum(['crm', 'tesouraria', 'lideranca-equipas', 'gestao-comercial', 'gestao-empresas', 'recursos-humanos']),
-  "fullName": zod.string().min(createCourseEnrollmentRequestBodyFullNameMin).max(createCourseEnrollmentRequestBodyFullNameMax),
-  "phone": zod.string().min(createCourseEnrollmentRequestBodyPhoneMin).max(createCourseEnrollmentRequestBodyPhoneMax).regex(createCourseEnrollmentRequestBodyPhoneRegExp),
-  "email": zod.string().email().max(createCourseEnrollmentRequestBodyEmailMax),
-  "privacyAccepted": zod.literal(true)
-})
-
-export const createCourseEnrollmentRequestBodyFullNameMax = 120;
-
-export const createCourseEnrollmentRequestBodyPhoneMax = 24;
-
-export const createCourseEnrollmentRequestBodyEmailMax = 320;
-
-export const createCourseEnrollmentRequestBodyPhoneMin = 7;
-
-export const createCourseEnrollmentRequestBodyPhoneRegExp = new RegExp('^\\+?[\\d\\s().-]+$');

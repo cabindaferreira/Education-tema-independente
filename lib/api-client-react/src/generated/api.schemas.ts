@@ -80,6 +80,60 @@ export interface Room {
   rateDetails: string[];
 }
 
+export interface RoomBookingRules {
+  /** @pattern ^\d{2}:\d{2}$ */
+  standardStartTime: string;
+  /** @pattern ^\d{2}:\d{2}$ */
+  standardEndTime: string;
+  /**
+     * @minimum 1
+     * @maximum 9
+     */
+  standardMinimumHours: number;
+  /** @minimum 1 */
+  standardHourlyRate: number;
+  /** @minimum 1 */
+  standardShortStayHourlyRate: number;
+  /**
+     * @minimum 1
+     * @maximum 9
+     */
+  standardDiscountFromHours: number;
+  /** @pattern ^\d{2}:\d{2}$ */
+  afterHoursStartTime: string;
+  /** @pattern ^\d{2}:\d{2}$ */
+  afterHoursEndTime: string;
+  /** @minimum 1 */
+  afterHoursPriceKz: number;
+  /** @pattern ^\d{2}:\d{2}$ */
+  sessionMorningStartTime: string;
+  /** @pattern ^\d{2}:\d{2}$ */
+  sessionMorningEndTime: string;
+  /** @pattern ^\d{2}:\d{2}$ */
+  sessionAfternoonStartTime: string;
+  /** @pattern ^\d{2}:\d{2}$ */
+  sessionAfternoonEndTime: string;
+  /** @minimum 1 */
+  weekdaySessionPriceKz: number;
+  /** @minimum 1 */
+  holidaySessionPriceKz: number;
+}
+
+export type RoomBookingSettingsRoomRules = {
+  'sala-soba': RoomBookingRules;
+  'sala-kilamba': RoomBookingRules;
+  'sala-kudi': RoomBookingRules;
+  'sala-ondjango': RoomBookingRules;
+};
+
+export interface RoomBookingSettings {
+  roomRules: RoomBookingSettingsRoomRules;
+  /** @items.pattern ^\d{4}-\d{2}-\d{2}$ */
+  holidayDates: string[];
+}
+
+export type RoomBookingSettingsUpdate = RoomBookingSettings;
+
 export type RoomList = Room[];
 
 export interface RoomSlot {
@@ -163,6 +217,32 @@ export interface RoomReservation {
   status: string;
 }
 
+export type RoomStaffReservationStatus = typeof RoomStaffReservationStatus[keyof typeof RoomStaffReservationStatus];
+
+
+export const RoomStaffReservationStatus = {
+  confirmed: 'confirmed',
+  cancelled: 'cancelled',
+} as const;
+
+export interface RoomStaffReservation {
+  id: number;
+  roomId: RoomId;
+  roomName: string;
+  /** @pattern ^\d{4}-\d{2}-\d{2}$ */
+  date: string;
+  startTime: string;
+  endTime: string;
+  durationMinutes: number;
+  priceKz: number;
+  status: RoomStaffReservationStatus;
+  name: string;
+  /** @nullable */
+  company: string | null;
+}
+
+export type RoomStaffReservationList = RoomStaffReservation[];
+
 export type CourseId = typeof CourseId[keyof typeof CourseId];
 
 
@@ -191,6 +271,29 @@ export interface CourseEnrollmentRequestInput {
   /** @maxLength 320 */
   email: string;
   privacyAccepted: true;
+}
+
+export type CourseEnrollmentRequestResponseStatus = typeof CourseEnrollmentRequestResponseStatus[keyof typeof CourseEnrollmentRequestResponseStatus];
+
+
+export const CourseEnrollmentRequestResponseStatus = {
+  received: 'received',
+} as const;
+
+export interface CourseEnrollmentRequestResponse {
+  status: CourseEnrollmentRequestResponseStatus;
+}
+
+export type CourseEnrollmentRequestErrorError = typeof CourseEnrollmentRequestErrorError[keyof typeof CourseEnrollmentRequestErrorError];
+
+
+export const CourseEnrollmentRequestErrorError = {
+  invalid_request: 'invalid_request',
+  email_delivery_failed: 'email_delivery_failed',
+} as const;
+
+export interface CourseEnrollmentRequestError {
+  error: CourseEnrollmentRequestErrorError;
 }
 
 export interface CourseEnrollmentInput {
@@ -291,24 +394,11 @@ export interface ProxyPayPaymentEvent {
   terminal_transaction_id?: number | null;
 }
 
+export type ListRoomReservationsParams = {
+roomId: RoomId;
+/**
+ * @pattern ^\d{4}-\d{2}-\d{2}$
+ */
+date: string;
+};
 
-export type CourseEnrollmentRequestResponseStatus = typeof CourseEnrollmentRequestResponseStatus[keyof typeof CourseEnrollmentRequestResponseStatus];
-
-export interface CourseEnrollmentRequestResponse {
-  status: CourseEnrollmentRequestResponseStatus;
-}
-
-export type CourseEnrollmentRequestErrorError = typeof CourseEnrollmentRequestErrorError[keyof typeof CourseEnrollmentRequestErrorError];
-
-export const CourseEnrollmentRequestErrorError = {
-  invalid_request: 'invalid_request',
-  email_delivery_failed: 'email_delivery_failed',
-} as const;
-
-export interface CourseEnrollmentRequestError {
-  error: CourseEnrollmentRequestErrorError;
-}
-
-export const CourseEnrollmentRequestResponseStatus = {
-  received: 'received',
-} as const;

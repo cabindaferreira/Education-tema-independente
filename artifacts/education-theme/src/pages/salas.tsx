@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ArrowLeft, ArrowRight, Check, Clock3, Users, X } from 'lucide-react';
-import { useCheckRoomAvailability, useCreateRoomReservation, useListRooms } from '@workspace/api-client-react';
+import { getListRoomsQueryKey, useCheckRoomAvailability, useCreateRoomReservation, useListRooms } from '@workspace/api-client-react';
 import type { ReservationPeriod, Room, RoomAvailability, RoomReservation, RoomSlot } from '@workspace/api-client-react';
 import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -30,7 +30,14 @@ function defaultRoomDuration(roomId: Room['id']) { return roomId === 'sala-soba'
 function roomDurationMinimum(roomId: Room['id']) { return roomId === 'sala-soba' || roomId === 'sala-kilamba' ? 6 : 1; }
 
 export default function RoomsPage() {
-  const roomsQuery = useListRooms();
+  const roomsQuery = useListRooms({
+    query: {
+      queryKey: getListRoomsQueryKey(),
+      refetchInterval: 30_000,
+      refetchOnMount: 'always',
+      refetchOnWindowFocus: true,
+    },
+  });
   const availabilityMutation = useCheckRoomAvailability();
   const reservationMutation = useCreateRoomReservation();
   const [activeRoom, setActiveRoom] = useState<Room | null>(null);

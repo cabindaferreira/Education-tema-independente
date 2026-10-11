@@ -46,6 +46,45 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/RoomList"
+  /room-booking-settings:
+    get:
+      operationId: getRoomBookingSettings
+      tags: [rooms]
+      summary: Get current room booking prices and schedules for academy staff
+      responses:
+        "200":
+          description: Current editable booking rules and holiday dates
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoomBookingSettings"
+        "401":
+          description: Sign-in required
+        "403":
+          description: Staff access required
+    put:
+      operationId: updateRoomBookingSettings
+      tags: [rooms]
+      summary: Replace room booking prices, schedules, and holiday dates
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoomBookingSettingsUpdate"
+      responses:
+        "200":
+          description: Updated booking rules
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoomBookingSettings"
+        "400":
+          description: Invalid booking settings
+        "401":
+          description: Sign-in required
+        "403":
+          description: Staff access required
   /room-availability:
     post:
       operationId: checkRoomAvailability
@@ -67,6 +106,35 @@ paths:
         "400":
           description: Invalid date, room, or booking period
   /room-reservations:
+    get:
+      operationId: listRoomReservations
+      tags: [reservations]
+      summary: List room reservations for academy staff
+      parameters:
+        - name: roomId
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/RoomId"
+        - name: date
+          in: query
+          required: true
+          schema:
+            type: string
+            pattern: '^\d{4}-\d{2}-\d{2}$'
+      responses:
+        "200":
+          description: Reservations for the selected room and date without tax identification numbers
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoomStaffReservationList"
+        "400":
+          description: Invalid room or date
+        "401":
+          description: Sign-in required
+        "403":
+          description: Staff access required
     post:
       operationId: createRoomReservation
       tags: [reservations]
@@ -88,6 +156,33 @@ paths:
           description: Invalid reservation details
         "409":
           description: The selected slot is no longer available
+  /room-reservations/{id}/cancel:
+    patch:
+      operationId: cancelRoomReservation
+      tags: [reservations]
+      summary: Cancel a room reservation as academy staff
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        "200":
+          description: Reservation cancelled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoomStaffReservation"
+        "400":
+          description: Invalid reservation identifier
+        "401":
+          description: Sign-in required
+        "403":
+          description: Staff access required
+        "404":
+          description: Reservation not found
   /course-enrollments:
     post:
       operationId: createCourseEnrollment
@@ -327,6 +422,45 @@ components:
           type: array
           items:
             type: string
+    RoomBookingRules:
+      type: object
+      required: [standardStartTime, standardEndTime, standardMinimumHours, standardHourlyRate, standardShortStayHourlyRate, standardDiscountFromHours, afterHoursStartTime, afterHoursEndTime, afterHoursPriceKz, sessionMorningStartTime, sessionMorningEndTime, sessionAfternoonStartTime, sessionAfternoonEndTime, weekdaySessionPriceKz, holidaySessionPriceKz]
+      properties:
+        standardStartTime: { type: string, pattern: '^\d{2}:\d{2}$' }
+        standardEndTime: { type: string, pattern: '^\d{2}:\d{2}$' }
+        standardMinimumHours: { type: integer, minimum: 1, maximum: 9 }
+        standardHourlyRate: { type: integer, minimum: 1 }
+        standardShortStayHourlyRate: { type: integer, minimum: 1 }
+        standardDiscountFromHours: { type: integer, minimum: 1, maximum: 9 }
+        afterHoursStartTime: { type: string, pattern: '^\d{2}:\d{2}$' }
+        afterHoursEndTime: { type: string, pattern: '^\d{2}:\d{2}$' }
+        afterHoursPriceKz: { type: integer, minimum: 1 }
+        sessionMorningStartTime: { type: string, pattern: '^\d{2}:\d{2}$' }
+        sessionMorningEndTime: { type: string, pattern: '^\d{2}:\d{2}$' }
+        sessionAfternoonStartTime: { type: string, pattern: '^\d{2}:\d{2}$' }
+        sessionAfternoonEndTime: { type: string, pattern: '^\d{2}:\d{2}$' }
+        weekdaySessionPriceKz: { type: integer, minimum: 1 }
+        holidaySessionPriceKz: { type: integer, minimum: 1 }
+    RoomBookingSettings:
+      type: object
+      required: [roomRules, holidayDates]
+      properties:
+        roomRules:
+          type: object
+          required: [sala-soba, sala-kilamba, sala-kudi, sala-ondjango]
+          properties:
+            sala-soba: { $ref: "#/components/schemas/RoomBookingRules" }
+            sala-kilamba: { $ref: "#/components/schemas/RoomBookingRules" }
+            sala-kudi: { $ref: "#/components/schemas/RoomBookingRules" }
+            sala-ondjango: { $ref: "#/components/schemas/RoomBookingRules" }
+        holidayDates:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+            pattern: '^\d{4}-\d{2}-\d{2}$'
+    RoomBookingSettingsUpdate:
+      $ref: "#/components/schemas/RoomBookingSettings"
     RoomList:
       type: array
       items:
@@ -430,6 +564,38 @@ components:
           type: integer
         status:
           type: string
+    RoomStaffReservation:
+      type: object
+      required: [id, roomId, roomName, date, startTime, endTime, durationMinutes, priceKz, status, name, company]
+      properties:
+        id:
+          type: integer
+        roomId:
+          $ref: "#/components/schemas/RoomId"
+        roomName:
+          type: string
+        date:
+          type: string
+          pattern: '^\d{4}-\d{2}-\d{2}$'
+        startTime:
+          type: string
+        endTime:
+          type: string
+        durationMinutes:
+          type: integer
+        priceKz:
+          type: integer
+        status:
+          type: string
+          enum: [confirmed, cancelled]
+        name:
+          type: string
+        company:
+          type: ["string", "null"]
+    RoomStaffReservationList:
+      type: array
+      items:
+        $ref: "#/components/schemas/RoomStaffReservation"
     CourseId:
       type: string
       enum:

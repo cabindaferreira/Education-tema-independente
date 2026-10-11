@@ -1,4 +1,5 @@
 export * from "./room-reservations";
+export * from "./room-booking-settings";
 export * from "./app-users";
 export * from "./course-enrollments";
 //
