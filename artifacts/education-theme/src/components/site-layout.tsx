@@ -184,14 +184,14 @@ export function SiteLayout({ children }: { children: ReactNode }) {
               <Link
                 href="/sign-in"
                 onClick={closeMenu}
-                className="nav-auth-link border-t-[#FF0101] border-r-[#FF0101] border-b-[#FF0101] border-l-[#FF0101]"
+                className="nav-auth-link"
               >
                 Entrar
               </Link>
               <Link
                 href="/sign-up"
                 onClick={closeMenu}
-                className="nav-auth-link border-t-[#FF0101] border-r-[#FF0101] border-b-[#FF0101] border-l-[#FF0101]"
+                className="nav-auth-link"
               >
                 Criar conta
               </Link>

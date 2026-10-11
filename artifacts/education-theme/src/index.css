@@ -105,7 +105,6 @@ button, input { font: inherit; }
 .nav-links a:not(.nav-cta):hover:after,.nav-links a.active:not(.nav-cta):after { transform:scaleX(1); }
 .nav-links a:hover { color:#ffc7cc;background:rgba(255,255,255,.07); }
 .nav-links a.active:not(.nav-cta) { color:#FF0101;border:1px solid #FF0101; }
-.nav-links .nav-auth-link { border:1px solid #FF0101; }
 .nav-links .nav-cta { background:#FF0101;color:white;padding:0 35px;margin-left:8px;font-size:9px;font-weight:700;letter-spacing:.12em;transition:background .2s,color .2s,transform .2s,box-shadow .2s; }
 .nav-links .nav-cta:hover { background:#d90000;color:white;transform:translateY(-2px);box-shadow:0 7px 18px rgba(20,5,8,.2); }
 .menu-toggle { display:none;background:transparent;color:white;border:0;padding:10px;cursor:pointer; }
