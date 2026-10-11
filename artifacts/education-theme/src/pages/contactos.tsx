@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { ArrowRight, Clock3, Mail, MapPin, Phone } from 'lucide-react';
 import { PageIntro } from '@/components/site-layout';
+import { trackEvent } from '@/lib/analytics';
 
 export default function ContactsPage() {
   const [email, setEmail] = useState('');
@@ -19,6 +20,7 @@ export default function ContactsPage() {
       const result = await response.json() as { status?: string; error?: string };
 
       if (response.status === 201 && result.status === 'confirmation_sent') {
+        trackEvent('newsletter_signup_confirmed');
         setSignupState('success');
       } else if (response.status === 200 && result.status === 'already_subscribed') {
         setSignupState('duplicate');
