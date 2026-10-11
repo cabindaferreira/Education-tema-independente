@@ -77,7 +77,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
       <div className="topline">
         <div className="container topline-inner">
           <Link className="topbrand" href="/" onClick={closeMenu} aria-label="Página inicial da Academia">
-            ACADEMIA<small>FORMAÇÃO ONLINE &amp; APRENDIZAGEM</small>
+            ACADEMIA<small>FORMAÇÃO PRESENCIA &amp; APRENDIZAGEM</small>
           </Link>
           <div className="top-details">
             <div className="top-detail"><Clock3 size={20} /><span>Segunda a sexta<br /><strong>08h00–20h00</strong></span></div>
