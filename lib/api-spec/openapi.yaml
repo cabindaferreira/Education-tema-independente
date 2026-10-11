@@ -14,6 +14,8 @@ tags:
     description: Room catalogue and booking availability
   - name: reservations
     description: Room reservation requests
+  - name: course-enrollments
+    description: Course enrollment and ProxyPay checkout
   - name: auth
     description: Signed-in user profile
 paths:
@@ -84,6 +86,72 @@ paths:
           description: Invalid reservation details
         "409":
           description: The selected slot is no longer available
+  /course-enrollments:
+    post:
+      operationId: createCourseEnrollment
+      tags: [course-enrollments]
+      summary: Create a course enrollment and payment reference
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CourseEnrollmentInput"
+      responses:
+        "201":
+          description: Enrollment created with a pending payment reference
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseEnrollmentCheckout"
+        "400":
+          description: Invalid enrollment details
+        "502":
+          description: ProxyPay could not create the payment reference
+        "503":
+          description: Payment service is not configured
+  /course-enrollments/{id}:
+    get:
+      operationId: getCourseEnrollmentStatus
+      tags: [course-enrollments]
+      summary: Get public payment status for an enrollment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Enrollment payment status without personal data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseEnrollmentStatus"
+        "404":
+          description: Enrollment not found
+  /proxypay/webhook:
+    post:
+      operationId: receiveProxyPayPayment
+      tags: [course-enrollments]
+      summary: Receive a signed ProxyPay payment notification
+      description: The signature is verified against the raw request body before processing.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProxyPayPaymentEvent"
+      responses:
+        "200":
+          description: Payment notification processed
+        "400":
+          description: Invalid payment notification
+        "401":
+          description: Invalid ProxyPay signature
+        "500":
+          description: Payment confirmation email could not be sent
   /auth/profile:
     post:
       operationId: syncAuthProfile
@@ -272,4 +340,138 @@ components:
           type: integer
         status:
           type: string
+    CourseId:
+      type: string
+      enum:
+        - crm
+        - tesouraria
+        - lideranca-equipas
+        - gestao-comercial
+        - gestao-empresas
+        - recursos-humanos
+    CourseEnrollmentInput:
+      type: object
+      required:
+        - courseId
+        - fullName
+        - birthDate
+        - identityNumber
+        - nationality
+        - phone
+        - email
+        - address
+        - municipality
+        - province
+        - profession
+        - maritalStatus
+        - privacyAccepted
+      properties:
+        courseId:
+          $ref: "#/components/schemas/CourseId"
+        fullName:
+          type: string
+          minLength: 2
+          maxLength: 160
+        birthDate:
+          type: string
+          format: date
+        identityNumber:
+          type: string
+          minLength: 3
+          maxLength: 40
+        nationality:
+          type: string
+          minLength: 2
+          maxLength: 80
+        phone:
+          type: string
+          minLength: 6
+          maxLength: 40
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        address:
+          type: string
+          minLength: 3
+          maxLength: 240
+        municipality:
+          type: string
+          minLength: 2
+          maxLength: 100
+        province:
+          type: string
+          minLength: 2
+          maxLength: 100
+        profession:
+          type: string
+          minLength: 2
+          maxLength: 120
+        maritalStatus:
+          type: string
+          minLength: 2
+          maxLength: 40
+        privacyAccepted:
+          type: boolean
+          enum: [true]
+    CourseEnrollmentCheckout:
+      type: object
+      required:
+        - id
+        - courseId
+        - courseTitle
+        - amountKz
+        - paymentEntity
+        - paymentReference
+        - paymentStatus
+        - expiresAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        courseId:
+          $ref: "#/components/schemas/CourseId"
+        courseTitle:
+          type: string
+        amountKz:
+          type: integer
+        paymentEntity:
+          type: string
+        paymentReference:
+          type: string
+        paymentStatus:
+          $ref: "#/components/schemas/CoursePaymentStatus"
+        expiresAt:
+          type: string
+          format: date-time
+    CourseEnrollmentStatus:
+      allOf:
+        - $ref: "#/components/schemas/CourseEnrollmentCheckout"
+        - type: object
+          required:
+            - confirmationEmailStatus
+          properties:
+            confirmationEmailStatus:
+              type: string
+              enum: [pending, sent]
+            paidAt:
+              type: ["string", "null"]
+              format: date-time
+    CoursePaymentStatus:
+      type: string
+      enum: [pending, paid, review_required, expired]
+    ProxyPayPaymentEvent:
+      type: object
+      required: [transaction_id, reference_id, amount]
+      properties:
+        transaction_id:
+          type: integer
+        reference_id:
+          type: integer
+        amount:
+          type: string
+        terminal_type:
+          type: ["string", "null"]
+        terminal_transaction_id:
+          type: ["integer", "null"]
 

@@ -15,6 +15,7 @@ import {
 import { SiteLayout } from '@/components/site-layout';
 import HomePage from '@/pages/home';
 import CoursesPage from '@/pages/cursos';
+import CourseEnrollmentPage from '@/pages/inscricao';
 import RoomsPage from '@/pages/salas';
 import EventsPage from '@/pages/eventos';
 import ContactsPage from '@/pages/contactos';
@@ -159,6 +160,7 @@ function AppRoutes() {
         <Route path="/conta" component={AccountPage} />
         <Route path="/" component={PublicHome} />
         <Route path="/cursos"><PublicPage><CoursesPage /></PublicPage></Route>
+        <Route path="/inscricao/:courseId"><PublicPage><CourseEnrollmentPage /></PublicPage></Route>
         <Route path="/salas"><PublicPage><RoomsPage /></PublicPage></Route>
         <Route path="/eventos"><PublicPage><EventsPage /></PublicPage></Route>
         <Route path="/contactos"><PublicPage><ContactsPage /></PublicPage></Route>

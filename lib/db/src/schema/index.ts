@@ -1,5 +1,6 @@
 export * from "./room-reservations";
 export * from "./app-users";
+export * from "./course-enrollments";
 //
 // Each model/table should ideally be split into different files.
 // Each model/table should define a Drizzle table, insert schema, and types:

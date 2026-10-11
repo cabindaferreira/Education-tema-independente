@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { ArrowRight, BadgeCheck, BookOpen, Clock3 } from 'lucide-react';
+import { Link } from 'wouter';
 import { PageIntro } from '@/components/site-layout';
 
 const courses = [
-  { title: 'Estágio Formativo em CRM', image: '/images/courses/crm.jpg', description: 'Desenvolva competências práticas para gerir o relacionamento com clientes e apoiar as rotinas comerciais.', price: '100.000 Kz', duration: 'Estágio de 3 meses' },
-  { title: 'Estágio Formativo em Tesouraria', image: '/images/courses/tesouraria.jpg', description: 'Aprenda a acompanhar operações de tesouraria, organizar registos e apoiar o controlo financeiro.', price: '100.000 Kz', duration: 'Estágio de 3 meses' },
-  { title: 'Liderança e Gestão de Equipas', image: '/images/courses/lideranca-equipas.jpg', description: 'Prepare-se para coordenar equipas, comunicar objetivos e apoiar a execução do trabalho.', price: '100.000 Kz', duration: 'Estágio de 3 meses' },
-  { title: 'Estágio Formativo em Gestão Comercial', image: '/images/courses/gestao-comercial.jpg', description: 'Desenvolva competências práticas em gestão de vendas, acompanhamento comercial e relação com clientes.', price: '100.000 Kz', duration: 'Estágio de 3 meses' },
-  { title: 'Gestão e Administração de Empresas', image: '/images/courses/gestao-empresas.jpg', description: 'Conheça práticas de planeamento, organização e gestão das atividades de uma empresa.', price: '100.000 Kz', duration: 'Estágio de 3 meses' },
-  { title: 'Gestão de Recursos Humanos', image: '/images/courses/recursos-humanos.jpg', description: 'Explore os fundamentos da gestão de pessoas e do apoio às rotinas de recursos humanos.', price: '100.000 Kz', duration: 'Estágio de 3 meses' },
+  { id: 'crm', title: 'Estágio Formativo em CRM', image: '/images/courses/crm.jpg', description: 'Desenvolva competências práticas para gerir o relacionamento com clientes e apoiar as rotinas comerciais.', price: '100.000 Kz', duration: 'Estágio de 3 meses' },
+  { id: 'tesouraria', title: 'Estágio Formativo em Tesouraria', image: '/images/courses/tesouraria.jpg', description: 'Aprenda a acompanhar operações de tesouraria, organizar registos e apoiar o controlo financeiro.', price: '100.000 Kz', duration: 'Estágio de 3 meses' },
+  { id: 'lideranca-equipas', title: 'Liderança e Gestão de Equipas', image: '/images/courses/lideranca-equipas.jpg', description: 'Prepare-se para coordenar equipas, comunicar objetivos e apoiar a execução do trabalho.', price: '100.000 Kz', duration: 'Estágio de 3 meses' },
+  { id: 'gestao-comercial', title: 'Estágio Formativo em Gestão Comercial', image: '/images/courses/gestao-comercial.jpg', description: 'Desenvolva competências práticas em gestão de vendas, acompanhamento comercial e relação com clientes.', price: '100.000 Kz', duration: 'Estágio de 3 meses' },
+  { id: 'gestao-empresas', title: 'Gestão e Administração de Empresas', image: '/images/courses/gestao-empresas.jpg', description: 'Conheça práticas de planeamento, organização e gestão das atividades de uma empresa.', price: '100.000 Kz', duration: 'Estágio de 3 meses' },
+  { id: 'recursos-humanos', title: 'Gestão de Recursos Humanos', image: '/images/courses/recursos-humanos.jpg', description: 'Explore os fundamentos da gestão de pessoas e do apoio às rotinas de recursos humanos.', price: '100.000 Kz', duration: 'Estágio de 3 meses' },
 ];
 
 export default function CoursesPage() {
@@ -25,7 +26,7 @@ export default function CoursesPage() {
               <h3>{course.title}</h3><p>{course.description}</p>
               <ul className="course-highlights"><li><BadgeCheck size={15} /><span>Certificado reconhecido pelo INEFOP</span></li><li><BookOpen size={15} /><span>Manual de apoio incluído</span></li></ul>
               <div className="course-bottom"><span>Investimento total</span><strong>{course.price}</strong></div>
-              <a className="course-cta" href={`mailto:academia@procenter.co.ao?subject=${encodeURIComponent(`Inscrição: ${course.title}`)}`}>Quero inscrever-me <ArrowRight size={14} /></a>
+              <Link className="course-cta" href={`/inscricao/${course.id}`}>Inscrever-me <ArrowRight size={14} /></Link>
             </div>
           </article>
         ))}</div>
