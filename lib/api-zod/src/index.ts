@@ -1,2 +1,12 @@
 export * from "./generated/api";
-export * from "./generated/types";
+export type {
+  HealthStatus,
+  ReservationPeriod,
+  Room,
+  RoomAvailability,
+  RoomId,
+  RoomList,
+  RoomReservation,
+  RoomReservationInput,
+  RoomSlot,
+} from "./generated/types";

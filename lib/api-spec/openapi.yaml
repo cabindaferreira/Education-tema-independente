@@ -10,6 +10,10 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: rooms
+    description: Room catalogue and booking availability
+  - name: reservations
+    description: Room reservation requests
 paths:
   /healthz:
     get:
@@ -24,6 +28,78 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /rooms:
+    get:
+      operationId: listRooms
+      tags: [rooms]
+      summary: List rooms available for booking
+      responses:
+        "200":
+          description: Available rooms and booking terms
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoomList"
+  /rooms/{roomId}/availability:
+    get:
+      operationId: getRoomAvailability
+      tags: [rooms]
+      summary: Get available booking slots for a room and date
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/RoomId"
+        - name: date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: period
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/ReservationPeriod"
+        - name: durationHours
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 9
+      responses:
+        "200":
+          description: Available slots for the requested day
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoomAvailability"
+        "400":
+          description: Invalid date, room, or booking period
+  /room-reservations:
+    post:
+      operationId: createRoomReservation
+      tags: [reservations]
+      summary: Reserve an available room slot
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoomReservationInput"
+      responses:
+        "201":
+          description: Reservation created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoomReservation"
+        "400":
+          description: Invalid reservation details
+        "409":
+          description: The selected slot is no longer available
 components:
   schemas:
     HealthStatus:
@@ -33,4 +109,116 @@ components:
           type: string
       required:
         - status
+    RoomId:
+      type: string
+      enum: [sala-soba, sala-kilamba, sala-kudi, sala-ondjango]
+    ReservationPeriod:
+      type: string
+      enum: [standard, after_hours, session]
+    Room:
+      type: object
+      required: [id, name, capacity, description, image, facilities, rateDetails]
+      properties:
+        id:
+          $ref: "#/components/schemas/RoomId"
+        name:
+          type: string
+        capacity:
+          type: integer
+        description:
+          type: string
+        image:
+          type: string
+        facilities:
+          type: array
+          items:
+            type: string
+        rateDetails:
+          type: array
+          items:
+            type: string
+    RoomList:
+      type: array
+      items:
+        $ref: "#/components/schemas/Room"
+    RoomSlot:
+      type: object
+      required: [id, startTime, endTime, durationMinutes, priceKz, period]
+      properties:
+        id:
+          type: string
+        startTime:
+          type: string
+        endTime:
+          type: string
+        durationMinutes:
+          type: integer
+        priceKz:
+          type: integer
+        period:
+          $ref: "#/components/schemas/ReservationPeriod"
+    RoomAvailability:
+      type: object
+      required: [roomId, date, slots]
+      properties:
+        roomId:
+          $ref: "#/components/schemas/RoomId"
+        date:
+          type: string
+          format: date
+        slots:
+          type: array
+          items:
+            $ref: "#/components/schemas/RoomSlot"
+    RoomReservationInput:
+      type: object
+      required: [roomId, date, slotId, period, name, nif]
+      properties:
+        roomId:
+          $ref: "#/components/schemas/RoomId"
+        date:
+          type: string
+          format: date
+        slotId:
+          type: string
+        period:
+          $ref: "#/components/schemas/ReservationPeriod"
+        durationHours:
+          type: integer
+          minimum: 1
+          maximum: 9
+        name:
+          type: string
+          minLength: 2
+          maxLength: 120
+        company:
+          type: ["string", "null"]
+          maxLength: 160
+        nif:
+          type: string
+          minLength: 3
+          maxLength: 32
+    RoomReservation:
+      type: object
+      required: [id, roomId, roomName, date, startTime, endTime, durationMinutes, priceKz, status]
+      properties:
+        id:
+          type: integer
+        roomId:
+          $ref: "#/components/schemas/RoomId"
+        roomName:
+          type: string
+        date:
+          type: string
+          format: date
+        startTime:
+          type: string
+        endTime:
+          type: string
+        durationMinutes:
+          type: integer
+        priceKz:
+          type: integer
+        status:
+          type: string
 
