@@ -105,7 +105,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
             <Show when="signed-in">
               <Link href="/conta" onClick={closeMenu} className="nav-auth-link">Minha conta</Link>
             </Show>
-            <Link className="nav-cta" href="/cursos" onClick={closeMenu}>VER FORMAÇÕES <ArrowRight size={13} /></Link>
+            <Link className="nav-cta bg-[#cd1d2f]" href="/cursos" onClick={closeMenu}>VER FORMAÇÕES <ArrowRight size={13} /></Link>
           </nav>
         </div>
       </header>
@@ -126,5 +126,5 @@ export function SiteLayout({ children }: { children: ReactNode }) {
 }
 
 export function PageIntro({ eyebrow, title, description }: { eyebrow: string; title: string; description?: string }) {
-  return <section className="page-intro"><div className="container"><div className="eyebrow">{eyebrow}</div><h1>{title}</h1>{description && <p>{description}</p>}</div></section>;
+  return <section className="page-intro mt-[-20px] mb-[-20px]"><div className="container"><div className="eyebrow flex-row justify-center gap-[10px] items-center">{eyebrow}</div><h1 className="mt-[-5px]">{title}</h1>{description && <p className="mt-[-2px] mb-[-2px]">{description}</p>}</div></section>;
 }

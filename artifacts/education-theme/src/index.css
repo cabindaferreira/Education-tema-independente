@@ -101,7 +101,7 @@ button, input { font: inherit; }
 .nav-links a:not(.nav-cta):hover:after,.nav-links a.active:not(.nav-cta):after { transform:scaleX(1); }
 .nav-links a:hover { color:#ffc7cc;background:rgba(255,255,255,.07); }
 .nav-links a.active:not(.nav-cta) { color:#ffd0d4; }
-.nav-links .nav-cta { background:#c91f2e;padding:0 35px;margin-left:8px;font-size:9px;font-weight:700;letter-spacing:.12em;transition:background .2s,color .2s,transform .2s,box-shadow .2s; }
+.nav-links .nav-cta { background:#cd1d2f;padding:0 35px;margin-left:8px;font-size:9px;font-weight:700;letter-spacing:.12em;transition:background .2s,color .2s,transform .2s,box-shadow .2s; }
 .nav-links .nav-cta:hover { background:#a91825;color:white;transform:translateY(-2px);box-shadow:0 7px 18px rgba(20,5,8,.2); }
 .menu-toggle { display:none;background:transparent;color:white;border:0;padding:10px;cursor:pointer; }
 .hero-content { position:relative; z-index:2; padding-top:222px; max-width:530px; }
@@ -249,9 +249,9 @@ button, input { font: inherit; }
 .page-intro { position:relative;background:#fbf9f6;padding:180px 0 55px;min-height:330px;text-align:center; }
 .page-intro:after { content:'';position:absolute;left:50%;bottom:0;width:min(1110px,calc(100% - 48px));height:1px;transform:translateX(-50%);background:#e9dfdd; }
 .page-intro .container { position:relative;z-index:1; }
-.page-intro .eyebrow { justify-content:center;color:#a92935; }
-.page-intro h1 { color:#35272a;font:800 clamp(31px,4vw,46px)/1.16 var(--app-font-display);letter-spacing:-.045em;margin:14px auto 12px;max-width:760px; }
-.page-intro p { color:#76817e;line-height:1.8;font-size:12px;max-width:620px;margin:0 auto; }
+.page-intro .eyebrow { justify-content:center;gap:10px;color:#a92935; }
+.page-intro h1 { color:#35272a;font:800 clamp(31px,4vw,46px)/1.16 var(--app-font-display);letter-spacing:-.045em;margin:-5px auto 12px;max-width:760px; }
+.page-intro p { color:#76817e;line-height:1.8;font-size:12px;max-width:620px;margin:-2px auto; }
 .home-note { background:#fbf9f6;padding:48px 0; }
 .home-note-inner { display:flex;align-items:center;justify-content:space-between;gap:24px;border-top:1px solid #e8dfdd;padding-top:34px; }
 .home-note h2 { font:800 clamp(22px,3vw,31px)/1.2 var(--app-font-display);letter-spacing:-.04em;margin:12px 0 0;color:#35272a; }
