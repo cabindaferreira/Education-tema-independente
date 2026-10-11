@@ -3,6 +3,7 @@ import { ClerkProvider, Show, useClerk } from '@clerk/react';
 import { publishableKeyFromHost } from '@clerk/react/internal';
 import { ptPT } from '@clerk/localizations';
 import { shadcn } from '@clerk/themes';
+import { ui } from '@clerk/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   Redirect as WouterRedirect,
@@ -28,6 +29,24 @@ const clerkPubKey = publishableKeyFromHost(
   import.meta.env.VITE_CLERK_PUBLISHABLE_KEY,
 );
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
+const academyLocalization = {
+  ...ptPT,
+  formFieldInputPlaceholder__signUpPassword: 'Crie uma palavra-passe',
+  signIn: {
+    ...ptPT.signIn,
+    start: {
+      ...ptPT.signIn?.start,
+      subtitle: 'Aceda à sua conta Academia Procenter.',
+    },
+  },
+  signUp: {
+    ...ptPT.signUp,
+    start: {
+      ...ptPT.signUp?.start,
+      subtitle: 'Crie a sua conta Academia Procenter.',
+    },
+  },
+};
 
 if (!clerkPubKey) {
   throw new Error('Missing VITE_CLERK_PUBLISHABLE_KEY in the app environment.');
@@ -123,10 +142,11 @@ function AppRoutes() {
 
   return (
     <ClerkProvider
+      ui={ui}
       publishableKey={clerkPubKey}
       proxyUrl={clerkProxyUrl}
       appearance={clerkAppearance}
-      localization={ptPT}
+      localization={academyLocalization}
       signInUrl={`${basePath}/sign-in`}
       signUpUrl={`${basePath}/sign-up`}
       routerPush={(to) => setLocation(stripBase(to))}
