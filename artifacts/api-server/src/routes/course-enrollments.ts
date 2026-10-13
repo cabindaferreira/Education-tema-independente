@@ -17,6 +17,7 @@ import {
   RetryStaffCourseEnrollmentConfirmationResponse,
 } from "@workspace/api-zod";
 import { academyCoursesTable, db, courseEnrollmentActionsTable, courseEnrollmentsTable } from "@workspace/db";
+import { ensureDefaultAcademyCourses } from "../lib/course-catalog-db";
 import { sendCoursePaymentConfirmation } from "../lib/course-payment-email";
 
 const router: IRouter = Router();
@@ -240,6 +241,7 @@ router.post("/course-enrollments", async (req, res): Promise<void> => {
   }
 
   const input = parsed.data;
+  await ensureDefaultAcademyCourses();
   const [course] = await db
     .select()
     .from(academyCoursesTable)

@@ -13,6 +13,10 @@ function rolesFor(user: AcademyUser): string[] {
 }
 
 export function hasAcademyRole(user: AcademyUser, role: string): boolean {
+  const metadata = user.privateMetadata as Record<string, unknown>;
+  if (role === "academy_admin" && (metadata.academyOwner === true || metadata.academyRole === "admin")) {
+    return true;
+  }
   return rolesFor(user).includes(role);
 }
 

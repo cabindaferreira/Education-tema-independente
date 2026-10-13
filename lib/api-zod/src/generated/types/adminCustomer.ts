@@ -21,7 +21,7 @@ export interface AdminCustomer {
   taxId: string | null;
   item: string;
   /** @nullable */
-  date: Date | null;
+  date: string | null;
   status: string;
   /** @nullable */
   amountKz: number | null;

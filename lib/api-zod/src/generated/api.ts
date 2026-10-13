@@ -318,7 +318,7 @@ export const ListAdminCustomersResponseItem = zod.object({
   "company": zod.string().nullable(),
   "taxId": zod.string().nullable(),
   "item": zod.string(),
-  "date": zod.coerce.date().nullable(),
+  "date": zod.string().nullable(),
   "status": zod.string(),
   "amountKz": zod.number().int().nullable()
 })

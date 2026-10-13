@@ -24,6 +24,12 @@ import { AccountPage } from '@/pages/conta';
 import StaffReservationsPage from '@/pages/equipa-reservas';
 import StaffRoomSettingsPage from '@/pages/equipa-salas';
 import StaffCourseEnrollmentsPage from '@/pages/equipa-inscricoes';
+import StaffAdminHome from '@/pages/equipa';
+import StaffCoursesPage from '@/pages/equipa-cursos';
+import StaffMediaPage from '@/pages/equipa-midias';
+import StaffCustomersPage from '@/pages/equipa-clientes';
+import StaffAgendaPage from '@/pages/equipa-agenda';
+import StaffAccessPage from '@/pages/equipa-acessos';
 import { SignInPage, SignUpPage } from '@/pages/auth';
 import NewsletterUnsubscribePage from '@/pages/newsletter-unsubscribe';
 import NotFound from '@/pages/not-found';
@@ -162,6 +168,12 @@ function AppRoutes() {
         <Route path="/sign-in/*?" component={SignInPage} />
         <Route path="/sign-up/*?" component={SignUpPage} />
         <Route path="/unsubscribe"><PublicPage><NewsletterUnsubscribePage /></PublicPage></Route>
+        <Route path="/equipa" component={StaffAdminHome} />
+        <Route path="/equipa/cursos" component={StaffCoursesPage} />
+        <Route path="/equipa/midias" component={StaffMediaPage} />
+        <Route path="/equipa/clientes" component={StaffCustomersPage} />
+        <Route path="/equipa/agenda" component={StaffAgendaPage} />
+        <Route path="/equipa/acessos" component={StaffAccessPage} />
         <Route path="/equipa/reservas" component={StaffReservationsPage} />
         <Route path="/equipa/salas" component={StaffRoomSettingsPage} />
         <Route path="/equipa/inscricoes" component={StaffCourseEnrollmentsPage} />

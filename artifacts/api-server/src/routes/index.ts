@@ -5,6 +5,8 @@ import authRouter from "./auth";
 import courseEnrollmentsRouter from "./course-enrollments";
 import courseEnrollmentRequestsRouter from "./course-enrollment-requests";
 import newsletterRouter from "./newsletter";
+import adminRouter from "./admin";
+import storageRouter from "./storage";
 
 const router: IRouter = Router();
 
@@ -14,5 +16,7 @@ router.use(courseEnrollmentsRouter);
 router.use(courseEnrollmentRequestsRouter);
 router.use(authRouter);
 router.use(newsletterRouter);
+router.use(adminRouter);
+router.use(storageRouter);
 
 export default router;

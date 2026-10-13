@@ -7,6 +7,7 @@ import {
 } from "@workspace/api-zod";
 import { and, eq, isNull } from "drizzle-orm";
 import { academyCoursesTable, db } from "@workspace/db";
+import { ensureDefaultAcademyCourses } from "../lib/course-catalog-db";
 
 const router: IRouter = Router();
 const connectors = new ReplitConnectors();
@@ -47,6 +48,7 @@ router.post("/course-enrollment-requests", async (req, res): Promise<void> => {
 
   const { courseId, fullName, phone } = parsed.data;
   const email = parsed.data.email.toLowerCase();
+  await ensureDefaultAcademyCourses();
   const [course] = await db
     .select()
     .from(academyCoursesTable)

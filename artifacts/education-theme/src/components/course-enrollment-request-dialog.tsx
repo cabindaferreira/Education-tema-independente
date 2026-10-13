@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CheckCircle2, LoaderCircle } from 'lucide-react';
-import { useForm } from 'react-hook-form';
+import { useForm, type SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 import type { CourseEnrollmentRequestInput } from '@workspace/api-client-react';
 import {
@@ -60,7 +60,7 @@ export function CourseEnrollmentRequestDialog({
   const form = useForm<EnrollmentRequestForm>({
     resolver: zodResolver(enrollmentRequestSchema),
     defaultValues: {
-      courseId: course.id,
+      courseId: course.id as EnrollmentRequestForm['courseId'],
       fullName: '',
       phone: '',
       email: '',
@@ -102,7 +102,7 @@ export function CourseEnrollmentRequestDialog({
           </div>
         ) : (
           <Form {...form}>
-            <form className="course-request-form" onSubmit={form.handleSubmit(sendRequest)} noValidate>
+            <form className="course-request-form" onSubmit={form.handleSubmit(sendRequest as SubmitHandler<EnrollmentRequestForm>)} noValidate>
               <input type="hidden" {...form.register('courseId')} />
 
               <label className="course-request-field">

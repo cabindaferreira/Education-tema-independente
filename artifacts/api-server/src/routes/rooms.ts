@@ -324,7 +324,7 @@ router.post("/room-availability", async (req, res): Promise<void> => {
 
   const slots = buildRoomSlots(input.roomId, input.date, input.period, input.durationHours, settings)
     .filter((slot) => !slotHasStarted(input.date, slot))
-    .filter((slot) => !bookedSlots.some((booked) => slotsOverlap(slot, booked)));
+    .filter((slot) => !bookedSlots.some((booked) => slotsOverlap(slot, booked)))
     .filter((slot) => !blockedSlots.some((block) => slotsOverlap(slot, block)));
 
   res.json(CheckRoomAvailabilityResponse.parse({

@@ -18,42 +18,8 @@ import type {
   CourseEnrollmentInput,
   CourseEnrollmentStatus,
 } from '@workspace/api-client-react';
+import { getGetCourseEnrollmentStatusQueryKey, useCreateCourseEnrollment, useGetCourseEnrollmentStatus, useListPublishedCourses } from '@workspace/api-client-react';
 import './inscricao.css';
-
-const API_BASE = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/api`;
-
-const courseDetails: Record<string, { title: string; image: string; description: string }> = {
-  crm: {
-    title: 'Estágio Formativo em CRM',
-    image: '/images/courses/crm.jpg',
-    description: 'Relacionamento com clientes e apoio às rotinas comerciais.',
-  },
-  tesouraria: {
-    title: 'Estágio Formativo em Tesouraria',
-    image: '/images/courses/tesouraria.jpg',
-    description: 'Operações de tesouraria, registos e controlo financeiro.',
-  },
-  'lideranca-equipas': {
-    title: 'Liderança e Gestão de Equipas',
-    image: '/images/courses/lideranca-equipas.jpg',
-    description: 'Coordenação de equipas, comunicação e execução do trabalho.',
-  },
-  'gestao-comercial': {
-    title: 'Estágio Formativo em Gestão Comercial',
-    image: '/images/courses/gestao-comercial.jpg',
-    description: 'Gestão de vendas, acompanhamento comercial e relação com clientes.',
-  },
-  'gestao-empresas': {
-    title: 'Gestão e Administração de Empresas',
-    image: '/images/courses/gestao-empresas.jpg',
-    description: 'Planeamento, organização e gestão das atividades de uma empresa.',
-  },
-  'recursos-humanos': {
-    title: 'Gestão de Recursos Humanos',
-    image: '/images/courses/recursos-humanos.jpg',
-    description: 'Gestão de pessoas e apoio às rotinas de recursos humanos.',
-  },
-};
 
 type EnrollmentForm = Omit<CourseEnrollmentInput, 'privacyAccepted'> & {
   privacyAccepted: boolean;
@@ -65,7 +31,9 @@ function formatKz(amount: number): string {
 
 export default function CourseEnrollmentPage() {
   const { courseId = '' } = useParams<{ courseId: string }>();
-  const course = courseDetails[courseId];
+  const coursesQuery = useListPublishedCourses();
+  const course = coursesQuery.data?.find((entry) => entry.id === courseId);
+  const createEnrollment = useCreateCourseEnrollment();
   const [form, setForm] = useState<EnrollmentForm>({
     courseId: courseId as CourseEnrollmentInput['courseId'],
     fullName: '',
@@ -86,6 +54,13 @@ export default function CourseEnrollmentPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState('');
+  const statusQuery = useGetCourseEnrollmentStatus(checkout?.id ?? '', {
+    query: {
+      queryKey: getGetCourseEnrollmentStatusQueryKey(checkout?.id ?? ''),
+      enabled: Boolean(checkout?.id && !['paid', 'review_required', 'expired'].includes(paymentStatus?.paymentStatus ?? '')),
+      refetchInterval: 5000,
+    },
+  });
 
   useEffect(() => {
     setForm((current) => ({
@@ -95,29 +70,8 @@ export default function CourseEnrollmentPage() {
   }, [courseId]);
 
   useEffect(() => {
-    if (!checkout?.id || ['paid', 'review_required', 'expired'].includes(paymentStatus?.paymentStatus ?? '')) {
-      return;
-    }
-
-    let active = true;
-    const pollStatus = async () => {
-      try {
-        const response = await fetch(`${API_BASE}/course-enrollments/${checkout.id}`);
-        if (!response.ok) return;
-        const latest = await response.json() as CourseEnrollmentStatus;
-        if (active) setPaymentStatus(latest);
-      } catch {
-        // Keep the pending state visible and retry on the next poll.
-      }
-    };
-
-    void pollStatus();
-    const timer = window.setInterval(() => void pollStatus(), 5000);
-    return () => {
-      active = false;
-      window.clearInterval(timer);
-    };
-  }, [checkout?.id, paymentStatus?.paymentStatus]);
+    if (statusQuery.data) setPaymentStatus(statusQuery.data);
+  }, [statusQuery.data]);
 
   function updateField(field: keyof Omit<EnrollmentForm, 'courseId' | 'privacyAccepted'>, value: string) {
     setForm((current) => ({ ...current, [field]: value }));
@@ -131,15 +85,7 @@ export default function CourseEnrollmentPage() {
     setIsSubmitting(true);
     try {
       const payload: CourseEnrollmentInput = { ...form, privacyAccepted: true };
-      const response = await fetch(`${API_BASE}/course-enrollments`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      const result = await response.json() as CourseEnrollmentCheckout & { error?: string };
-      if (!response.ok) {
-        throw new Error(result.error || 'Não foi possível iniciar a inscrição.');
-      }
+      const result = await createEnrollment.mutateAsync({ data: payload });
       setCheckout(result);
       setPaymentStatus({
         ...result,
@@ -163,6 +109,14 @@ export default function CourseEnrollmentPage() {
     } catch {
       setError('Não foi possível copiar. Selecione a referência para a copiar manualmente.');
     }
+  }
+
+  if (coursesQuery.isLoading) {
+    return <section className="section course-enrollment-section"><div className="container enrollment-container"><div className="enrollment-layout"><div className="enrollment-main"><div className="enrollment-skeleton" aria-busy="true"><span /><span /><span /><span /></div></div></div></div></section>;
+  }
+
+  if (coursesQuery.isError) {
+    return <section className="section course-enrollment-section"><div className="container enrollment-invalid"><AlertCircle size={30} /><h1>Não foi possível carregar a formação</h1><p>Verifique a ligação e tente novamente.</p><button className="button button-teal" type="button" onClick={() => coursesQuery.refetch()}>Tentar novamente</button></div></section>;
   }
 
   if (!course) {
@@ -211,7 +165,7 @@ export default function CourseEnrollmentPage() {
             </div>
 
             <div className="payment-course-card">
-              <img src={course.image} alt="" />
+              <img src={course.imageUrl} alt="" />
               <div><span>Curso</span><strong>{course.title}</strong></div>
               <div className="payment-total"><span>Valor</span><strong>{formatKz(checkout.amountKz)}</strong></div>
             </div>
@@ -334,17 +288,17 @@ export default function CourseEnrollmentPage() {
           </div>
 
           <aside className="enrollment-summary">
-            <img className="enrollment-course-image" src={course.image} alt={`Cartaz do curso ${course.title}`} />
+            <img className="enrollment-course-image" src={course.imageUrl} alt={`Cartaz do curso ${course.title}`} />
             <div className="enrollment-summary-body">
               <span className="enrollment-summary-label">A sua formação</span>
               <h2>{course.title}</h2>
               <p>{course.description}</p>
               <ul>
-                <li><Clock3 size={16} />Estágio de 3 meses</li>
+                <li><Clock3 size={16} />{course.duration}</li>
                 <li><BadgeCheck size={16} />Certificado reconhecido pelo INEFOP</li>
                 <li><BookOpen size={16} />Manual de apoio incluído</li>
               </ul>
-              <div className="enrollment-summary-price"><span>Inscrição gratuita</span><strong>{formatKz(100000)}</strong><small>Investimento total do curso</small></div>
+              <div className="enrollment-summary-price"><span>Inscrição gratuita</span><strong>{formatKz(course.priceKz)}</strong><small>Investimento total do curso</small></div>
               <div className="enrollment-summary-note"><ShieldCheck size={15} /> Pagamento por referência Multicaixa, validado automaticamente.</div>
             </div>
           </aside>

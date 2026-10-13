@@ -52,7 +52,7 @@ paths:
     get:
       operationId: listPublishedCourses
       tags: [course-enrollments]
-      summary: List published courses with open enrollment
+      summary: List publicly visible courses
       responses:
         "200":
           description: Published courses available to the public
@@ -1324,7 +1324,6 @@ components:
           type: string
         date:
           type: ["string", "null"]
-          format: date-time
         status:
           type: string
         amountKz:

@@ -16,6 +16,8 @@ import {
 } from 'lucide-react';
 import {
   getListStaffCourseEnrollmentsQueryKey,
+  getListAdminCoursesQueryKey,
+  useListAdminCourses,
   useListStaffCourseEnrollments,
   useResolveStaffCourseEnrollment,
   useRetryStaffCourseEnrollmentConfirmation,
@@ -24,15 +26,6 @@ import {
   type StaffCourseEnrollment,
 } from '@workspace/api-client-react';
 import './equipa-inscricoes.css';
-
-const courses = [
-  { id: 'crm', title: 'Estágio Formativo em CRM' },
-  { id: 'tesouraria', title: 'Estágio Formativo em Tesouraria' },
-  { id: 'lideranca-equipas', title: 'Liderança e Gestão de Equipas' },
-  { id: 'gestao-comercial', title: 'Estágio Formativo em Gestão Comercial' },
-  { id: 'gestao-empresas', title: 'Gestão e Administração de Empresas' },
-  { id: 'recursos-humanos', title: 'Gestão de Recursos Humanos' },
-] as const;
 
 const paymentStatuses: { value: CoursePaymentStatus | ''; label: string }[] = [
   { value: '', label: 'Todos os estados' },
@@ -85,6 +78,12 @@ export default function StaffCourseEnrollmentsPage() {
   const [decision, setDecision] = useState<'confirm_payment' | 'reject_payment'>('confirm_payment');
   const [note, setNote] = useState('');
   const [feedback, setFeedback] = useState('');
+  const coursesQuery = useListAdminCourses({
+    query: {
+      queryKey: getListAdminCoursesQueryKey(),
+      enabled: Boolean(isLoaded && isSignedIn),
+    },
+  });
 
   const params = useMemo<ListStaffCourseEnrollmentsParams>(() => ({
     ...(courseId ? { courseId } : {}),
@@ -166,6 +165,7 @@ export default function StaffCourseEnrollmentsPage() {
       <header className="enrollment-topbar">
         <Link to="/" className="enrollment-brand"><img src="/favicon.svg" alt="" /><span>ACADEMIA<small>PROCENTER · EQUIPA</small></span></Link>
         <span className="enrollment-topbar-meta"><i /> Área interna / Inscrições</span>
+        <Link to="/equipa" className="enrollment-back-link">Painel</Link>
         <Link to="/equipa/reservas" className="enrollment-back-link">Reservas <ArrowLeft size={14} /></Link>
       </header>
       <div className="enrollment-main">
@@ -196,7 +196,7 @@ export default function StaffCourseEnrollmentsPage() {
           <>
             <section className="enrollment-filters" aria-label="Pesquisa e filtros de inscrições">
               <label className="enrollment-search"><span>Pesquisar</span><div><Search size={16} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Nome, e-mail, telefone ou referência" /></div></label>
-              <label><span>Curso</span><select value={courseId} onChange={(event) => setCourseId(event.target.value as ListStaffCourseEnrollmentsParams['courseId'] | '')}><option value="">Todos os cursos</option>{courses.map((course) => <option value={course.id} key={course.id}>{course.title}</option>)}</select></label>
+              <label><span>Curso</span><select value={courseId} onChange={(event) => setCourseId(event.target.value as ListStaffCourseEnrollmentsParams['courseId'] | '')}><option value="">Todos os cursos</option>{coursesQuery.data?.map((course) => <option value={course.id} key={course.id}>{course.title}</option>)}</select></label>
               <label><span>Pagamento</span><select value={paymentStatus} onChange={(event) => setPaymentStatus(event.target.value as CoursePaymentStatus | '')}>{paymentStatuses.map((status) => <option value={status.value} key={status.value}>{status.label}</option>)}</select></label>
               <p><ShieldCheck size={14} /> Dados pessoais visíveis apenas à equipa autorizada</p>
             </section>
