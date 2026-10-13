@@ -33,6 +33,497 @@ export const ListRoomsResponse = zod.array(ListRoomsResponseItem)
 
 
 /**
+ * @summary List published courses with open enrollment
+ */
+export const listPublishedCoursesResponseIdMin = 2;
+export const listPublishedCoursesResponseIdMax = 70;
+
+
+export const listPublishedCoursesResponseIdRegExp = new RegExp('^[a-z0-9]+(?:-[a-z0-9]+)*$');
+
+
+export const ListPublishedCoursesResponseItem = zod.object({
+  "id": zod.string().min(listPublishedCoursesResponseIdMin).max(listPublishedCoursesResponseIdMax).regex(listPublishedCoursesResponseIdRegExp),
+  "title": zod.string(),
+  "description": zod.string(),
+  "duration": zod.string(),
+  "priceKz": zod.number().int(),
+  "imageUrl": zod.string(),
+  "published": zod.boolean(),
+  "enrollmentOpen": zod.boolean(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+export const ListPublishedCoursesResponse = zod.array(ListPublishedCoursesResponseItem)
+
+
+/**
+ * @summary Check the signed-in user's Academy administration access
+ */
+export const GetAdminAccessResponse = zod.object({
+  "isAdmin": zod.boolean(),
+  "isOwner": zod.boolean(),
+  "email": zod.string().email().nullable()
+})
+
+
+/**
+ * @summary Get administration dashboard counts
+ */
+export const GetAdminOverviewResponse = zod.object({
+  "courses": zod.number().int(),
+  "openEnrollments": zod.number().int(),
+  "upcomingReservations": zod.number().int(),
+  "mediaAssets": zod.number().int()
+})
+
+
+/**
+ * @summary List all courses, including unpublished courses
+ */
+export const listAdminCoursesResponseIdMin = 2;
+export const listAdminCoursesResponseIdMax = 70;
+
+
+export const listAdminCoursesResponseIdRegExp = new RegExp('^[a-z0-9]+(?:-[a-z0-9]+)*$');
+
+
+export const ListAdminCoursesResponseItem = zod.object({
+  "id": zod.string().min(listAdminCoursesResponseIdMin).max(listAdminCoursesResponseIdMax).regex(listAdminCoursesResponseIdRegExp),
+  "title": zod.string(),
+  "description": zod.string(),
+  "duration": zod.string(),
+  "priceKz": zod.number().int(),
+  "imageUrl": zod.string(),
+  "published": zod.boolean(),
+  "enrollmentOpen": zod.boolean(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+export const ListAdminCoursesResponse = zod.array(ListAdminCoursesResponseItem)
+
+
+/**
+ * @summary Create a course
+ */
+export const createAdminCourseBodyIdMin = 2;
+export const createAdminCourseBodyIdMax = 70;
+
+
+export const createAdminCourseBodyIdRegExp = new RegExp('^[a-z0-9]+(?:-[a-z0-9]+)*$');
+export const createAdminCourseBodyTitleMin = 2;
+export const createAdminCourseBodyTitleMax = 160;
+
+export const createAdminCourseBodyDescriptionMin = 5;
+export const createAdminCourseBodyDescriptionMax = 2000;
+
+export const createAdminCourseBodyDurationMin = 2;
+export const createAdminCourseBodyDurationMax = 100;
+
+export const createAdminCourseBodyPriceKzMax = 100000000;
+
+export const createAdminCourseBodyImageUrlMax = 1000;
+
+
+
+export const CreateAdminCourseBody = zod.object({
+  "id": zod.string().min(createAdminCourseBodyIdMin).max(createAdminCourseBodyIdMax).regex(createAdminCourseBodyIdRegExp),
+  "title": zod.string().min(createAdminCourseBodyTitleMin).max(createAdminCourseBodyTitleMax),
+  "description": zod.string().min(createAdminCourseBodyDescriptionMin).max(createAdminCourseBodyDescriptionMax),
+  "duration": zod.string().min(createAdminCourseBodyDurationMin).max(createAdminCourseBodyDurationMax),
+  "priceKz": zod.number().int().min(1).max(createAdminCourseBodyPriceKzMax),
+  "imageUrl": zod.string().min(1).max(createAdminCourseBodyImageUrlMax),
+  "published": zod.boolean(),
+  "enrollmentOpen": zod.boolean()
+})
+
+export const createAdminCourseResponseIdMin = 2;
+export const createAdminCourseResponseIdMax = 70;
+
+
+export const createAdminCourseResponseIdRegExp = new RegExp('^[a-z0-9]+(?:-[a-z0-9]+)*$');
+
+
+export const CreateAdminCourseResponse = zod.object({
+  "id": zod.string().min(createAdminCourseResponseIdMin).max(createAdminCourseResponseIdMax).regex(createAdminCourseResponseIdRegExp),
+  "title": zod.string(),
+  "description": zod.string(),
+  "duration": zod.string(),
+  "priceKz": zod.number().int(),
+  "imageUrl": zod.string(),
+  "published": zod.boolean(),
+  "enrollmentOpen": zod.boolean(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Edit a course
+ */
+export const updateAdminCoursePathCourseIdMin = 2;
+export const updateAdminCoursePathCourseIdMax = 70;
+
+
+export const updateAdminCoursePathCourseIdRegExp = new RegExp('^[a-z0-9]+(?:-[a-z0-9]+)*$');
+
+
+export const UpdateAdminCourseParams = zod.object({
+  "courseId": zod.coerce.string().min(updateAdminCoursePathCourseIdMin).max(updateAdminCoursePathCourseIdMax).regex(updateAdminCoursePathCourseIdRegExp)
+})
+
+export const updateAdminCourseBodyTitleMin = 2;
+export const updateAdminCourseBodyTitleMax = 160;
+
+export const updateAdminCourseBodyDescriptionMin = 5;
+export const updateAdminCourseBodyDescriptionMax = 2000;
+
+export const updateAdminCourseBodyDurationMin = 2;
+export const updateAdminCourseBodyDurationMax = 100;
+
+export const updateAdminCourseBodyPriceKzMax = 100000000;
+
+export const updateAdminCourseBodyImageUrlMax = 1000;
+
+
+
+export const UpdateAdminCourseBody = zod.object({
+  "title": zod.string().min(updateAdminCourseBodyTitleMin).max(updateAdminCourseBodyTitleMax),
+  "description": zod.string().min(updateAdminCourseBodyDescriptionMin).max(updateAdminCourseBodyDescriptionMax),
+  "duration": zod.string().min(updateAdminCourseBodyDurationMin).max(updateAdminCourseBodyDurationMax),
+  "priceKz": zod.number().int().min(1).max(updateAdminCourseBodyPriceKzMax),
+  "imageUrl": zod.string().min(1).max(updateAdminCourseBodyImageUrlMax),
+  "published": zod.boolean(),
+  "enrollmentOpen": zod.boolean()
+})
+
+export const updateAdminCourseResponseIdMin = 2;
+export const updateAdminCourseResponseIdMax = 70;
+
+
+export const updateAdminCourseResponseIdRegExp = new RegExp('^[a-z0-9]+(?:-[a-z0-9]+)*$');
+
+
+export const UpdateAdminCourseResponse = zod.object({
+  "id": zod.string().min(updateAdminCourseResponseIdMin).max(updateAdminCourseResponseIdMax).regex(updateAdminCourseResponseIdRegExp),
+  "title": zod.string(),
+  "description": zod.string(),
+  "duration": zod.string(),
+  "priceKz": zod.number().int(),
+  "imageUrl": zod.string(),
+  "published": zod.boolean(),
+  "enrollmentOpen": zod.boolean(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Remove a course from the active catalogue without deleting its history
+ */
+export const archiveAdminCoursePathCourseIdMin = 2;
+export const archiveAdminCoursePathCourseIdMax = 70;
+
+
+export const archiveAdminCoursePathCourseIdRegExp = new RegExp('^[a-z0-9]+(?:-[a-z0-9]+)*$');
+
+
+export const ArchiveAdminCourseParams = zod.object({
+  "courseId": zod.coerce.string().min(archiveAdminCoursePathCourseIdMin).max(archiveAdminCoursePathCourseIdMax).regex(archiveAdminCoursePathCourseIdRegExp)
+})
+
+export const archiveAdminCourseResponseIdMin = 2;
+export const archiveAdminCourseResponseIdMax = 70;
+
+
+export const archiveAdminCourseResponseIdRegExp = new RegExp('^[a-z0-9]+(?:-[a-z0-9]+)*$');
+
+
+export const ArchiveAdminCourseResponse = zod.object({
+  "id": zod.string().min(archiveAdminCourseResponseIdMin).max(archiveAdminCourseResponseIdMax).regex(archiveAdminCourseResponseIdRegExp),
+  "title": zod.string(),
+  "description": zod.string(),
+  "duration": zod.string(),
+  "priceKz": zod.number().int(),
+  "imageUrl": zod.string(),
+  "published": zod.boolean(),
+  "enrollmentOpen": zod.boolean(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary List administrators and authorized staff
+ */
+export const ListAdminTeamResponseItem = zod.object({
+  "userId": zod.string(),
+  "email": zod.string().email(),
+  "firstName": zod.string().nullable(),
+  "lastName": zod.string().nullable(),
+  "isOwner": zod.boolean(),
+  "createdAt": zod.coerce.date()
+})
+export const ListAdminTeamResponse = zod.array(ListAdminTeamResponseItem)
+
+
+/**
+ * @summary Grant administration access to an existing verified account
+ */
+export const authorizeAdminTeamMemberBodyEmailMax = 320;
+
+
+
+export const AuthorizeAdminTeamMemberBody = zod.object({
+  "email": zod.string().email().max(authorizeAdminTeamMemberBodyEmailMax)
+})
+
+export const AuthorizeAdminTeamMemberResponse = zod.object({
+  "userId": zod.string(),
+  "email": zod.string().email(),
+  "firstName": zod.string().nullable(),
+  "lastName": zod.string().nullable(),
+  "isOwner": zod.boolean(),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Revoke a collaborator's administration access
+ */
+export const RevokeAdminTeamMemberParams = zod.object({
+  "userId": zod.coerce.string()
+})
+
+export const RevokeAdminTeamMemberResponse = zod.void()
+
+
+/**
+ * @summary Search course and room customers
+ */
+export const listAdminCustomersQuerySearchMax = 100;
+
+
+
+export const ListAdminCustomersQueryParams = zod.object({
+  "search": zod.coerce.string().max(listAdminCustomersQuerySearchMax).optional()
+})
+
+export const ListAdminCustomersResponseItem = zod.object({
+  "id": zod.string(),
+  "source": zod.enum(['course', 'room']),
+  "name": zod.string(),
+  "email": zod.string().email().nullable(),
+  "phone": zod.string().nullable(),
+  "company": zod.string().nullable(),
+  "taxId": zod.string().nullable(),
+  "item": zod.string(),
+  "date": zod.coerce.date().nullable(),
+  "status": zod.string(),
+  "amountKz": zod.number().int().nullable()
+})
+export const ListAdminCustomersResponse = zod.array(ListAdminCustomersResponseItem)
+
+
+/**
+ * @summary List active media assets
+ */
+export const ListAdminMediaResponseItem = zod.object({
+  "id": zod.number().int(),
+  "title": zod.string(),
+  "altText": zod.string(),
+  "objectPath": zod.string(),
+  "url": zod.string(),
+  "contentType": zod.string(),
+  "sizeBytes": zod.number().int(),
+  "createdAt": zod.coerce.date()
+})
+export const ListAdminMediaResponse = zod.array(ListAdminMediaResponseItem)
+
+
+/**
+ * @summary Register an uploaded image in the media library
+ */
+export const createAdminMediaBodyTitleMin = 2;
+export const createAdminMediaBodyTitleMax = 160;
+
+export const createAdminMediaBodyAltTextMax = 500;
+
+export const createAdminMediaBodyObjectPathMax = 1000;
+
+export const createAdminMediaBodySizeBytesMax = 15728640;
+
+
+
+export const CreateAdminMediaBody = zod.object({
+  "title": zod.string().min(createAdminMediaBodyTitleMin).max(createAdminMediaBodyTitleMax),
+  "altText": zod.string().max(createAdminMediaBodyAltTextMax),
+  "objectPath": zod.string().min(1).max(createAdminMediaBodyObjectPathMax),
+  "contentType": zod.enum(['image/jpeg', 'image/png', 'image/webp', 'image/avif']),
+  "sizeBytes": zod.number().int().min(1).max(createAdminMediaBodySizeBytesMax)
+})
+
+export const CreateAdminMediaResponse = zod.object({
+  "id": zod.number().int(),
+  "title": zod.string(),
+  "altText": zod.string(),
+  "objectPath": zod.string(),
+  "url": zod.string(),
+  "contentType": zod.string(),
+  "sizeBytes": zod.number().int(),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Remove an unused media asset from the library
+ */
+export const RemoveAdminMediaParams = zod.object({
+  "id": zod.coerce.number().int()
+})
+
+export const RemoveAdminMediaResponse = zod.void()
+
+
+/**
+ * @summary Get a short-lived upload URL for an administrator
+ */
+export const requestAdminMediaUploadUrlBodySizeBytesMax = 15728640;
+
+
+
+export const RequestAdminMediaUploadUrlBody = zod.object({
+  "contentType": zod.enum(['image/jpeg', 'image/png', 'image/webp', 'image/avif']),
+  "sizeBytes": zod.number().int().min(1).max(requestAdminMediaUploadUrlBodySizeBytesMax)
+})
+
+export const RequestAdminMediaUploadUrlResponse = zod.object({
+  "uploadUrl": zod.string().url(),
+  "objectPath": zod.string(),
+  "expiresAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary List room reservations and blocked periods for one day
+ */
+export const getAdminAgendaQueryDateRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+
+
+export const GetAdminAgendaQueryParams = zod.object({
+  "roomId": zod.enum(['sala-soba', 'sala-kilamba', 'sala-kudi', 'sala-ondjango']),
+  "date": zod.coerce.string().regex(getAdminAgendaQueryDateRegExp)
+})
+
+export const getAdminAgendaResponseDateRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+export const getAdminAgendaResponseReservationsItemDateRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+export const getAdminAgendaResponseBlocksItemDateRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+export const getAdminAgendaResponseBlocksItemStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const getAdminAgendaResponseBlocksItemEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+
+
+export const GetAdminAgendaResponse = zod.object({
+  "roomId": zod.enum(['sala-soba', 'sala-kilamba', 'sala-kudi', 'sala-ondjango']),
+  "date": zod.string().regex(getAdminAgendaResponseDateRegExp),
+  "reservations": zod.array(zod.object({
+  "id": zod.number().int(),
+  "roomId": zod.enum(['sala-soba', 'sala-kilamba', 'sala-kudi', 'sala-ondjango']),
+  "roomName": zod.string(),
+  "date": zod.string().regex(getAdminAgendaResponseReservationsItemDateRegExp),
+  "startTime": zod.string(),
+  "endTime": zod.string(),
+  "durationMinutes": zod.number().int(),
+  "priceKz": zod.number().int(),
+  "status": zod.enum(['confirmed', 'cancelled']),
+  "name": zod.string(),
+  "company": zod.string().nullable()
+})),
+  "blocks": zod.array(zod.object({
+  "id": zod.number().int(),
+  "roomId": zod.enum(['sala-soba', 'sala-kilamba', 'sala-kudi', 'sala-ondjango']),
+  "date": zod.string().regex(getAdminAgendaResponseBlocksItemDateRegExp),
+  "startTime": zod.string().regex(getAdminAgendaResponseBlocksItemStartTimeRegExp),
+  "endTime": zod.string().regex(getAdminAgendaResponseBlocksItemEndTimeRegExp),
+  "reason": zod.string(),
+  "createdAt": zod.coerce.date()
+}))
+})
+
+
+/**
+ * @summary List blocked periods for a room and date
+ */
+export const listAdminRoomBlocksQueryDateRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+
+
+export const ListAdminRoomBlocksQueryParams = zod.object({
+  "roomId": zod.enum(['sala-soba', 'sala-kilamba', 'sala-kudi', 'sala-ondjango']),
+  "date": zod.coerce.string().regex(listAdminRoomBlocksQueryDateRegExp)
+})
+
+export const listAdminRoomBlocksResponseDateRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+export const listAdminRoomBlocksResponseStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const listAdminRoomBlocksResponseEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+
+
+export const ListAdminRoomBlocksResponseItem = zod.object({
+  "id": zod.number().int(),
+  "roomId": zod.enum(['sala-soba', 'sala-kilamba', 'sala-kudi', 'sala-ondjango']),
+  "date": zod.string().regex(listAdminRoomBlocksResponseDateRegExp),
+  "startTime": zod.string().regex(listAdminRoomBlocksResponseStartTimeRegExp),
+  "endTime": zod.string().regex(listAdminRoomBlocksResponseEndTimeRegExp),
+  "reason": zod.string(),
+  "createdAt": zod.coerce.date()
+})
+export const ListAdminRoomBlocksResponse = zod.array(ListAdminRoomBlocksResponseItem)
+
+
+/**
+ * @summary Block an available room period
+ */
+export const createAdminRoomBlockBodyDateRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+export const createAdminRoomBlockBodyStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const createAdminRoomBlockBodyEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const createAdminRoomBlockBodyReasonMin = 2;
+export const createAdminRoomBlockBodyReasonMax = 300;
+
+
+
+export const CreateAdminRoomBlockBody = zod.object({
+  "roomId": zod.enum(['sala-soba', 'sala-kilamba', 'sala-kudi', 'sala-ondjango']),
+  "date": zod.string().regex(createAdminRoomBlockBodyDateRegExp),
+  "startTime": zod.string().regex(createAdminRoomBlockBodyStartTimeRegExp),
+  "endTime": zod.string().regex(createAdminRoomBlockBodyEndTimeRegExp),
+  "reason": zod.string().min(createAdminRoomBlockBodyReasonMin).max(createAdminRoomBlockBodyReasonMax)
+})
+
+export const createAdminRoomBlockResponseDateRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+export const createAdminRoomBlockResponseStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+export const createAdminRoomBlockResponseEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
+
+
+export const CreateAdminRoomBlockResponse = zod.object({
+  "id": zod.number().int(),
+  "roomId": zod.enum(['sala-soba', 'sala-kilamba', 'sala-kudi', 'sala-ondjango']),
+  "date": zod.string().regex(createAdminRoomBlockResponseDateRegExp),
+  "startTime": zod.string().regex(createAdminRoomBlockResponseStartTimeRegExp),
+  "endTime": zod.string().regex(createAdminRoomBlockResponseEndTimeRegExp),
+  "reason": zod.string(),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Release a previously blocked room period
+ */
+export const ReleaseAdminRoomBlockParams = zod.object({
+  "id": zod.coerce.number().int()
+})
+
+export const ReleaseAdminRoomBlockResponse = zod.void()
+
+
+/**
  * @summary Get current room booking prices and schedules for academy staff
  */
 export const getRoomBookingSettingsResponseRoomRulesSalaSobaStandardStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
@@ -611,6 +1102,11 @@ export const CancelRoomReservationResponse = zod.object({
 /**
  * @summary Create a course enrollment and payment reference
  */
+export const createCourseEnrollmentBodyCourseIdMin = 2;
+export const createCourseEnrollmentBodyCourseIdMax = 70;
+
+
+export const createCourseEnrollmentBodyCourseIdRegExp = new RegExp('^[a-z0-9]+(?:-[a-z0-9]+)*$');
 export const createCourseEnrollmentBodyFullNameMin = 2;
 export const createCourseEnrollmentBodyFullNameMax = 160;
 
@@ -643,7 +1139,7 @@ export const createCourseEnrollmentBodyMaritalStatusMax = 40;
 
 
 export const CreateCourseEnrollmentBody = zod.object({
-  "courseId": zod.enum(['crm', 'tesouraria', 'lideranca-equipas', 'gestao-comercial', 'gestao-empresas', 'recursos-humanos']),
+  "courseId": zod.string().min(createCourseEnrollmentBodyCourseIdMin).max(createCourseEnrollmentBodyCourseIdMax).regex(createCourseEnrollmentBodyCourseIdRegExp),
   "fullName": zod.string().min(createCourseEnrollmentBodyFullNameMin).max(createCourseEnrollmentBodyFullNameMax),
   "birthDate": zod.coerce.date(),
   "identityNumber": zod.string().min(createCourseEnrollmentBodyIdentityNumberMin).max(createCourseEnrollmentBodyIdentityNumberMax),
@@ -658,9 +1154,16 @@ export const CreateCourseEnrollmentBody = zod.object({
   "privacyAccepted": zod.literal(true)
 })
 
+export const createCourseEnrollmentResponseCourseIdMin = 2;
+export const createCourseEnrollmentResponseCourseIdMax = 70;
+
+
+export const createCourseEnrollmentResponseCourseIdRegExp = new RegExp('^[a-z0-9]+(?:-[a-z0-9]+)*$');
+
+
 export const CreateCourseEnrollmentResponse = zod.object({
   "id": zod.string().uuid(),
-  "courseId": zod.enum(['crm', 'tesouraria', 'lideranca-equipas', 'gestao-comercial', 'gestao-empresas', 'recursos-humanos']),
+  "courseId": zod.string().min(createCourseEnrollmentResponseCourseIdMin).max(createCourseEnrollmentResponseCourseIdMax).regex(createCourseEnrollmentResponseCourseIdRegExp),
   "courseTitle": zod.string(),
   "amountKz": zod.number().int(),
   "paymentEntity": zod.string(),
@@ -673,6 +1176,11 @@ export const CreateCourseEnrollmentResponse = zod.object({
 /**
  * @summary Send a course enrollment request to the Academy
  */
+export const createCourseEnrollmentRequestBodyCourseIdMin = 2;
+export const createCourseEnrollmentRequestBodyCourseIdMax = 70;
+
+
+export const createCourseEnrollmentRequestBodyCourseIdRegExp = new RegExp('^[a-z0-9]+(?:-[a-z0-9]+)*$');
 export const createCourseEnrollmentRequestBodyFullNameMin = 2;
 export const createCourseEnrollmentRequestBodyFullNameMax = 120;
 
@@ -686,7 +1194,7 @@ export const createCourseEnrollmentRequestBodyEmailMax = 320;
 
 
 export const CreateCourseEnrollmentRequestBody = zod.object({
-  "courseId": zod.enum(['crm', 'tesouraria', 'lideranca-equipas', 'gestao-comercial', 'gestao-empresas', 'recursos-humanos']),
+  "courseId": zod.string().min(createCourseEnrollmentRequestBodyCourseIdMin).max(createCourseEnrollmentRequestBodyCourseIdMax).regex(createCourseEnrollmentRequestBodyCourseIdRegExp),
   "fullName": zod.string().min(createCourseEnrollmentRequestBodyFullNameMin).max(createCourseEnrollmentRequestBodyFullNameMax),
   "phone": zod.string().min(createCourseEnrollmentRequestBodyPhoneMin).max(createCourseEnrollmentRequestBodyPhoneMax).regex(createCourseEnrollmentRequestBodyPhoneRegExp),
   "email": zod.string().email().max(createCourseEnrollmentRequestBodyEmailMax),
@@ -705,9 +1213,16 @@ export const GetCourseEnrollmentStatusParams = zod.object({
   "id": zod.coerce.string().uuid()
 })
 
+export const getCourseEnrollmentStatusResponseOneCourseIdMin = 2;
+export const getCourseEnrollmentStatusResponseOneCourseIdMax = 70;
+
+
+export const getCourseEnrollmentStatusResponseOneCourseIdRegExp = new RegExp('^[a-z0-9]+(?:-[a-z0-9]+)*$');
+
+
 export const GetCourseEnrollmentStatusResponse = zod.object({
   "id": zod.string().uuid(),
-  "courseId": zod.enum(['crm', 'tesouraria', 'lideranca-equipas', 'gestao-comercial', 'gestao-empresas', 'recursos-humanos']),
+  "courseId": zod.string().min(getCourseEnrollmentStatusResponseOneCourseIdMin).max(getCourseEnrollmentStatusResponseOneCourseIdMax).regex(getCourseEnrollmentStatusResponseOneCourseIdRegExp),
   "courseTitle": zod.string(),
   "amountKz": zod.number().int(),
   "paymentEntity": zod.string(),
@@ -723,19 +1238,31 @@ export const GetCourseEnrollmentStatusResponse = zod.object({
 /**
  * @summary Search course enrollments for authorized staff
  */
+export const listStaffCourseEnrollmentsQueryCourseIdMin = 2;
+export const listStaffCourseEnrollmentsQueryCourseIdMax = 70;
+
+
+export const listStaffCourseEnrollmentsQueryCourseIdRegExp = new RegExp('^[a-z0-9]+(?:-[a-z0-9]+)*$');
 export const listStaffCourseEnrollmentsQuerySearchMax = 100;
 
 
 
 export const ListStaffCourseEnrollmentsQueryParams = zod.object({
-  "courseId": zod.enum(['crm', 'tesouraria', 'lideranca-equipas', 'gestao-comercial', 'gestao-empresas', 'recursos-humanos']).optional(),
+  "courseId": zod.coerce.string().min(listStaffCourseEnrollmentsQueryCourseIdMin).max(listStaffCourseEnrollmentsQueryCourseIdMax).regex(listStaffCourseEnrollmentsQueryCourseIdRegExp).optional(),
   "paymentStatus": zod.enum(['pending', 'paid', 'review_required', 'expired']).optional(),
   "search": zod.coerce.string().max(listStaffCourseEnrollmentsQuerySearchMax).optional()
 })
 
+export const listStaffCourseEnrollmentsResponseCourseIdMin = 2;
+export const listStaffCourseEnrollmentsResponseCourseIdMax = 70;
+
+
+export const listStaffCourseEnrollmentsResponseCourseIdRegExp = new RegExp('^[a-z0-9]+(?:-[a-z0-9]+)*$');
+
+
 export const ListStaffCourseEnrollmentsResponseItem = zod.object({
   "id": zod.string().uuid(),
-  "courseId": zod.enum(['crm', 'tesouraria', 'lideranca-equipas', 'gestao-comercial', 'gestao-empresas', 'recursos-humanos']),
+  "courseId": zod.string().min(listStaffCourseEnrollmentsResponseCourseIdMin).max(listStaffCourseEnrollmentsResponseCourseIdMax).regex(listStaffCourseEnrollmentsResponseCourseIdRegExp),
   "courseTitle": zod.string(),
   "fullName": zod.string(),
   "birthDate": zod.coerce.date(),
@@ -788,9 +1315,16 @@ export const ResolveStaffCourseEnrollmentBody = zod.object({
   "note": zod.string().min(resolveStaffCourseEnrollmentBodyNoteMin).max(resolveStaffCourseEnrollmentBodyNoteMax)
 })
 
+export const resolveStaffCourseEnrollmentResponseCourseIdMin = 2;
+export const resolveStaffCourseEnrollmentResponseCourseIdMax = 70;
+
+
+export const resolveStaffCourseEnrollmentResponseCourseIdRegExp = new RegExp('^[a-z0-9]+(?:-[a-z0-9]+)*$');
+
+
 export const ResolveStaffCourseEnrollmentResponse = zod.object({
   "id": zod.string().uuid(),
-  "courseId": zod.enum(['crm', 'tesouraria', 'lideranca-equipas', 'gestao-comercial', 'gestao-empresas', 'recursos-humanos']),
+  "courseId": zod.string().min(resolveStaffCourseEnrollmentResponseCourseIdMin).max(resolveStaffCourseEnrollmentResponseCourseIdMax).regex(resolveStaffCourseEnrollmentResponseCourseIdRegExp),
   "courseTitle": zod.string(),
   "fullName": zod.string(),
   "birthDate": zod.coerce.date(),
@@ -832,9 +1366,16 @@ export const RetryStaffCourseEnrollmentConfirmationParams = zod.object({
   "id": zod.coerce.string().uuid()
 })
 
+export const retryStaffCourseEnrollmentConfirmationResponseCourseIdMin = 2;
+export const retryStaffCourseEnrollmentConfirmationResponseCourseIdMax = 70;
+
+
+export const retryStaffCourseEnrollmentConfirmationResponseCourseIdRegExp = new RegExp('^[a-z0-9]+(?:-[a-z0-9]+)*$');
+
+
 export const RetryStaffCourseEnrollmentConfirmationResponse = zod.object({
   "id": zod.string().uuid(),
-  "courseId": zod.enum(['crm', 'tesouraria', 'lideranca-equipas', 'gestao-comercial', 'gestao-empresas', 'recursos-humanos']),
+  "courseId": zod.string().min(retryStaffCourseEnrollmentConfirmationResponseCourseIdMin).max(retryStaffCourseEnrollmentConfirmationResponseCourseIdMax).regex(retryStaffCourseEnrollmentConfirmationResponseCourseIdRegExp),
   "courseTitle": zod.string(),
   "fullName": zod.string(),
   "birthDate": zod.coerce.date(),

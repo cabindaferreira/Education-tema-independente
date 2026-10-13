@@ -1,4 +1,4 @@
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 import { Router, type IRouter } from "express";
 import { clerkClient, getAuth } from "@clerk/express";
 import {
@@ -15,7 +15,7 @@ import {
   UpdateRoomBookingSettingsBody,
   UpdateRoomBookingSettingsResponse,
 } from "@workspace/api-zod";
-import { db, roomBookingSettingsTable, roomReservationsTable } from "@workspace/db";
+import { db, roomAvailabilityBlocksTable, roomBookingSettingsTable, roomReservationsTable } from "@workspace/db";
 import {
   buildRoomSlots,
   defaultRoomBookingSettings,
@@ -113,7 +113,13 @@ async function requireRoomStaff(req: Parameters<typeof getAuth>[0], res: import(
   }
 
   const user = await clerkClient.users.getUser(userId);
-  if (user.privateMetadata.academyRole !== "room_staff") {
+  const metadata = user.privateMetadata as Record<string, unknown>;
+  const roleList = Array.isArray(metadata.academyRoles)
+    ? metadata.academyRoles.filter((role): role is string => typeof role === "string")
+    : [];
+  const role = metadata.academyRole;
+  if (!roleList.some((entry) => ["room_staff", "academy_admin", "admin"].includes(entry))
+    && !["room_staff", "academy_admin", "admin"].includes(String(role))) {
     res.status(403).json({ error: "Esta área está reservada à equipa da Academia." });
     return false;
   }
@@ -307,10 +313,19 @@ router.post("/room-availability", async (req, res): Promise<void> => {
       eq(roomReservationsTable.bookingDate, input.date),
       eq(roomReservationsTable.status, "confirmed"),
     ));
+  const blockedSlots = await db
+    .select({ startTime: roomAvailabilityBlocksTable.startTime, endTime: roomAvailabilityBlocksTable.endTime })
+    .from(roomAvailabilityBlocksTable)
+    .where(and(
+      eq(roomAvailabilityBlocksTable.roomId, input.roomId),
+      eq(roomAvailabilityBlocksTable.bookingDate, input.date),
+      isNull(roomAvailabilityBlocksTable.releasedAt),
+    ));
 
   const slots = buildRoomSlots(input.roomId, input.date, input.period, input.durationHours, settings)
     .filter((slot) => !slotHasStarted(input.date, slot))
     .filter((slot) => !bookedSlots.some((booked) => slotsOverlap(slot, booked)));
+    .filter((slot) => !blockedSlots.some((block) => slotsOverlap(slot, block)));
 
   res.json(CheckRoomAvailabilityResponse.parse({
     roomId: input.roomId,
@@ -374,8 +389,20 @@ router.post("/room-reservations", async (req, res): Promise<void> => {
         eq(roomReservationsTable.bookingDate, input.date),
         eq(roomReservationsTable.status, "confirmed"),
       ));
+    const blockedSlots = await tx
+      .select({ startTime: roomAvailabilityBlocksTable.startTime, endTime: roomAvailabilityBlocksTable.endTime })
+      .from(roomAvailabilityBlocksTable)
+      .where(and(
+        eq(roomAvailabilityBlocksTable.roomId, input.roomId),
+        eq(roomAvailabilityBlocksTable.bookingDate, input.date),
+        isNull(roomAvailabilityBlocksTable.releasedAt),
+      ));
 
-    if (slotHasStarted(input.date, currentSlot) || bookedSlots.some((booked) => slotsOverlap(currentSlot, booked))) {
+    if (
+      slotHasStarted(input.date, currentSlot)
+      || bookedSlots.some((booked) => slotsOverlap(currentSlot, booked))
+      || blockedSlots.some((block) => slotsOverlap(currentSlot, block))
+    ) {
       return null;
     }
 

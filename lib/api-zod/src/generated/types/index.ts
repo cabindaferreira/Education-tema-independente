@@ -6,6 +6,26 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './adminAccess';
+export * from './adminAgenda';
+export * from './adminCourse';
+export * from './adminCourseCreateInput';
+export * from './adminCourseList';
+export * from './adminCourseUpdateInput';
+export * from './adminCustomer';
+export * from './adminCustomerList';
+export * from './adminCustomerSource';
+export * from './adminMedia';
+export * from './adminMediaInput';
+export * from './adminMediaInputContentType';
+export * from './adminMediaList';
+export * from './adminOverview';
+export * from './adminTeamList';
+export * from './adminTeamMember';
+export * from './adminTeamMemberInput';
+export * from './adminUploadUrl';
+export * from './adminUploadUrlInput';
+export * from './adminUploadUrlInputContentType';
 export * from './courseEnrollmentCheckout';
 export * from './courseEnrollmentInput';
 export * from './courseEnrollmentRequestError';
@@ -17,7 +37,10 @@ export * from './courseEnrollmentStatus';
 export * from './courseEnrollmentStatusConfirmationEmailStatus';
 export * from './courseId';
 export * from './coursePaymentStatus';
+export * from './getAdminAgendaParams';
 export * from './healthStatus';
+export * from './listAdminCustomersParams';
+export * from './listAdminRoomBlocksParams';
 export * from './listRoomReservationsParams';
 export * from './listStaffCourseEnrollmentsParams';
 export * from './newsletterSignupError';
@@ -36,6 +59,9 @@ export * from './resolveCourseEnrollmentPayment';
 export * from './resolveCourseEnrollmentPaymentDecision';
 export * from './room';
 export * from './roomAvailability';
+export * from './roomAvailabilityBlock';
+export * from './roomAvailabilityBlockInput';
+export * from './roomAvailabilityBlockList';
 export * from './roomAvailabilityInput';
 export * from './roomBookingRules';
 export * from './roomBookingSettings';

@@ -5,7 +5,8 @@ import {
   CreateCourseEnrollmentRequestResponse,
   SubscribeToNewsletterBody,
 } from "@workspace/api-zod";
-import { COURSE_CATALOG } from "../lib/course-catalog";
+import { and, eq, isNull } from "drizzle-orm";
+import { academyCoursesTable, db } from "@workspace/db";
 
 const router: IRouter = Router();
 const connectors = new ReplitConnectors();
@@ -46,7 +47,19 @@ router.post("/course-enrollment-requests", async (req, res): Promise<void> => {
 
   const { courseId, fullName, phone } = parsed.data;
   const email = parsed.data.email.toLowerCase();
-  const course = COURSE_CATALOG[courseId];
+  const [course] = await db
+    .select()
+    .from(academyCoursesTable)
+    .where(and(
+      eq(academyCoursesTable.id, courseId),
+      eq(academyCoursesTable.published, true),
+      isNull(academyCoursesTable.archivedAt),
+    ))
+    .limit(1);
+  if (!course) {
+    res.status(400).json({ error: "invalid_request" });
+    return;
+  }
   const sender = process.env.NEWSLETTER_FROM_EMAIL?.trim();
 
   if (!sender) {

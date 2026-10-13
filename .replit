@@ -26,3 +26,4 @@ channel = "stable-25_05"
 
 [userenv.shared]
 NEWSLETTER_FROM_EMAIL = "academia@procenter.co.ao"
+ACADEMY_OWNER_EMAIL = "dti.procenter@gmail.com"

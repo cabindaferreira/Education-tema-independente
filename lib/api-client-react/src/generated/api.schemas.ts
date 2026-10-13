@@ -275,17 +275,262 @@ export interface RoomStaffReservation {
 
 export type RoomStaffReservationList = RoomStaffReservation[];
 
-export type CourseId = typeof CourseId[keyof typeof CourseId];
+export interface AdminAccess {
+  isAdmin: boolean;
+  isOwner: boolean;
+  /** @nullable */
+  email: string | null;
+}
+
+export interface AdminOverview {
+  courses: number;
+  openEnrollments: number;
+  upcomingReservations: number;
+  mediaAssets: number;
+}
+
+export interface AdminTeamMember {
+  userId: string;
+  email: string;
+  /** @nullable */
+  firstName: string | null;
+  /** @nullable */
+  lastName: string | null;
+  isOwner: boolean;
+  createdAt: string;
+}
+
+export type AdminTeamList = AdminTeamMember[];
+
+export interface AdminTeamMemberInput {
+  /** @maxLength 320 */
+  email: string;
+}
+
+/**
+ * @minLength 2
+ * @maxLength 70
+ * @pattern ^[a-z0-9]+(?:-[a-z0-9]+)*$
+ */
+export type CourseId = string;
+
+export interface AdminCourse {
+  id: CourseId;
+  title: string;
+  description: string;
+  duration: string;
+  priceKz: number;
+  imageUrl: string;
+  published: boolean;
+  enrollmentOpen: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type AdminCourseList = AdminCourse[];
+
+export interface AdminCourseCreateInput {
+  /**
+     * @minLength 2
+     * @maxLength 70
+     * @pattern ^[a-z0-9]+(?:-[a-z0-9]+)*$
+     */
+  id: string;
+  /**
+     * @minLength 2
+     * @maxLength 160
+     */
+  title: string;
+  /**
+     * @minLength 5
+     * @maxLength 2000
+     */
+  description: string;
+  /**
+     * @minLength 2
+     * @maxLength 100
+     */
+  duration: string;
+  /**
+     * @minimum 1
+     * @maximum 100000000
+     */
+  priceKz: number;
+  /**
+     * @minLength 1
+     * @maxLength 1000
+     */
+  imageUrl: string;
+  published: boolean;
+  enrollmentOpen: boolean;
+}
+
+export interface AdminCourseUpdateInput {
+  /**
+     * @minLength 2
+     * @maxLength 160
+     */
+  title: string;
+  /**
+     * @minLength 5
+     * @maxLength 2000
+     */
+  description: string;
+  /**
+     * @minLength 2
+     * @maxLength 100
+     */
+  duration: string;
+  /**
+     * @minimum 1
+     * @maximum 100000000
+     */
+  priceKz: number;
+  /**
+     * @minLength 1
+     * @maxLength 1000
+     */
+  imageUrl: string;
+  published: boolean;
+  enrollmentOpen: boolean;
+}
+
+export type AdminCustomerSource = typeof AdminCustomerSource[keyof typeof AdminCustomerSource];
 
 
-export const CourseId = {
-  crm: 'crm',
-  tesouraria: 'tesouraria',
-  'lideranca-equipas': 'lideranca-equipas',
-  'gestao-comercial': 'gestao-comercial',
-  'gestao-empresas': 'gestao-empresas',
-  'recursos-humanos': 'recursos-humanos',
+export const AdminCustomerSource = {
+  course: 'course',
+  room: 'room',
 } as const;
+
+export interface AdminCustomer {
+  id: string;
+  source: AdminCustomerSource;
+  name: string;
+  /** @nullable */
+  email: string | null;
+  /** @nullable */
+  phone: string | null;
+  /** @nullable */
+  company: string | null;
+  /** @nullable */
+  taxId: string | null;
+  item: string;
+  /** @nullable */
+  date: string | null;
+  status: string;
+  /** @nullable */
+  amountKz: number | null;
+}
+
+export type AdminCustomerList = AdminCustomer[];
+
+export interface AdminMedia {
+  id: number;
+  title: string;
+  altText: string;
+  objectPath: string;
+  url: string;
+  contentType: string;
+  sizeBytes: number;
+  createdAt: string;
+}
+
+export type AdminMediaList = AdminMedia[];
+
+export type AdminMediaInputContentType = typeof AdminMediaInputContentType[keyof typeof AdminMediaInputContentType];
+
+
+export const AdminMediaInputContentType = {
+  'image/jpeg': 'image/jpeg',
+  'image/png': 'image/png',
+  'image/webp': 'image/webp',
+  'image/avif': 'image/avif',
+} as const;
+
+export interface AdminMediaInput {
+  /**
+     * @minLength 2
+     * @maxLength 160
+     */
+  title: string;
+  /** @maxLength 500 */
+  altText: string;
+  /**
+     * @minLength 1
+     * @maxLength 1000
+     */
+  objectPath: string;
+  contentType: AdminMediaInputContentType;
+  /**
+     * @minimum 1
+     * @maximum 15728640
+     */
+  sizeBytes: number;
+}
+
+export type AdminUploadUrlInputContentType = typeof AdminUploadUrlInputContentType[keyof typeof AdminUploadUrlInputContentType];
+
+
+export const AdminUploadUrlInputContentType = {
+  'image/jpeg': 'image/jpeg',
+  'image/png': 'image/png',
+  'image/webp': 'image/webp',
+  'image/avif': 'image/avif',
+} as const;
+
+export interface AdminUploadUrlInput {
+  contentType: AdminUploadUrlInputContentType;
+  /**
+     * @minimum 1
+     * @maximum 15728640
+     */
+  sizeBytes: number;
+}
+
+export interface AdminUploadUrl {
+  uploadUrl: string;
+  objectPath: string;
+  expiresAt: string;
+}
+
+export interface RoomAvailabilityBlock {
+  id: number;
+  roomId: RoomId;
+  /** @pattern ^\d{4}-\d{2}-\d{2}$ */
+  date: string;
+  /** @pattern ^\d{2}:\d{2}$ */
+  startTime: string;
+  /** @pattern ^\d{2}:\d{2}$ */
+  endTime: string;
+  reason: string;
+  createdAt: string;
+}
+
+export type RoomAvailabilityBlockList = RoomAvailabilityBlock[];
+
+export interface RoomAvailabilityBlockInput {
+  roomId: RoomId;
+  /** @pattern ^\d{4}-\d{2}-\d{2}$ */
+  date: string;
+  /** @pattern ^\d{2}:\d{2}$ */
+  startTime: string;
+  /** @pattern ^\d{2}:\d{2}$ */
+  endTime: string;
+  /**
+     * @minLength 2
+     * @maxLength 300
+     */
+  reason: string;
+}
+
+export interface AdminAgenda {
+  roomId: RoomId;
+  /** @pattern ^\d{4}-\d{2}-\d{2}$ */
+  date: string;
+  reservations: RoomStaffReservationList;
+  blocks: RoomAvailabilityBlockList;
+}
 
 export interface CourseEnrollmentRequestInput {
   courseId: CourseId;
@@ -533,6 +778,29 @@ export interface ProxyPayPaymentEvent {
   /** @nullable */
   terminal_transaction_id?: number | null;
 }
+
+export type ListAdminCustomersParams = {
+/**
+ * @maxLength 100
+ */
+search?: string;
+};
+
+export type GetAdminAgendaParams = {
+roomId: RoomId;
+/**
+ * @pattern ^\d{4}-\d{2}-\d{2}$
+ */
+date: string;
+};
+
+export type ListAdminRoomBlocksParams = {
+roomId: RoomId;
+/**
+ * @pattern ^\d{4}-\d{2}-\d{2}$
+ */
+date: string;
+};
 
 export type ListRoomReservationsParams = {
 roomId: RoomId;

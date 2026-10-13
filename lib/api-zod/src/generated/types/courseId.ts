@@ -6,14 +6,9 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type CourseId = typeof CourseId[keyof typeof CourseId];
-
-
-export const CourseId = {
-  crm: 'crm',
-  tesouraria: 'tesouraria',
-  'lideranca-equipas': 'lideranca-equipas',
-  'gestao-comercial': 'gestao-comercial',
-  'gestao-empresas': 'gestao-empresas',
-  'recursos-humanos': 'recursos-humanos',
-} as const;
+/**
+ * @minLength 2
+ * @maxLength 70
+ * @pattern ^[a-z0-9]+(?:-[a-z0-9]+)*$
+ */
+export type CourseId = string;

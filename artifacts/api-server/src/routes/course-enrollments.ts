@@ -1,5 +1,5 @@
 import { createHmac, randomUUID, timingSafeEqual } from "node:crypto";
-import { and, desc, eq, ilike, inArray, lt, or } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, isNull, lt, or } from "drizzle-orm";
 import { Router, type IRouter, type Request } from "express";
 import { clerkClient, getAuth } from "@clerk/express";
 import {
@@ -16,8 +16,7 @@ import {
   RetryStaffCourseEnrollmentConfirmationParams,
   RetryStaffCourseEnrollmentConfirmationResponse,
 } from "@workspace/api-zod";
-import { db, courseEnrollmentActionsTable, courseEnrollmentsTable } from "@workspace/db";
-import { COURSE_CATALOG, type CourseId } from "../lib/course-catalog";
+import { academyCoursesTable, db, courseEnrollmentActionsTable, courseEnrollmentsTable } from "@workspace/db";
 import { sendCoursePaymentConfirmation } from "../lib/course-payment-email";
 
 const router: IRouter = Router();
@@ -37,8 +36,15 @@ async function requireCourseStaff(
   }
 
   const user = await clerkClient.users.getUser(userId);
-  const role = user.privateMetadata.academyRole;
-  if (role !== "room_staff" && role !== "course_staff" && role !== "admin") {
+  const metadata = user.privateMetadata as Record<string, unknown>;
+  const academyRoles = Array.isArray(metadata.academyRoles)
+    ? metadata.academyRoles.filter((role): role is string => typeof role === "string")
+    : [];
+  const legacyRole = metadata.academyRole;
+  if (
+    !academyRoles.some((role) => ["room_staff", "course_staff", "admin", "academy_admin"].includes(role))
+    && !["room_staff", "course_staff", "admin", "academy_admin"].includes(String(legacyRole))
+  ) {
     res.status(403).json({ error: "Esta área está reservada à equipa autorizada da Academia." });
     return null;
   }
@@ -134,7 +140,7 @@ async function proxyPayRequest(path: string, init: RequestInit = {}): Promise<Re
   return response;
 }
 
-async function createProxyPayReference(amountKz: number, enrollmentId: string, courseId: CourseId, expiresAt: Date): Promise<string> {
+async function createProxyPayReference(amountKz: number, enrollmentId: string, courseId: string, expiresAt: Date): Promise<string> {
   const idResponse = await proxyPayRequest("/reference_ids", { method: "POST" });
   if (!idResponse.ok) {
     throw new ProxyPayRequestError(idResponse.status);
@@ -196,7 +202,7 @@ function checkoutResponse(enrollment: {
 }) {
   return {
     id: enrollment.id,
-    courseId: enrollment.courseId as CourseId,
+    courseId: enrollment.courseId,
     courseTitle: enrollment.courseTitle,
     amountKz: enrollment.amountKz,
     paymentEntity: enrollment.paymentEntity,
@@ -234,7 +240,20 @@ router.post("/course-enrollments", async (req, res): Promise<void> => {
   }
 
   const input = parsed.data;
-  const course = COURSE_CATALOG[input.courseId];
+  const [course] = await db
+    .select()
+    .from(academyCoursesTable)
+    .where(and(
+      eq(academyCoursesTable.id, input.courseId),
+      eq(academyCoursesTable.published, true),
+      eq(academyCoursesTable.enrollmentOpen, true),
+      isNull(academyCoursesTable.archivedAt),
+    ))
+    .limit(1);
+  if (!course) {
+    res.status(404).json({ error: "Este curso não está disponível para inscrição." });
+    return;
+  }
   const fullName = input.fullName.trim();
   const identityNumber = input.identityNumber.trim();
   const birthDate = submittedBirthDate;

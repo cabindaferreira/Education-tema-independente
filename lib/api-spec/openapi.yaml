@@ -20,6 +20,8 @@ tags:
     description: Signed-in user profile
   - name: newsletter
     description: Newsletter signup operations
+  - name: admin
+    description: Academy administration
 paths:
   /healthz:
     get:
@@ -46,6 +48,418 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/RoomList"
+  /courses:
+    get:
+      operationId: listPublishedCourses
+      tags: [course-enrollments]
+      summary: List published courses with open enrollment
+      responses:
+        "200":
+          description: Published courses available to the public
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminCourseList"
+  /admin/access:
+    get:
+      operationId: getAdminAccess
+      tags: [admin]
+      summary: Check the signed-in user's Academy administration access
+      responses:
+        "200":
+          description: Current account access
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminAccess"
+        "401":
+          description: Sign-in required
+  /admin/overview:
+    get:
+      operationId: getAdminOverview
+      tags: [admin]
+      summary: Get administration dashboard counts
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminOverview"
+        "401":
+          description: Sign-in required
+        "403":
+          description: Administrator access required
+  /admin/courses:
+    get:
+      operationId: listAdminCourses
+      tags: [admin]
+      summary: List all courses, including unpublished courses
+      responses:
+        "200":
+          description: Course catalogue for administrators
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminCourseList"
+        "401":
+          description: Sign-in required
+        "403":
+          description: Administrator access required
+    post:
+      operationId: createAdminCourse
+      tags: [admin]
+      summary: Create a course
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminCourseCreateInput"
+      responses:
+        "201":
+          description: Course created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminCourse"
+        "400":
+          description: Invalid course details
+        "401":
+          description: Sign-in required
+        "403":
+          description: Administrator access required
+        "409":
+          description: Course ID already exists
+  /admin/courses/{courseId}:
+    patch:
+      operationId: updateAdminCourse
+      tags: [admin]
+      summary: Edit a course
+      parameters:
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/CourseId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminCourseUpdateInput"
+      responses:
+        "200":
+          description: Course updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminCourse"
+        "400":
+          description: Invalid course details
+        "401":
+          description: Sign-in required
+        "403":
+          description: Administrator access required
+        "404":
+          description: Course not found
+  /admin/courses/{courseId}/archive:
+    post:
+      operationId: archiveAdminCourse
+      tags: [admin]
+      summary: Remove a course from the active catalogue without deleting its history
+      parameters:
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/CourseId"
+      responses:
+        "200":
+          description: Course archived
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminCourse"
+        "401":
+          description: Sign-in required
+        "403":
+          description: Administrator access required
+        "404":
+          description: Course not found
+  /admin/team:
+    get:
+      operationId: listAdminTeam
+      tags: [admin]
+      summary: List administrators and authorized staff
+      responses:
+        "200":
+          description: Academy users with administration access
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminTeamList"
+        "401":
+          description: Sign-in required
+        "403":
+          description: Owner access required
+    post:
+      operationId: authorizeAdminTeamMember
+      tags: [admin]
+      summary: Grant administration access to an existing verified account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminTeamMemberInput"
+      responses:
+        "200":
+          description: Administration access granted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminTeamMember"
+        "400":
+          description: Email is invalid or not verified
+        "401":
+          description: Sign-in required
+        "403":
+          description: Owner access required
+        "404":
+          description: The user must create an account before being authorized
+  /admin/team/{userId}:
+    delete:
+      operationId: revokeAdminTeamMember
+      tags: [admin]
+      summary: Revoke a collaborator's administration access
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Access revoked
+        "400":
+          description: The owner cannot be removed
+        "401":
+          description: Sign-in required
+        "403":
+          description: Owner access required
+        "404":
+          description: Authorized user not found
+  /admin/customers:
+    get:
+      operationId: listAdminCustomers
+      tags: [admin]
+      summary: Search course and room customers
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+            maxLength: 100
+      responses:
+        "200":
+          description: Matching customers and recent transactions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminCustomerList"
+        "401":
+          description: Sign-in required
+        "403":
+          description: Administrator access required
+  /admin/media:
+    get:
+      operationId: listAdminMedia
+      tags: [admin]
+      summary: List active media assets
+      responses:
+        "200":
+          description: Media library
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminMediaList"
+        "401":
+          description: Sign-in required
+        "403":
+          description: Administrator access required
+    post:
+      operationId: createAdminMedia
+      tags: [admin]
+      summary: Register an uploaded image in the media library
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminMediaInput"
+      responses:
+        "201":
+          description: Media asset registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminMedia"
+        "400":
+          description: Invalid upload metadata
+        "401":
+          description: Sign-in required
+        "403":
+          description: Administrator access required
+  /admin/media/{id}:
+    delete:
+      operationId: removeAdminMedia
+      tags: [admin]
+      summary: Remove an unused media asset from the library
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Media asset removed
+        "400":
+          description: Media asset is still used by a course
+        "401":
+          description: Sign-in required
+        "403":
+          description: Administrator access required
+        "404":
+          description: Media asset not found
+  /storage/uploads/request-url:
+    post:
+      operationId: requestAdminMediaUploadUrl
+      tags: [admin]
+      summary: Get a short-lived upload URL for an administrator
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminUploadUrlInput"
+      responses:
+        "200":
+          description: Temporary upload URL
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUploadUrl"
+        "400":
+          description: Unsupported image type or file size
+        "401":
+          description: Sign-in required
+        "403":
+          description: Administrator access required
+  /admin/agenda:
+    get:
+      operationId: getAdminAgenda
+      tags: [admin]
+      summary: List room reservations and blocked periods for one day
+      parameters:
+        - name: roomId
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/RoomId"
+        - name: date
+          in: query
+          required: true
+          schema:
+            type: string
+            pattern: '^\d{4}-\d{2}-\d{2}$'
+      responses:
+        "200":
+          description: Reservations and blocked periods for the selected room and date
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminAgenda"
+        "400":
+          description: Invalid room or date
+        "401":
+          description: Sign-in required
+        "403":
+          description: Administrator access required
+  /admin/room-blocks:
+    get:
+      operationId: listAdminRoomBlocks
+      tags: [admin]
+      summary: List blocked periods for a room and date
+      parameters:
+        - name: roomId
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/RoomId"
+        - name: date
+          in: query
+          required: true
+          schema:
+            type: string
+            pattern: '^\d{4}-\d{2}-\d{2}$'
+      responses:
+        "200":
+          description: Active blocked periods
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoomAvailabilityBlockList"
+        "401":
+          description: Sign-in required
+        "403":
+          description: Administrator access required
+    post:
+      operationId: createAdminRoomBlock
+      tags: [admin]
+      summary: Block an available room period
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoomAvailabilityBlockInput"
+      responses:
+        "201":
+          description: Period blocked
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoomAvailabilityBlock"
+        "400":
+          description: Invalid period
+        "401":
+          description: Sign-in required
+        "403":
+          description: Administrator access required
+        "409":
+          description: Period conflicts with a reservation or existing block
+  /admin/room-blocks/{id}:
+    delete:
+      operationId: releaseAdminRoomBlock
+      tags: [admin]
+      summary: Release a previously blocked room period
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Period released
+        "401":
+          description: Sign-in required
+        "403":
+          description: Administrator access required
+        "404":
+          description: Active block not found
   /room-booking-settings:
     get:
       operationId: getRoomBookingSettings
@@ -742,15 +1156,316 @@ components:
       type: array
       items:
         $ref: "#/components/schemas/RoomStaffReservation"
+    AdminAccess:
+      type: object
+      required: [isAdmin, isOwner, email]
+      properties:
+        isAdmin:
+          type: boolean
+        isOwner:
+          type: boolean
+        email:
+          type: ["string", "null"]
+          format: email
+    AdminOverview:
+      type: object
+      required: [courses, openEnrollments, upcomingReservations, mediaAssets]
+      properties:
+        courses:
+          type: integer
+        openEnrollments:
+          type: integer
+        upcomingReservations:
+          type: integer
+        mediaAssets:
+          type: integer
+    AdminTeamMember:
+      type: object
+      required: [userId, email, firstName, lastName, isOwner, createdAt]
+      properties:
+        userId:
+          type: string
+        email:
+          type: string
+          format: email
+        firstName:
+          type: ["string", "null"]
+        lastName:
+          type: ["string", "null"]
+        isOwner:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+    AdminTeamList:
+      type: array
+      items:
+        $ref: "#/components/schemas/AdminTeamMember"
+    AdminTeamMemberInput:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 320
+    AdminCourse:
+      type: object
+      required: [id, title, description, duration, priceKz, imageUrl, published, enrollmentOpen, createdAt, updatedAt]
+      properties:
+        id:
+          $ref: "#/components/schemas/CourseId"
+        title:
+          type: string
+        description:
+          type: string
+        duration:
+          type: string
+        priceKz:
+          type: integer
+        imageUrl:
+          type: string
+        published:
+          type: boolean
+        enrollmentOpen:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    AdminCourseList:
+      type: array
+      items:
+        $ref: "#/components/schemas/AdminCourse"
+    AdminCourseCreateInput:
+      type: object
+      required: [id, title, description, duration, priceKz, imageUrl, published, enrollmentOpen]
+      properties:
+        id:
+          type: string
+          minLength: 2
+          maxLength: 70
+          pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$'
+        title:
+          type: string
+          minLength: 2
+          maxLength: 160
+        description:
+          type: string
+          minLength: 5
+          maxLength: 2000
+        duration:
+          type: string
+          minLength: 2
+          maxLength: 100
+        priceKz:
+          type: integer
+          minimum: 1
+          maximum: 100000000
+        imageUrl:
+          type: string
+          minLength: 1
+          maxLength: 1000
+        published:
+          type: boolean
+        enrollmentOpen:
+          type: boolean
+    AdminCourseUpdateInput:
+      type: object
+      required: [title, description, duration, priceKz, imageUrl, published, enrollmentOpen]
+      properties:
+        title:
+          type: string
+          minLength: 2
+          maxLength: 160
+        description:
+          type: string
+          minLength: 5
+          maxLength: 2000
+        duration:
+          type: string
+          minLength: 2
+          maxLength: 100
+        priceKz:
+          type: integer
+          minimum: 1
+          maximum: 100000000
+        imageUrl:
+          type: string
+          minLength: 1
+          maxLength: 1000
+        published:
+          type: boolean
+        enrollmentOpen:
+          type: boolean
+    AdminCustomer:
+      type: object
+      required: [id, source, name, email, phone, company, taxId, item, date, status, amountKz]
+      properties:
+        id:
+          type: string
+        source:
+          type: string
+          enum: [course, room]
+        name:
+          type: string
+        email:
+          type: ["string", "null"]
+          format: email
+        phone:
+          type: ["string", "null"]
+        company:
+          type: ["string", "null"]
+        taxId:
+          type: ["string", "null"]
+        item:
+          type: string
+        date:
+          type: ["string", "null"]
+          format: date-time
+        status:
+          type: string
+        amountKz:
+          type: ["integer", "null"]
+    AdminCustomerList:
+      type: array
+      items:
+        $ref: "#/components/schemas/AdminCustomer"
+    AdminMedia:
+      type: object
+      required: [id, title, altText, objectPath, url, contentType, sizeBytes, createdAt]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        altText:
+          type: string
+        objectPath:
+          type: string
+        url:
+          type: string
+        contentType:
+          type: string
+        sizeBytes:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+    AdminMediaList:
+      type: array
+      items:
+        $ref: "#/components/schemas/AdminMedia"
+    AdminMediaInput:
+      type: object
+      required: [title, altText, objectPath, contentType, sizeBytes]
+      properties:
+        title:
+          type: string
+          minLength: 2
+          maxLength: 160
+        altText:
+          type: string
+          maxLength: 500
+        objectPath:
+          type: string
+          minLength: 1
+          maxLength: 1000
+        contentType:
+          type: string
+          enum: [image/jpeg, image/png, image/webp, image/avif]
+        sizeBytes:
+          type: integer
+          minimum: 1
+          maximum: 15728640
+    AdminUploadUrlInput:
+      type: object
+      required: [contentType, sizeBytes]
+      properties:
+        contentType:
+          type: string
+          enum: [image/jpeg, image/png, image/webp, image/avif]
+        sizeBytes:
+          type: integer
+          minimum: 1
+          maximum: 15728640
+    AdminUploadUrl:
+      type: object
+      required: [uploadUrl, objectPath, expiresAt]
+      properties:
+        uploadUrl:
+          type: string
+          format: uri
+        objectPath:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+    RoomAvailabilityBlock:
+      type: object
+      required: [id, roomId, date, startTime, endTime, reason, createdAt]
+      properties:
+        id:
+          type: integer
+        roomId:
+          $ref: "#/components/schemas/RoomId"
+        date:
+          type: string
+          pattern: '^\d{4}-\d{2}-\d{2}$'
+        startTime:
+          type: string
+          pattern: '^\d{2}:\d{2}$'
+        endTime:
+          type: string
+          pattern: '^\d{2}:\d{2}$'
+        reason:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    RoomAvailabilityBlockList:
+      type: array
+      items:
+        $ref: "#/components/schemas/RoomAvailabilityBlock"
+    RoomAvailabilityBlockInput:
+      type: object
+      required: [roomId, date, startTime, endTime, reason]
+      properties:
+        roomId:
+          $ref: "#/components/schemas/RoomId"
+        date:
+          type: string
+          pattern: '^\d{4}-\d{2}-\d{2}$'
+        startTime:
+          type: string
+          pattern: '^\d{2}:\d{2}$'
+        endTime:
+          type: string
+          pattern: '^\d{2}:\d{2}$'
+        reason:
+          type: string
+          minLength: 2
+          maxLength: 300
+    AdminAgenda:
+      type: object
+      required: [roomId, date, reservations, blocks]
+      properties:
+        roomId:
+          $ref: "#/components/schemas/RoomId"
+        date:
+          type: string
+          pattern: '^\d{4}-\d{2}-\d{2}$'
+        reservations:
+          $ref: "#/components/schemas/RoomStaffReservationList"
+        blocks:
+          $ref: "#/components/schemas/RoomAvailabilityBlockList"
     CourseId:
       type: string
-      enum:
-        - crm
-        - tesouraria
-        - lideranca-equipas
-        - gestao-comercial
-        - gestao-empresas
-        - recursos-humanos
+      minLength: 2
+      maxLength: 70
+      pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$'
     CourseEnrollmentRequestInput:
       type: object
       required: [courseId, fullName, phone, email, privacyAccepted]
