@@ -3,6 +3,7 @@ import {
   index,
   integer,
   pgTable,
+  serial,
   text,
   timestamp,
   uniqueIndex,
@@ -56,3 +57,24 @@ export const insertCourseEnrollmentSchema = createInsertSchema(courseEnrollments
   updatedAt: true,
 });
 export type InsertCourseEnrollment = z.infer<typeof insertCourseEnrollmentSchema>;
+
+export const courseEnrollmentActionsTable = pgTable(
+  "course_enrollment_actions",
+  {
+    id: serial("id").primaryKey(),
+    enrollmentId: uuid("enrollment_id")
+      .notNull()
+      .references(() => courseEnrollmentsTable.id, { onDelete: "cascade" }),
+    actorUserId: text("actor_user_id").notNull(),
+    actionType: text("action_type").notNull(),
+    paymentStatus: text("payment_status"),
+    confirmationEmailStatus: text("confirmation_email_status"),
+    note: text("note"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("course_enrollment_actions_enrollment_created_idx").on(table.enrollmentId, table.createdAt),
+  ],
+);
+
+export type CourseEnrollmentAction = typeof courseEnrollmentActionsTable.$inferSelect;

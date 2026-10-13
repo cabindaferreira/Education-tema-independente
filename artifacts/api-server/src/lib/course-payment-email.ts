@@ -18,6 +18,7 @@ export async function sendCoursePaymentConfirmation(input: {
   courseTitle: string;
   amountKz: number;
   paymentReference: string;
+  idempotencyKey?: string;
 }): Promise<void> {
   const connectors = new ReplitConnectors();
   const safeName = escapeHtml(input.name);
@@ -26,7 +27,7 @@ export async function sendCoursePaymentConfirmation(input: {
   const response = await connectors.proxy("resend", "/emails", {
     method: "POST",
     headers: {
-      "Idempotency-Key": `course-payment-confirmation-${input.enrollmentId}`,
+      "Idempotency-Key": input.idempotencyKey ?? `course-payment-confirmation-${input.enrollmentId}`,
     },
     body: JSON.stringify({
       from: FROM_EMAIL,

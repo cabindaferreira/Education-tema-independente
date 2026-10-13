@@ -149,6 +149,7 @@ export default function StaffReservationsPage() {
           </Link>
           <div className="staff-topbar-meta"><span className="staff-secure-dot" /> Área interna <span className="staff-topbar-separator">/</span> Reservas</div>
           <Link className="staff-exit-link" href="/equipa/salas" data-testid="link-room-settings">Preços e horários</Link>
+          <Link className="staff-exit-link" href="/equipa/inscricoes" data-testid="link-course-enrollments">Inscrições</Link>
           <Link className="staff-exit-link" href="/" data-testid="link-staff-exit">Voltar ao site <ArrowLeft size={14} /></Link>
         </div>
       </header>

@@ -1,14 +1,22 @@
 import { createHmac, randomUUID, timingSafeEqual } from "node:crypto";
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, lt, or } from "drizzle-orm";
 import { Router, type IRouter, type Request } from "express";
+import { clerkClient, getAuth } from "@clerk/express";
 import {
   CreateCourseEnrollmentBody,
   CreateCourseEnrollmentResponse,
   GetCourseEnrollmentStatusParams,
   GetCourseEnrollmentStatusResponse,
+  ListStaffCourseEnrollmentsQueryParams,
+  ListStaffCourseEnrollmentsResponse,
   ReceiveProxyPayPaymentBody,
+  ResolveStaffCourseEnrollmentBody,
+  ResolveStaffCourseEnrollmentParams,
+  ResolveStaffCourseEnrollmentResponse,
+  RetryStaffCourseEnrollmentConfirmationParams,
+  RetryStaffCourseEnrollmentConfirmationResponse,
 } from "@workspace/api-zod";
-import { db, courseEnrollmentsTable } from "@workspace/db";
+import { db, courseEnrollmentActionsTable, courseEnrollmentsTable } from "@workspace/db";
 import { COURSE_CATALOG, type CourseId } from "../lib/course-catalog";
 import { sendCoursePaymentConfirmation } from "../lib/course-payment-email";
 
@@ -17,6 +25,83 @@ const PROXYPAY_API_URL = "https://api.proxypay.co.ao";
 const PROXYPAY_ENTITY = "00413";
 const WEBHOOK_URL = "https://education-tema-independente.replit.app/api/proxypay/webhook";
 const REFERENCE_VALIDITY_HOURS = 72;
+
+async function requireCourseStaff(
+  req: Parameters<typeof getAuth>[0],
+  res: import("express").Response,
+): Promise<string | null> {
+  const { userId } = getAuth(req);
+  if (!userId) {
+    res.status(401).json({ error: "Inicie sessão para continuar." });
+    return null;
+  }
+
+  const user = await clerkClient.users.getUser(userId);
+  const role = user.privateMetadata.academyRole;
+  if (role !== "room_staff" && role !== "course_staff" && role !== "admin") {
+    res.status(403).json({ error: "Esta área está reservada à equipa autorizada da Academia." });
+    return null;
+  }
+
+  return userId;
+}
+
+function staffEnrollmentResponse(
+  enrollment: typeof courseEnrollmentsTable.$inferSelect,
+  actions: (typeof courseEnrollmentActionsTable.$inferSelect)[],
+) {
+  return {
+    id: enrollment.id,
+    courseId: enrollment.courseId,
+    courseTitle: enrollment.courseTitle,
+    fullName: enrollment.fullName,
+    birthDate: enrollment.birthDate,
+    identityNumber: enrollment.identityNumber,
+    nationality: enrollment.nationality,
+    phone: enrollment.phone,
+    email: enrollment.email,
+    address: enrollment.address,
+    municipality: enrollment.municipality,
+    province: enrollment.province,
+    profession: enrollment.profession,
+    maritalStatus: enrollment.maritalStatus,
+    amountKz: enrollment.amountKz,
+    paymentEntity: enrollment.paymentEntity,
+    paymentReference: enrollment.paymentReference,
+    paymentStatus: enrollment.paymentStatus,
+    paymentTransactionId: enrollment.paymentTransactionId,
+    paymentAmountKz: enrollment.paymentAmountKz,
+    paidAt: enrollment.paidAt,
+    expiresAt: enrollment.expiresAt,
+    confirmationEmailStatus: enrollment.confirmationEmailStatus,
+    confirmationEmailSentAt: enrollment.confirmationEmailSentAt,
+    actions: actions.map((action) => ({
+      id: action.id,
+      actorUserId: action.actorUserId,
+      actionType: action.actionType,
+      paymentStatus: action.paymentStatus,
+      confirmationEmailStatus: action.confirmationEmailStatus,
+      note: action.note,
+      createdAt: action.createdAt,
+    })),
+  };
+}
+
+async function loadStaffEnrollment(enrollmentId: string) {
+  const [enrollment] = await db
+    .select()
+    .from(courseEnrollmentsTable)
+    .where(eq(courseEnrollmentsTable.id, enrollmentId))
+    .limit(1);
+  if (!enrollment) return null;
+
+  const actions = await db
+    .select()
+    .from(courseEnrollmentActionsTable)
+    .where(eq(courseEnrollmentActionsTable.enrollmentId, enrollmentId))
+    .orderBy(courseEnrollmentActionsTable.createdAt, courseEnrollmentActionsTable.id);
+  return staffEnrollmentResponse(enrollment, actions);
+}
 
 class ProxyPayNotConfiguredError extends Error {}
 
@@ -218,6 +303,267 @@ router.post("/course-enrollments", async (req, res): Promise<void> => {
   }
 });
 
+router.get("/course-enrollments/staff", async (req, res): Promise<void> => {
+  if (!(await requireCourseStaff(req, res))) return;
+
+  const parsed = ListStaffCourseEnrollmentsQueryParams.safeParse(req.query);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Os filtros de pesquisa não são válidos." });
+    return;
+  }
+
+  await db
+    .update(courseEnrollmentsTable)
+    .set({ paymentStatus: "expired", updatedAt: new Date() })
+    .where(and(
+      eq(courseEnrollmentsTable.paymentStatus, "pending"),
+      lt(courseEnrollmentsTable.expiresAt, new Date()),
+    ));
+
+  const filters = [];
+  if (parsed.data.courseId) filters.push(eq(courseEnrollmentsTable.courseId, parsed.data.courseId));
+  if (parsed.data.paymentStatus) filters.push(eq(courseEnrollmentsTable.paymentStatus, parsed.data.paymentStatus));
+  const search = parsed.data.search?.trim();
+  if (search) {
+    const pattern = `%${search}%`;
+    filters.push(or(
+      ilike(courseEnrollmentsTable.fullName, pattern),
+      ilike(courseEnrollmentsTable.email, pattern),
+      ilike(courseEnrollmentsTable.identityNumber, pattern),
+      ilike(courseEnrollmentsTable.paymentReference, pattern),
+      ilike(courseEnrollmentsTable.phone, pattern),
+    )!);
+  }
+
+  const enrollments = await db
+    .select()
+    .from(courseEnrollmentsTable)
+    .where(filters.length ? and(...filters) : undefined)
+    .orderBy(desc(courseEnrollmentsTable.createdAt))
+    .limit(200);
+  const recentEnrollments = enrollments;
+  const enrollmentIds = recentEnrollments.map((enrollment) => enrollment.id);
+  const actions = enrollmentIds.length
+    ? await db
+        .select()
+        .from(courseEnrollmentActionsTable)
+        .where(inArray(courseEnrollmentActionsTable.enrollmentId, enrollmentIds))
+        .orderBy(courseEnrollmentActionsTable.createdAt, courseEnrollmentActionsTable.id)
+    : [];
+  const actionsByEnrollment = new Map<string, typeof actions>();
+  for (const action of actions) {
+    const current = actionsByEnrollment.get(action.enrollmentId) ?? [];
+    current.push(action);
+    actionsByEnrollment.set(action.enrollmentId, current);
+  }
+
+  res.json(ListStaffCourseEnrollmentsResponse.parse(
+    recentEnrollments.map((enrollment) =>
+      staffEnrollmentResponse(enrollment, actionsByEnrollment.get(enrollment.id) ?? []),
+    ),
+  ));
+});
+
+router.post("/course-enrollments/:id/resolve", async (req, res): Promise<void> => {
+  const actorUserId = await requireCourseStaff(req, res);
+  if (!actorUserId) return;
+
+  const params = ResolveStaffCourseEnrollmentParams.safeParse(req.params);
+  const body = ResolveStaffCourseEnrollmentBody.safeParse(req.body);
+  if (!params.success || !body.success || body.data.note.trim().length < 5) {
+    res.status(400).json({ error: "Indique uma decisão e uma justificação válida." });
+    return;
+  }
+
+  const nextPaymentStatus = body.data.decision === "confirm_payment" ? "paid" : "expired";
+  const transaction = await db.transaction(async (tx) => {
+    const [updated] = await tx
+      .update(courseEnrollmentsTable)
+      .set({
+        paymentStatus: nextPaymentStatus,
+        ...(nextPaymentStatus === "paid" ? { paidAt: new Date(), confirmationEmailStatus: "sending" } : {}),
+        updatedAt: new Date(),
+      })
+      .where(and(
+        eq(courseEnrollmentsTable.id, params.data.id),
+        eq(courseEnrollmentsTable.paymentStatus, "review_required"),
+      ))
+      .returning();
+    if (!updated) return null;
+
+    const [action] = await tx
+      .insert(courseEnrollmentActionsTable)
+      .values({
+        enrollmentId: updated.id,
+        actorUserId,
+        actionType: "payment_resolved",
+        paymentStatus: nextPaymentStatus,
+        confirmationEmailStatus: updated.confirmationEmailStatus,
+        note: body.data.note.trim(),
+      })
+      .returning();
+    return { enrollment: updated, action };
+  });
+
+  if (!transaction) {
+    const [existing] = await db
+      .select({ id: courseEnrollmentsTable.id })
+      .from(courseEnrollmentsTable)
+      .where(eq(courseEnrollmentsTable.id, params.data.id))
+      .limit(1);
+    res.status(existing ? 409 : 404).json({
+      error: existing ? "Esta exceção já foi resolvida por outra pessoa." : "Inscrição não encontrada.",
+    });
+    return;
+  }
+
+  if (nextPaymentStatus === "paid") {
+    try {
+      await sendCoursePaymentConfirmation({
+        enrollmentId: transaction.enrollment.id,
+        name: transaction.enrollment.fullName,
+        email: transaction.enrollment.email,
+        courseTitle: transaction.enrollment.courseTitle,
+        amountKz: transaction.enrollment.amountKz,
+        paymentReference: transaction.enrollment.paymentReference,
+        idempotencyKey: `course-payment-confirmation-${transaction.enrollment.id}-resolution-${transaction.action.id}`,
+      });
+      await db.transaction(async (tx) => {
+        await tx
+          .update(courseEnrollmentsTable)
+          .set({ confirmationEmailStatus: "sent", confirmationEmailSentAt: new Date(), updatedAt: new Date() })
+          .where(eq(courseEnrollmentsTable.id, transaction.enrollment.id));
+        await tx
+          .update(courseEnrollmentActionsTable)
+          .set({ confirmationEmailStatus: "sent" })
+          .where(eq(courseEnrollmentActionsTable.id, transaction.action.id));
+      });
+    } catch (error) {
+      await db.transaction(async (tx) => {
+        await tx
+          .update(courseEnrollmentsTable)
+          .set({ confirmationEmailStatus: "failed", updatedAt: new Date() })
+          .where(eq(courseEnrollmentsTable.id, transaction.enrollment.id));
+        await tx
+          .update(courseEnrollmentActionsTable)
+          .set({ confirmationEmailStatus: "failed" })
+          .where(eq(courseEnrollmentActionsTable.id, transaction.action.id));
+      });
+      req.log.error(
+        { enrollmentId: transaction.enrollment.id, errorName: error instanceof Error ? error.name : "UnknownError" },
+        "Payment review was resolved, but the confirmation email failed",
+      );
+    }
+  }
+
+  const response = await loadStaffEnrollment(transaction.enrollment.id);
+  if (!response) {
+    res.status(500).json({ error: "A inscrição foi actualizada, mas não foi possível recarregá-la." });
+    return;
+  }
+  res.json(ResolveStaffCourseEnrollmentResponse.parse(response));
+});
+
+router.post("/course-enrollments/:id/retry-confirmation", async (req, res): Promise<void> => {
+  const actorUserId = await requireCourseStaff(req, res);
+  if (!actorUserId) return;
+
+  const params = RetryStaffCourseEnrollmentConfirmationParams.safeParse(req.params);
+  if (!params.success) {
+    res.status(404).json({ error: "Inscrição não encontrada." });
+    return;
+  }
+
+  const claimed = await db.transaction(async (tx) => {
+    const [updated] = await tx
+      .update(courseEnrollmentsTable)
+      .set({ confirmationEmailStatus: "sending", updatedAt: new Date() })
+      .where(and(
+        eq(courseEnrollmentsTable.id, params.data.id),
+        eq(courseEnrollmentsTable.paymentStatus, "paid"),
+        eq(courseEnrollmentsTable.confirmationEmailStatus, "failed"),
+      ))
+      .returning();
+    if (!updated) return null;
+
+    const [action] = await tx
+      .insert(courseEnrollmentActionsTable)
+      .values({
+        enrollmentId: updated.id,
+        actorUserId,
+        actionType: "confirmation_retry",
+        paymentStatus: updated.paymentStatus,
+        confirmationEmailStatus: "sending",
+        note: "Reenvio manual solicitado pela equipa.",
+      })
+      .returning();
+    return { enrollment: updated, action };
+  });
+
+  if (!claimed) {
+    const [existing] = await db
+      .select({
+        id: courseEnrollmentsTable.id,
+        paymentStatus: courseEnrollmentsTable.paymentStatus,
+      })
+      .from(courseEnrollmentsTable)
+      .where(eq(courseEnrollmentsTable.id, params.data.id))
+      .limit(1);
+    if (!existing) {
+      res.status(404).json({ error: "Inscrição não encontrada." });
+      return;
+    }
+    res.status(409).json({ error: "Só é possível reenviar uma confirmação que tenha falhado." });
+    return;
+  }
+
+  try {
+    await sendCoursePaymentConfirmation({
+      enrollmentId: claimed.enrollment.id,
+      name: claimed.enrollment.fullName,
+      email: claimed.enrollment.email,
+      courseTitle: claimed.enrollment.courseTitle,
+      amountKz: claimed.enrollment.amountKz,
+      paymentReference: claimed.enrollment.paymentReference,
+      idempotencyKey: `course-payment-confirmation-${claimed.enrollment.id}-retry-${claimed.action.id}`,
+    });
+    await db.transaction(async (tx) => {
+      await tx
+        .update(courseEnrollmentsTable)
+        .set({ confirmationEmailStatus: "sent", confirmationEmailSentAt: new Date(), updatedAt: new Date() })
+        .where(eq(courseEnrollmentsTable.id, claimed.enrollment.id));
+      await tx
+        .update(courseEnrollmentActionsTable)
+        .set({ confirmationEmailStatus: "sent" })
+        .where(eq(courseEnrollmentActionsTable.id, claimed.action.id));
+    });
+  } catch (error) {
+    await db.transaction(async (tx) => {
+      await tx
+        .update(courseEnrollmentsTable)
+        .set({ confirmationEmailStatus: "failed", updatedAt: new Date() })
+        .where(eq(courseEnrollmentsTable.id, claimed.enrollment.id));
+      await tx
+        .update(courseEnrollmentActionsTable)
+        .set({ confirmationEmailStatus: "failed" })
+        .where(eq(courseEnrollmentActionsTable.id, claimed.action.id));
+    });
+    req.log.error(
+      { enrollmentId: claimed.enrollment.id, errorName: error instanceof Error ? error.name : "UnknownError" },
+      "Staff course payment confirmation retry failed",
+    );
+    res.status(502).json({ error: "O reenvio falhou e ficou registado. Pode tentar novamente mais tarde." });
+    return;
+  }
+
+  const response = await loadStaffEnrollment(claimed.enrollment.id);
+  if (!response) {
+    res.status(500).json({ error: "O e-mail foi enviado, mas não foi possível recarregar a inscrição." });
+    return;
+  }
+  res.json(RetryStaffCourseEnrollmentConfirmationResponse.parse(response));
+});
+
 router.get("/course-enrollments/:id", async (req, res): Promise<void> => {
   const params = GetCourseEnrollmentStatusParams.safeParse(req.params);
   if (!params.success) {
@@ -361,7 +707,16 @@ router.post("/proxypay/webhook", async (req, res): Promise<void> => {
     return;
   }
 
-  if (enrollment.confirmationEmailStatus !== "sent") {
+  const [emailClaim] = await db
+    .update(courseEnrollmentsTable)
+    .set({ confirmationEmailStatus: "sending", updatedAt: new Date() })
+    .where(and(
+      eq(courseEnrollmentsTable.id, enrollment.id),
+      inArray(courseEnrollmentsTable.confirmationEmailStatus, ["pending", "failed"]),
+    ))
+    .returning({ id: courseEnrollmentsTable.id });
+
+  if (emailClaim) {
     try {
       await sendCoursePaymentConfirmation({
         enrollmentId: enrollment.id,

@@ -23,6 +23,7 @@ import AboutPage from '@/pages/sobre-nos';
 import { AccountPage } from '@/pages/conta';
 import StaffReservationsPage from '@/pages/equipa-reservas';
 import StaffRoomSettingsPage from '@/pages/equipa-salas';
+import StaffCourseEnrollmentsPage from '@/pages/equipa-inscricoes';
 import { SignInPage, SignUpPage } from '@/pages/auth';
 import NewsletterUnsubscribePage from '@/pages/newsletter-unsubscribe';
 import NotFound from '@/pages/not-found';
@@ -163,6 +164,7 @@ function AppRoutes() {
         <Route path="/unsubscribe"><PublicPage><NewsletterUnsubscribePage /></PublicPage></Route>
         <Route path="/equipa/reservas" component={StaffReservationsPage} />
         <Route path="/equipa/salas" component={StaffRoomSettingsPage} />
+        <Route path="/equipa/inscricoes" component={StaffCourseEnrollmentsPage} />
         <Route path="/conta" component={AccountPage} />
         <Route path="/" component={PublicHome} />
         <Route path="/cursos"><PublicPage><CoursesPage /></PublicPage></Route>

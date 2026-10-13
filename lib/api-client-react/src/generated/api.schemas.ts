@@ -416,6 +416,114 @@ export type CourseEnrollmentStatus = CourseEnrollmentCheckout & ({
   paidAt?: string | null;
 });
 
+export type ResolveCourseEnrollmentPaymentDecision = typeof ResolveCourseEnrollmentPaymentDecision[keyof typeof ResolveCourseEnrollmentPaymentDecision];
+
+
+export const ResolveCourseEnrollmentPaymentDecision = {
+  confirm_payment: 'confirm_payment',
+  reject_payment: 'reject_payment',
+} as const;
+
+export interface ResolveCourseEnrollmentPayment {
+  decision: ResolveCourseEnrollmentPaymentDecision;
+  /**
+     * @minLength 5
+     * @maxLength 1000
+     */
+  note: string;
+}
+
+export type StaffCourseEnrollmentConfirmationEmailStatus = typeof StaffCourseEnrollmentConfirmationEmailStatus[keyof typeof StaffCourseEnrollmentConfirmationEmailStatus];
+
+
+export const StaffCourseEnrollmentConfirmationEmailStatus = {
+  pending: 'pending',
+  sending: 'sending',
+  sent: 'sent',
+  failed: 'failed',
+} as const;
+
+export type StaffCourseEnrollmentActionActionType = typeof StaffCourseEnrollmentActionActionType[keyof typeof StaffCourseEnrollmentActionActionType];
+
+
+export const StaffCourseEnrollmentActionActionType = {
+  payment_resolved: 'payment_resolved',
+  confirmation_retry: 'confirmation_retry',
+} as const;
+
+/**
+ * @nullable
+ */
+export type StaffCourseEnrollmentActionPaymentStatus = typeof StaffCourseEnrollmentActionPaymentStatus[keyof typeof StaffCourseEnrollmentActionPaymentStatus] | null;
+
+
+export const StaffCourseEnrollmentActionPaymentStatus = {
+  pending: 'pending',
+  paid: 'paid',
+  review_required: 'review_required',
+  expired: 'expired',
+} as const;
+
+/**
+ * @nullable
+ */
+export type StaffCourseEnrollmentActionConfirmationEmailStatus = typeof StaffCourseEnrollmentActionConfirmationEmailStatus[keyof typeof StaffCourseEnrollmentActionConfirmationEmailStatus] | null;
+
+
+export const StaffCourseEnrollmentActionConfirmationEmailStatus = {
+  pending: 'pending',
+  sending: 'sending',
+  sent: 'sent',
+  failed: 'failed',
+} as const;
+
+export interface StaffCourseEnrollmentAction {
+  id: number;
+  actorUserId: string;
+  actionType: StaffCourseEnrollmentActionActionType;
+  /** @nullable */
+  paymentStatus: StaffCourseEnrollmentActionPaymentStatus;
+  /** @nullable */
+  confirmationEmailStatus: StaffCourseEnrollmentActionConfirmationEmailStatus;
+  /** @nullable */
+  note: string | null;
+  createdAt: string;
+}
+
+export interface StaffCourseEnrollment {
+  id: string;
+  courseId: CourseId;
+  courseTitle: string;
+  fullName: string;
+  birthDate: string;
+  identityNumber: string;
+  nationality: string;
+  phone: string;
+  email: string;
+  address: string;
+  municipality: string;
+  province: string;
+  profession: string;
+  maritalStatus: string;
+  amountKz: number;
+  paymentEntity: string;
+  paymentReference: string;
+  paymentStatus: CoursePaymentStatus;
+  /** @nullable */
+  paymentTransactionId: string | null;
+  /** @nullable */
+  paymentAmountKz: number | null;
+  /** @nullable */
+  paidAt: string | null;
+  expiresAt: string;
+  confirmationEmailStatus: StaffCourseEnrollmentConfirmationEmailStatus;
+  /** @nullable */
+  confirmationEmailSentAt: string | null;
+  actions: StaffCourseEnrollmentAction[];
+}
+
+export type StaffCourseEnrollmentList = StaffCourseEnrollment[];
+
 export interface ProxyPayPaymentEvent {
   transaction_id: number;
   reference_id: number;
@@ -432,5 +540,14 @@ roomId: RoomId;
  * @pattern ^\d{4}-\d{2}-\d{2}$
  */
 date: string;
+};
+
+export type ListStaffCourseEnrollmentsParams = {
+courseId?: CourseId;
+paymentStatus?: CoursePaymentStatus;
+/**
+ * @maxLength 100
+ */
+search?: string;
 };
 

@@ -137,6 +137,7 @@ export default function StaffRoomSettingsPage() {
       <header className="staff-settings-topbar">
         <Link to="/" className="staff-settings-brand"><img src="/favicon.svg" alt="" /><span>ACADEMIA<small>PROCENTER · EQUIPA</small></span></Link>
         <span><i /> Área interna / Salas</span>
+        <Link to="/equipa/inscricoes" className="staff-settings-back">Inscrições</Link>
         <Link to="/equipa/reservas" className="staff-settings-back">Reservas <ArrowLeft size={14} /></Link>
       </header>
       <div className="staff-settings-main">

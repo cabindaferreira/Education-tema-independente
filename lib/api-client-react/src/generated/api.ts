@@ -28,6 +28,7 @@ import type {
   CourseEnrollmentStatus,
   HealthStatus,
   ListRoomReservationsParams,
+  ListStaffCourseEnrollmentsParams,
   NewsletterSignupError,
   NewsletterSignupInput,
   NewsletterSignupResponse,
@@ -35,6 +36,7 @@ import type {
   NewsletterUnsubscribeInput,
   NewsletterUnsubscribeResponse,
   ProxyPayPaymentEvent,
+  ResolveCourseEnrollmentPayment,
   RoomAvailability,
   RoomAvailabilityInput,
   RoomBookingSettings,
@@ -43,6 +45,8 @@ import type {
   RoomReservationInput,
   RoomStaffReservation,
   RoomStaffReservationList,
+  StaffCourseEnrollment,
+  StaffCourseEnrollmentList,
   UserProfile
 } from './api.schemas';
 
@@ -979,6 +983,253 @@ export function useGetCourseEnrollmentStatus<TData = Awaited<ReturnType<typeof g
 
 
 
+
+export const getListStaffCourseEnrollmentsUrl = (params?: ListStaffCourseEnrollmentsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/course-enrollments/staff?${stringifiedParams}` : `/api/course-enrollments/staff`
+}
+
+/**
+ * @summary Search course enrollments for authorized staff
+ */
+export const listStaffCourseEnrollments = async (params?: ListStaffCourseEnrollmentsParams, options?: Parameters<typeof customFetch>[1]): Promise<StaffCourseEnrollmentList> => {
+
+  return customFetch<StaffCourseEnrollmentList>(getListStaffCourseEnrollmentsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListStaffCourseEnrollmentsQueryKey = (params?: ListStaffCourseEnrollmentsParams,) => {
+    return [
+    `/api/course-enrollments/staff`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListStaffCourseEnrollmentsQueryOptions = <TData = Awaited<ReturnType<typeof listStaffCourseEnrollments>>, TError = ErrorType<void>>(params?: ListStaffCourseEnrollmentsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listStaffCourseEnrollments>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListStaffCourseEnrollmentsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listStaffCourseEnrollments>>> = ({ signal }) => listStaffCourseEnrollments(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listStaffCourseEnrollments>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListStaffCourseEnrollmentsQueryResult = NonNullable<Awaited<ReturnType<typeof listStaffCourseEnrollments>>>
+export type ListStaffCourseEnrollmentsQueryError = ErrorType<void>
+
+
+/**
+ * @summary Search course enrollments for authorized staff
+ */
+
+export function useListStaffCourseEnrollments<TData = Awaited<ReturnType<typeof listStaffCourseEnrollments>>, TError = ErrorType<void>>(
+ params?: ListStaffCourseEnrollmentsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listStaffCourseEnrollments>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListStaffCourseEnrollmentsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getResolveStaffCourseEnrollmentUrl = (id: string,) => {
+
+
+
+
+  return `/api/course-enrollments/${id}/resolve`
+}
+
+/**
+ * @summary Record a staff decision for a payment exception
+ */
+export const resolveStaffCourseEnrollment = async (id: string,
+    resolveCourseEnrollmentPayment: ResolveCourseEnrollmentPayment, options?: Parameters<typeof customFetch>[1]): Promise<StaffCourseEnrollment> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<StaffCourseEnrollment>(getResolveStaffCourseEnrollmentUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(resolveCourseEnrollmentPayment)
+  }
+);}
+
+
+
+
+
+export const getResolveStaffCourseEnrollmentMutationKey = () => ['resolveStaffCourseEnrollment'] as const;
+
+export const getResolveStaffCourseEnrollmentMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resolveStaffCourseEnrollment>>, TError,ResolveStaffCourseEnrollmentMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof resolveStaffCourseEnrollment>>, TError,ResolveStaffCourseEnrollmentMutationVariables, TContext> => {
+
+const mutationKey = getResolveStaffCourseEnrollmentMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof resolveStaffCourseEnrollment>>, ResolveStaffCourseEnrollmentMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  resolveStaffCourseEnrollment(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ResolveStaffCourseEnrollmentMutationResult = NonNullable<Awaited<ReturnType<typeof resolveStaffCourseEnrollment>>>
+    export type ResolveStaffCourseEnrollmentMutationBody = BodyType<ResolveCourseEnrollmentPayment>
+    export type ResolveStaffCourseEnrollmentMutationError = ErrorType<void>
+    export type ResolveStaffCourseEnrollmentMutationVariables = {id: string;data: BodyType<ResolveCourseEnrollmentPayment>}
+
+    /**
+ * @summary Record a staff decision for a payment exception
+ */
+export const useResolveStaffCourseEnrollment = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resolveStaffCourseEnrollment>>, TError,ResolveStaffCourseEnrollmentMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof resolveStaffCourseEnrollment>>,
+        TError,
+        ResolveStaffCourseEnrollmentMutationVariables,
+        TContext
+      > => {
+      return useMutation(getResolveStaffCourseEnrollmentMutationOptions(options));
+    }
+
+export const getRetryStaffCourseEnrollmentConfirmationUrl = (id: string,) => {
+
+
+
+
+  return `/api/course-enrollments/${id}/retry-confirmation`
+}
+
+/**
+ * @summary Retry a failed payment confirmation email
+ */
+export const retryStaffCourseEnrollmentConfirmation = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<StaffCourseEnrollment> => {
+
+  return customFetch<StaffCourseEnrollment>(getRetryStaffCourseEnrollmentConfirmationUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getRetryStaffCourseEnrollmentConfirmationMutationKey = () => ['retryStaffCourseEnrollmentConfirmation'] as const;
+
+export const getRetryStaffCourseEnrollmentConfirmationMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof retryStaffCourseEnrollmentConfirmation>>, TError,RetryStaffCourseEnrollmentConfirmationMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof retryStaffCourseEnrollmentConfirmation>>, TError,RetryStaffCourseEnrollmentConfirmationMutationVariables, TContext> => {
+
+const mutationKey = getRetryStaffCourseEnrollmentConfirmationMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof retryStaffCourseEnrollmentConfirmation>>, RetryStaffCourseEnrollmentConfirmationMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  retryStaffCourseEnrollmentConfirmation(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RetryStaffCourseEnrollmentConfirmationMutationResult = NonNullable<Awaited<ReturnType<typeof retryStaffCourseEnrollmentConfirmation>>>
+
+    export type RetryStaffCourseEnrollmentConfirmationMutationError = ErrorType<void>
+    export type RetryStaffCourseEnrollmentConfirmationMutationVariables = {id: string}
+
+    /**
+ * @summary Retry a failed payment confirmation email
+ */
+export const useRetryStaffCourseEnrollmentConfirmation = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof retryStaffCourseEnrollmentConfirmation>>, TError,RetryStaffCourseEnrollmentConfirmationMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof retryStaffCourseEnrollmentConfirmation>>,
+        TError,
+        RetryStaffCourseEnrollmentConfirmationMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRetryStaffCourseEnrollmentConfirmationMutationOptions(options));
+    }
 
 export const getReceiveProxyPayPaymentUrl = () => {
 

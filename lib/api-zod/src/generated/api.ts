@@ -721,6 +721,155 @@ export const GetCourseEnrollmentStatusResponse = zod.object({
 
 
 /**
+ * @summary Search course enrollments for authorized staff
+ */
+export const listStaffCourseEnrollmentsQuerySearchMax = 100;
+
+
+
+export const ListStaffCourseEnrollmentsQueryParams = zod.object({
+  "courseId": zod.enum(['crm', 'tesouraria', 'lideranca-equipas', 'gestao-comercial', 'gestao-empresas', 'recursos-humanos']).optional(),
+  "paymentStatus": zod.enum(['pending', 'paid', 'review_required', 'expired']).optional(),
+  "search": zod.coerce.string().max(listStaffCourseEnrollmentsQuerySearchMax).optional()
+})
+
+export const ListStaffCourseEnrollmentsResponseItem = zod.object({
+  "id": zod.string().uuid(),
+  "courseId": zod.enum(['crm', 'tesouraria', 'lideranca-equipas', 'gestao-comercial', 'gestao-empresas', 'recursos-humanos']),
+  "courseTitle": zod.string(),
+  "fullName": zod.string(),
+  "birthDate": zod.coerce.date(),
+  "identityNumber": zod.string(),
+  "nationality": zod.string(),
+  "phone": zod.string(),
+  "email": zod.string().email(),
+  "address": zod.string(),
+  "municipality": zod.string(),
+  "province": zod.string(),
+  "profession": zod.string(),
+  "maritalStatus": zod.string(),
+  "amountKz": zod.number().int(),
+  "paymentEntity": zod.string(),
+  "paymentReference": zod.string(),
+  "paymentStatus": zod.enum(['pending', 'paid', 'review_required', 'expired']),
+  "paymentTransactionId": zod.string().nullable(),
+  "paymentAmountKz": zod.number().int().nullable(),
+  "paidAt": zod.coerce.date().nullable(),
+  "expiresAt": zod.coerce.date(),
+  "confirmationEmailStatus": zod.enum(['pending', 'sending', 'sent', 'failed']),
+  "confirmationEmailSentAt": zod.coerce.date().nullable(),
+  "actions": zod.array(zod.object({
+  "id": zod.number().int(),
+  "actorUserId": zod.string(),
+  "actionType": zod.enum(['payment_resolved', 'confirmation_retry']),
+  "paymentStatus": zod.union([zod.literal('pending'),zod.literal('paid'),zod.literal('review_required'),zod.literal('expired'),zod.literal(null)]).nullable(),
+  "confirmationEmailStatus": zod.union([zod.literal('pending'),zod.literal('sending'),zod.literal('sent'),zod.literal('failed'),zod.literal(null)]).nullable(),
+  "note": zod.string().nullable(),
+  "createdAt": zod.coerce.date()
+}))
+})
+export const ListStaffCourseEnrollmentsResponse = zod.array(ListStaffCourseEnrollmentsResponseItem)
+
+
+/**
+ * @summary Record a staff decision for a payment exception
+ */
+export const ResolveStaffCourseEnrollmentParams = zod.object({
+  "id": zod.coerce.string().uuid()
+})
+
+export const resolveStaffCourseEnrollmentBodyNoteMin = 5;
+export const resolveStaffCourseEnrollmentBodyNoteMax = 1000;
+
+
+
+export const ResolveStaffCourseEnrollmentBody = zod.object({
+  "decision": zod.enum(['confirm_payment', 'reject_payment']),
+  "note": zod.string().min(resolveStaffCourseEnrollmentBodyNoteMin).max(resolveStaffCourseEnrollmentBodyNoteMax)
+})
+
+export const ResolveStaffCourseEnrollmentResponse = zod.object({
+  "id": zod.string().uuid(),
+  "courseId": zod.enum(['crm', 'tesouraria', 'lideranca-equipas', 'gestao-comercial', 'gestao-empresas', 'recursos-humanos']),
+  "courseTitle": zod.string(),
+  "fullName": zod.string(),
+  "birthDate": zod.coerce.date(),
+  "identityNumber": zod.string(),
+  "nationality": zod.string(),
+  "phone": zod.string(),
+  "email": zod.string().email(),
+  "address": zod.string(),
+  "municipality": zod.string(),
+  "province": zod.string(),
+  "profession": zod.string(),
+  "maritalStatus": zod.string(),
+  "amountKz": zod.number().int(),
+  "paymentEntity": zod.string(),
+  "paymentReference": zod.string(),
+  "paymentStatus": zod.enum(['pending', 'paid', 'review_required', 'expired']),
+  "paymentTransactionId": zod.string().nullable(),
+  "paymentAmountKz": zod.number().int().nullable(),
+  "paidAt": zod.coerce.date().nullable(),
+  "expiresAt": zod.coerce.date(),
+  "confirmationEmailStatus": zod.enum(['pending', 'sending', 'sent', 'failed']),
+  "confirmationEmailSentAt": zod.coerce.date().nullable(),
+  "actions": zod.array(zod.object({
+  "id": zod.number().int(),
+  "actorUserId": zod.string(),
+  "actionType": zod.enum(['payment_resolved', 'confirmation_retry']),
+  "paymentStatus": zod.union([zod.literal('pending'),zod.literal('paid'),zod.literal('review_required'),zod.literal('expired'),zod.literal(null)]).nullable(),
+  "confirmationEmailStatus": zod.union([zod.literal('pending'),zod.literal('sending'),zod.literal('sent'),zod.literal('failed'),zod.literal(null)]).nullable(),
+  "note": zod.string().nullable(),
+  "createdAt": zod.coerce.date()
+}))
+})
+
+
+/**
+ * @summary Retry a failed payment confirmation email
+ */
+export const RetryStaffCourseEnrollmentConfirmationParams = zod.object({
+  "id": zod.coerce.string().uuid()
+})
+
+export const RetryStaffCourseEnrollmentConfirmationResponse = zod.object({
+  "id": zod.string().uuid(),
+  "courseId": zod.enum(['crm', 'tesouraria', 'lideranca-equipas', 'gestao-comercial', 'gestao-empresas', 'recursos-humanos']),
+  "courseTitle": zod.string(),
+  "fullName": zod.string(),
+  "birthDate": zod.coerce.date(),
+  "identityNumber": zod.string(),
+  "nationality": zod.string(),
+  "phone": zod.string(),
+  "email": zod.string().email(),
+  "address": zod.string(),
+  "municipality": zod.string(),
+  "province": zod.string(),
+  "profession": zod.string(),
+  "maritalStatus": zod.string(),
+  "amountKz": zod.number().int(),
+  "paymentEntity": zod.string(),
+  "paymentReference": zod.string(),
+  "paymentStatus": zod.enum(['pending', 'paid', 'review_required', 'expired']),
+  "paymentTransactionId": zod.string().nullable(),
+  "paymentAmountKz": zod.number().int().nullable(),
+  "paidAt": zod.coerce.date().nullable(),
+  "expiresAt": zod.coerce.date(),
+  "confirmationEmailStatus": zod.enum(['pending', 'sending', 'sent', 'failed']),
+  "confirmationEmailSentAt": zod.coerce.date().nullable(),
+  "actions": zod.array(zod.object({
+  "id": zod.number().int(),
+  "actorUserId": zod.string(),
+  "actionType": zod.enum(['payment_resolved', 'confirmation_retry']),
+  "paymentStatus": zod.union([zod.literal('pending'),zod.literal('paid'),zod.literal('review_required'),zod.literal('expired'),zod.literal(null)]).nullable(),
+  "confirmationEmailStatus": zod.union([zod.literal('pending'),zod.literal('sending'),zod.literal('sent'),zod.literal('failed'),zod.literal(null)]).nullable(),
+  "note": zod.string().nullable(),
+  "createdAt": zod.coerce.date()
+}))
+})
+
+
+/**
  * The signature is verified against the raw request body before processing.
  * @summary Receive a signed ProxyPay payment notification
  */

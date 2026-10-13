@@ -258,6 +258,98 @@ paths:
                 $ref: "#/components/schemas/CourseEnrollmentStatus"
         "404":
           description: Enrollment not found
+  /course-enrollments/staff:
+    get:
+      operationId: listStaffCourseEnrollments
+      tags: [course-enrollments]
+      summary: Search course enrollments for authorized staff
+      parameters:
+        - name: courseId
+          in: query
+          schema:
+            $ref: "#/components/schemas/CourseId"
+        - name: paymentStatus
+          in: query
+          schema:
+            $ref: "#/components/schemas/CoursePaymentStatus"
+        - name: search
+          in: query
+          schema:
+            type: string
+            maxLength: 100
+      responses:
+        "200":
+          description: Filtered enrollment details and payment action history
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StaffCourseEnrollmentList"
+        "401":
+          description: Sign-in required
+        "403":
+          description: Staff access required
+  /course-enrollments/{id}/resolve:
+    post:
+      operationId: resolveStaffCourseEnrollment
+      tags: [course-enrollments]
+      summary: Record a staff decision for a payment exception
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResolveCourseEnrollmentPayment"
+      responses:
+        "200":
+          description: Payment exception resolved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StaffCourseEnrollment"
+        "400":
+          description: Invalid resolution
+        "401":
+          description: Sign-in required
+        "403":
+          description: Staff access required
+        "404":
+          description: Payment exception not found
+  /course-enrollments/{id}/retry-confirmation:
+    post:
+      operationId: retryStaffCourseEnrollmentConfirmation
+      tags: [course-enrollments]
+      summary: Retry a failed payment confirmation email
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Confirmation email retry recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StaffCourseEnrollment"
+        "401":
+          description: Sign-in required
+        "403":
+          description: Staff access required
+        "404":
+          description: Enrollment or failed email not found
+        "409":
+          description: Confirmation email is not currently retryable
+        "502":
+          description: Confirmation email retry failed and was recorded
   /proxypay/webhook:
     post:
       operationId: receiveProxyPayPayment
@@ -803,6 +895,106 @@ components:
             paidAt:
               type: ["string", "null"]
               format: date-time
+    ResolveCourseEnrollmentPayment:
+      type: object
+      required: [decision, note]
+      properties:
+        decision:
+          type: string
+          enum: [confirm_payment, reject_payment]
+        note:
+          type: string
+          minLength: 5
+          maxLength: 1000
+    StaffCourseEnrollment:
+      type: object
+      required: [id, courseId, courseTitle, fullName, birthDate, identityNumber, nationality, phone, email, address, municipality, province, profession, maritalStatus, amountKz, paymentEntity, paymentReference, paymentStatus, paymentTransactionId, paymentAmountKz, paidAt, expiresAt, confirmationEmailStatus, confirmationEmailSentAt, actions]
+      properties:
+        id:
+          type: string
+          format: uuid
+        courseId:
+          $ref: "#/components/schemas/CourseId"
+        courseTitle:
+          type: string
+        fullName:
+          type: string
+        birthDate:
+          type: string
+          format: date
+        identityNumber:
+          type: string
+        nationality:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+          format: email
+        address:
+          type: string
+        municipality:
+          type: string
+        province:
+          type: string
+        profession:
+          type: string
+        maritalStatus:
+          type: string
+        amountKz:
+          type: integer
+        paymentEntity:
+          type: string
+        paymentReference:
+          type: string
+        paymentStatus:
+          $ref: "#/components/schemas/CoursePaymentStatus"
+        paymentTransactionId:
+          type: ["string", "null"]
+        paymentAmountKz:
+          type: ["integer", "null"]
+        paidAt:
+          type: ["string", "null"]
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+        confirmationEmailStatus:
+          type: string
+          enum: [pending, sending, sent, failed]
+        confirmationEmailSentAt:
+          type: ["string", "null"]
+          format: date-time
+        actions:
+          type: array
+          items:
+            $ref: "#/components/schemas/StaffCourseEnrollmentAction"
+    StaffCourseEnrollmentAction:
+      type: object
+      required: [id, actorUserId, actionType, paymentStatus, confirmationEmailStatus, note, createdAt]
+      properties:
+        id:
+          type: integer
+        actorUserId:
+          type: string
+        actionType:
+          type: string
+          enum: [payment_resolved, confirmation_retry]
+        paymentStatus:
+          type: ["string", "null"]
+          enum: [pending, paid, review_required, expired, null]
+        confirmationEmailStatus:
+          type: ["string", "null"]
+          enum: [pending, sending, sent, failed, null]
+        note:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+    StaffCourseEnrollmentList:
+      type: array
+      items:
+        $ref: "#/components/schemas/StaffCourseEnrollment"
     CoursePaymentStatus:
       type: string
       enum: [pending, paid, review_required, expired]
