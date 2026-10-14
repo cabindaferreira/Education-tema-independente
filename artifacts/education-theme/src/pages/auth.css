@@ -200,6 +200,9 @@
 .account-gate-card > p:not(.auth-overline) { margin: 0 0 24px; color: #7d716e; font-size: 11px; line-height: 1.8; }
 .account-primary-link { min-height: 44px; display: flex; align-items: center; justify-content: center; background: #c91f2e; color: white; text-decoration: none; font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
 .account-primary-link:hover { background: #a71927; }
+.account-admin-access { display: flex; justify-content: flex-start; margin: 20px 0; }
+.account-admin-access .account-primary-link { width: auto; gap: 9px; padding: 0 20px; transition: background .2s ease, transform .2s ease; }
+.account-admin-access .account-primary-link:hover { transform: translateY(-1px); }
 .account-back-link { display: flex; align-items: center; justify-content: center; gap: 7px; margin-top: 18px; color: #a51e2a; text-decoration: none; font-size: 10px; font-weight: 700; }
 .account-skeleton { width: min(calc(100% - 48px), 850px); margin: 120px auto; display: grid; gap: 15px; }
 .account-skeleton span, .account-skeleton div { display: block; height: 14px; background: linear-gradient(100deg, #eee4e0 20%, #f8f1ee 38%, #eee4e0 60%); background-size: 200% 100%; animation: auth-shimmer 1.5s ease-in-out infinite; }

@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { useClerk, useAuth } from '@clerk/react';
 import { Link } from 'wouter';
-import { useSyncAuthProfile } from '@workspace/api-client-react';
-import { ArrowLeft, CalendarDays, CheckCircle2, CircleUserRound, LogOut, Mail, ShieldCheck } from 'lucide-react';
+import { getGetAdminAccessQueryKey, useGetAdminAccess, useSyncAuthProfile } from '@workspace/api-client-react';
+import { ArrowLeft, ArrowRight, CalendarDays, CheckCircle2, CircleUserRound, LogOut, Mail, ShieldCheck } from 'lucide-react';
 import './auth.css';
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -16,6 +16,13 @@ function formatDate(value: string) {
 export function AccountPage() {
   const { isLoaded, isSignedIn } = useAuth();
   const { signOut } = useClerk();
+  const adminAccess = useGetAdminAccess({
+    query: {
+      queryKey: getGetAdminAccessQueryKey(),
+      enabled: Boolean(isLoaded && isSignedIn),
+      retry: false,
+    },
+  });
   const profileMutation = useSyncAuthProfile();
   const hasRequestedProfile = useRef(false);
 
@@ -85,6 +92,14 @@ export function AccountPage() {
           </div>
           <div className="account-welcome-mark"><img src={`${basePath}/favicon.svg`} alt="" /></div>
         </div>
+
+        {adminAccess.data?.isAdmin && (
+          <div className="account-admin-access">
+            <Link className="account-primary-link" href="/equipa" data-testid="link-account-admin">
+              Abrir Painel Administrativo <ArrowRight size={14} />
+            </Link>
+          </div>
+        )}
 
         {profileMutation.isPending && (
           <section className="account-state account-loading-state" aria-live="polite" aria-busy="true" data-testid="status-profile-loading">

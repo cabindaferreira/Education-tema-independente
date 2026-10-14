@@ -1,10 +1,11 @@
 import { useEffect, useRef, type ReactNode } from 'react';
-import { ClerkProvider, Show, useClerk } from '@clerk/react';
+import { ClerkProvider, useAuth, useClerk } from '@clerk/react';
 import { publishableKeyFromHost } from '@clerk/react/internal';
 import { ptPT } from '@clerk/localizations';
 import { shadcn } from '@clerk/themes';
 import { ui } from '@clerk/ui';
 import { useQueryClient } from '@tanstack/react-query';
+import { getGetAdminAccessQueryKey, useGetAdminAccess } from '@workspace/api-client-react';
 import {
   Redirect as WouterRedirect,
   Route,
@@ -132,16 +133,32 @@ function ClerkQueryCacheInvalidator() {
 }
 
 function PublicHome() {
-  return (
-    <>
-      <Show when="signed-in">
-        <WouterRedirect to="/conta" />
-      </Show>
-      <Show when="signed-out">
-        <SiteLayout><HomePage /></SiteLayout>
-      </Show>
-    </>
-  );
+  const { isLoaded, isSignedIn } = useAuth();
+  const adminAccess = useGetAdminAccess({
+    query: {
+      queryKey: getGetAdminAccessQueryKey(),
+      enabled: Boolean(isLoaded && isSignedIn),
+      retry: false,
+    },
+  });
+
+  if (!isLoaded || isSignedIn && adminAccess.isLoading) {
+    return (
+      <main className="admin-access-screen" aria-busy="true">
+        <section className="admin-gate-card">
+          <p className="admin-kicker">A VALIDAR ACESSO</p>
+          <h1>A preparar a sua área Academia</h1>
+          <p>Estamos a confirmar as permissões da sua conta.</p>
+        </section>
+      </main>
+    );
+  }
+
+  if (isSignedIn) {
+    return <WouterRedirect to={adminAccess.data?.isAdmin ? "/equipa" : "/conta"} />;
+  }
+
+  return <SiteLayout><HomePage /></SiteLayout>;
 }
 
 function PublicPage({ children }: { children: ReactNode }) {
