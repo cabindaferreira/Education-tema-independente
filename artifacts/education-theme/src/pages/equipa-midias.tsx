@@ -1,7 +1,7 @@
 import { useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { Check, Image, RefreshCw, Trash2, UploadCloud, X } from 'lucide-react';
-import { getListAdminMediaQueryKey, getListHomepageBannersQueryKey, getListRoomPhotosQueryKey, useCreateAdminMedia, useListAdminMedia, useRemoveAdminMedia, useRequestAdminMediaUploadUrl, useUpdateAdminMedia, type AdminMediaInput, type AdminMediaInputRoomId, type AdminMediaUpdateRoomId } from '@workspace/api-client-react';
+import { ArrowDown, ArrowUp, Check, Image, RefreshCw, Trash2, UploadCloud, X } from 'lucide-react';
+import { getListAdminMediaQueryKey, getListHomepageBannersQueryKey, getListRoomPhotosQueryKey, useCreateAdminMedia, useListAdminMedia, useRemoveAdminMedia, useRequestAdminMediaUploadUrl, useSetAdminRoomPhotoOrder, useUpdateAdminMedia, type AdminMediaInput, type AdminMediaInputRoomId, type AdminMediaUpdateRoomId } from '@workspace/api-client-react';
 import { AdminPage, formatAdminDate } from '@/components/admin-shell';
 
 const roomNames: Record<NonNullable<AdminMediaInputRoomId>, string> = {
@@ -21,6 +21,7 @@ function MediaContent() {
   const requestUrl = useRequestAdminMediaUploadUrl();
   const register = useCreateAdminMedia();
   const remove = useRemoveAdminMedia();
+  const setRoomPhotoOrder = useSetAdminRoomPhotoOrder();
   const updateMedia = useUpdateAdminMedia();
   const inputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
@@ -39,6 +40,29 @@ function MediaContent() {
     client.invalidateQueries({ queryKey: getListAdminMediaQueryKey() }),
     client.invalidateQueries({ queryKey: getListHomepageBannersQueryKey() }),
   ]);
+  const moveRoomPhoto = async (roomId: NonNullable<AdminMediaUpdateRoomId>, mediaId: number, direction: -1 | 1) => {
+    if (!media.data) return;
+    const photos = media.data
+      .filter(item => item.roomId === roomId)
+      .sort((a, b) => a.sortOrder - b.sortOrder || a.createdAt.localeCompare(b.createdAt) || a.id - b.id);
+    const currentIndex = photos.findIndex(item => item.id === mediaId);
+    const targetIndex = currentIndex + direction;
+    if (currentIndex < 0 || targetIndex < 0 || targetIndex >= photos.length) return;
+    const photoIds = photos.map(item => item.id);
+    [photoIds[currentIndex], photoIds[targetIndex]] = [photoIds[targetIndex], photoIds[currentIndex]];
+    setError('');
+    setSuccess('');
+    try {
+      await setRoomPhotoOrder.mutateAsync({ roomId, data: { photoIds } });
+      await Promise.all([
+        refresh(),
+        client.invalidateQueries({ queryKey: getListRoomPhotosQueryKey(roomId) }),
+      ]);
+      setSuccess(`Ordem da galeria de ${roomNames[roomId]} actualizada.`);
+    } catch (orderError) {
+      setError(orderError instanceof Error ? orderError.message : 'Não foi possível guardar a ordem das fotografias.');
+    }
+  };
   const chooseFile = (event: ChangeEvent<HTMLInputElement>) => {
     const selected = event.target.files?.[0] ?? null;
     setFile(selected);
@@ -58,8 +82,11 @@ function MediaContent() {
       const uploadInfo = await requestUrl.mutateAsync({ data: { contentType, sizeBytes: file.size } });
       const response = await fetch(uploadInfo.uploadUrl, { method: 'PUT', headers: { 'Content-Type': file.type }, body: file });
       if (!response.ok) throw new Error('O armazenamento não aceitou o ficheiro. Tente novamente.');
-      await register.mutateAsync({ data: { title: title.trim(), altText: altText.trim(), roomId, homeBanner, objectPath: uploadInfo.objectPath, contentType, sizeBytes: file.size } });
-      await refresh();
+      const createdMedia = await register.mutateAsync({ data: { title: title.trim(), altText: altText.trim(), roomId, homeBanner, objectPath: uploadInfo.objectPath, contentType, sizeBytes: file.size } });
+      await Promise.all([
+        refresh(),
+        ...(createdMedia.roomId ? [client.invalidateQueries({ queryKey: getListRoomPhotosQueryKey(createdMedia.roomId) })] : []),
+      ]);
       setSuccess('Imagem carregada e adicionada à biblioteca.');
       setDialog(false); setFile(null); setTitle(''); setAltText(''); setRoomId(null); setHomeBanner(false);
       if (inputRef.current) inputRef.current.value = '';
@@ -70,7 +97,17 @@ function MediaContent() {
   const deleteMedia = (id: number, name: string) => {
     if (!window.confirm(`Remover “${name}” da biblioteca?`)) return;
     setError(''); setSuccess('');
-    remove.mutate({ id }, { onSuccess: () => { refresh(); setSuccess('Imagem removida da biblioteca.'); }, onError: e => setError(e instanceof Error ? e.message : 'Não foi possível remover a imagem. Se estiver a ser usada num curso, altere primeiro a imagem desse curso.') });
+    const roomId = media.data?.find(item => item.id === id)?.roomId;
+    remove.mutate({ id }, {
+      onSuccess: async () => {
+        await Promise.all([
+          refresh(),
+          ...(roomId ? [client.invalidateQueries({ queryKey: getListRoomPhotosQueryKey(roomId) })] : []),
+        ]);
+        setSuccess('Imagem removida da biblioteca.');
+      },
+      onError: e => setError(e instanceof Error ? e.message : 'Não foi possível remover a imagem. Se estiver a ser usada num curso, altere primeiro a imagem desse curso.'),
+    });
   };
   const saveAssociations = async (id: number) => {
     setError(''); setSuccess('');
@@ -101,6 +138,29 @@ function MediaContent() {
             <div className="admin-media-room-edit-actions"><button type="button" className="admin-button" onClick={() => saveAssociations(item.id)} disabled={updateMedia.isPending}>{updateMedia.isPending ? 'A guardar…' : 'Guardar associações'}</button><button type="button" className="admin-button ghost" onClick={() => setEditingMediaId(null)} disabled={updateMedia.isPending}>Cancelar</button></div>
           </div> : <button type="button" className="admin-inline-link admin-media-room-edit-trigger" onClick={() => { setEditingMediaId(item.id); setSelectedRoomId(item.roomId); setSelectedHomeBanner(item.homeBanner); setError(''); setSuccess(''); }}>Editar associações</button>}
           <div className="admin-media-actions"><a href={item.url} target="_blank" rel="noreferrer" className="admin-inline-link">Abrir imagem</a><button type="button" className="admin-icon-button" aria-label={`Remover ${item.title}`} title="Remover imagem" onClick={() => deleteMedia(item.id, item.title)} disabled={remove.isPending || updateMedia.isPending}><Trash2 size={14} /></button></div></div></article>)}</div> : <div className="admin-empty"><Image size={25} /><strong>A biblioteca ainda está vazia.</strong><p>Carregue uma imagem para a usar numa sala ou curso.</p><button type="button" className="admin-button" onClick={() => setDialog(true)}><UploadCloud size={14} /> Carregar primeira imagem</button></div>}</div>
+    </section>
+    <section className="admin-section">
+      <div className="admin-section-head"><div><h2>Ordem das galerias</h2><p>A primeira fotografia de cada sala é apresentada como capa no catálogo público.</p></div></div>
+      <div className="admin-section-body">
+        {Object.entries(roomNames).map(([roomId, roomName]) => {
+          const roomKey = roomId as NonNullable<AdminMediaUpdateRoomId>;
+          const photos = (media.data ?? [])
+            .filter(photo => photo.roomId === roomKey)
+            .sort((a, b) => a.sortOrder - b.sortOrder || a.createdAt.localeCompare(b.createdAt) || a.id - b.id);
+          if (!photos.length) return null;
+          return <div className="admin-room-photo-order-list" key={roomKey}>
+            <h3>{roomName}</h3>
+            <ol>{photos.map((photo, index) => <li key={photo.id}>
+              <span><strong>{index === 0 ? 'Capa' : `Fotografia ${index + 1}`}</strong> · {photo.title}</span>
+              <div>
+                <button type="button" className="admin-icon-button" aria-label={`Mover ${photo.title} para cima`} title="Mover para cima" onClick={() => moveRoomPhoto(roomKey, photo.id, -1)} disabled={index === 0 || setRoomPhotoOrder.isPending || updateMedia.isPending} data-testid={`button-room-photo-up-${photo.id}`}><ArrowUp size={14} /></button>
+                <button type="button" className="admin-icon-button" aria-label={`Mover ${photo.title} para baixo`} title="Mover para baixo" onClick={() => moveRoomPhoto(roomKey, photo.id, 1)} disabled={index === photos.length - 1 || setRoomPhotoOrder.isPending || updateMedia.isPending} data-testid={`button-room-photo-down-${photo.id}`}><ArrowDown size={14} /></button>
+              </div>
+            </li>)}</ol>
+          </div>;
+        })}
+        {!media.isLoading && !media.isError && !media.data?.some(photo => photo.roomId) && <p className="admin-empty">Ainda não há fotografias associadas a salas.</p>}
+      </div>
     </section>
     {dialog && <div className="admin-dialog-backdrop" role="presentation" onMouseDown={e => { if (e.target === e.currentTarget && !busy) setDialog(false); }}><section className="admin-dialog" role="dialog" aria-modal="true" aria-labelledby="media-dialog-title"><header className="admin-dialog-head"><div><h2 id="media-dialog-title">Adicionar imagem</h2><p>O ficheiro é enviado directamente para o armazenamento seguro.</p></div><button type="button" className="admin-icon-button" onClick={() => setDialog(false)} aria-label="Fechar" disabled={busy}><X size={16} /></button></header><form className="admin-dialog-body" onSubmit={upload}><div className="admin-form-grid">
       <label className="admin-field wide"><span>Ficheiro de imagem</span><input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp,image/avif" required onChange={chooseFile} /></label>

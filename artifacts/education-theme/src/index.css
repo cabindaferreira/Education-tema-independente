@@ -460,6 +460,10 @@ button, input { font: inherit; }
 .admin-media-info strong { display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:700 11px var(--app-font-display); }
 .admin-media-info small { display:block;color:#8c817d;font-size:9px;margin-top:5px; }
 .admin-media-actions { display:flex;justify-content:space-between;align-items:center;margin-top:10px; }
+.admin-media-order { display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:9px;padding:7px 8px;background:#f8f4ef;border:1px solid #eee6df;color:#665956;font-size:9px; }
+.admin-media-order>div { display:flex;gap:4px; }
+.admin-media-order .admin-icon-button { width:27px;height:27px; }
+.admin-media-order .admin-icon-button:disabled { opacity:.4;cursor:not-allowed; }
 .admin-media-room-edit { display:grid;gap:8px;margin-top:9px; }
 .admin-media-room-edit .admin-field select { padding:8px 9px;font-size:10px; }
 .admin-media-room-edit-actions { display:flex;flex-wrap:wrap;gap:7px; }
@@ -471,6 +475,15 @@ button, input { font: inherit; }
 .admin-media-home-banner-toggle span { display:grid;gap:4px; }
 .admin-media-home-banner-toggle strong { font-size:10px; }
 .admin-media-home-banner-toggle small { color:#8c817d;font-size:9px;line-height:1.5; }
+.admin-room-photo-order-list { padding:13px 0;border-bottom:1px solid var(--admin-line); }
+.admin-room-photo-order-list:first-child { padding-top:0; }
+.admin-room-photo-order-list h3 { margin:0 0 9px;color:var(--admin-ink);font:700 12px var(--app-font-display); }
+.admin-room-photo-order-list ol { display:grid;gap:6px;margin:0;padding:0;list-style:none; }
+.admin-room-photo-order-list li { display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 10px;background:#f8f4ef;border:1px solid #eee6df;color:#665956;font-size:10px; }
+.admin-room-photo-order-list li strong { color:#493d3a; }
+.admin-room-photo-order-list li>div { display:flex;gap:4px;flex:0 0 auto; }
+.admin-room-photo-order-list .admin-icon-button { width:27px;height:27px; }
+.admin-room-photo-order-list .admin-icon-button:disabled { opacity:.4;cursor:not-allowed; }
 .admin-agenda-grid { display:grid;grid-template-columns:1fr 1fr;gap:16px; }
 .admin-agenda-list { display:grid;gap:9px; }
 .admin-agenda-entry { display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 13px;background:#faf7f3;border:1px solid #eee6df; }

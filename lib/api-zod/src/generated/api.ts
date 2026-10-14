@@ -43,7 +43,8 @@ export const ListRoomPhotosResponseItem = zod.object({
   "id": zod.number().int(),
   "title": zod.string(),
   "altText": zod.string(),
-  "url": zod.string()
+  "url": zod.string(),
+  "sortOrder": zod.number().int()
 })
 export const ListRoomPhotosResponse = zod.array(ListRoomPhotosResponseItem)
 
@@ -352,6 +353,7 @@ export const ListAdminMediaResponseItem = zod.object({
   "url": zod.string(),
   "roomId": zod.union([zod.literal('sala-soba'),zod.literal('sala-kilamba'),zod.literal('sala-kudi'),zod.literal('sala-ondjango'),zod.literal(null)]).nullable(),
   "homeBanner": zod.boolean(),
+  "sortOrder": zod.number().int(),
   "contentType": zod.string(),
   "sizeBytes": zod.number().int(),
   "createdAt": zod.coerce.date()
@@ -391,6 +393,7 @@ export const CreateAdminMediaResponse = zod.object({
   "url": zod.string(),
   "roomId": zod.union([zod.literal('sala-soba'),zod.literal('sala-kilamba'),zod.literal('sala-kudi'),zod.literal('sala-ondjango'),zod.literal(null)]).nullable(),
   "homeBanner": zod.boolean(),
+  "sortOrder": zod.number().int(),
   "contentType": zod.string(),
   "sizeBytes": zod.number().int(),
   "createdAt": zod.coerce.date()
@@ -429,6 +432,7 @@ export const UpdateAdminMediaResponse = zod.object({
   "url": zod.string(),
   "roomId": zod.union([zod.literal('sala-soba'),zod.literal('sala-kilamba'),zod.literal('sala-kudi'),zod.literal('sala-ondjango'),zod.literal(null)]).nullable(),
   "homeBanner": zod.boolean(),
+  "sortOrder": zod.number().int(),
   "contentType": zod.string(),
   "sizeBytes": zod.number().int(),
   "createdAt": zod.coerce.date()
@@ -443,6 +447,29 @@ export const RemoveAdminMediaParams = zod.object({
 })
 
 export const RemoveAdminMediaResponse = zod.void()
+
+
+/**
+ * @summary Save the order of active photos in a room gallery
+ */
+export const SetAdminRoomPhotoOrderParams = zod.object({
+  "roomId": zod.enum(['sala-soba', 'sala-kilamba', 'sala-kudi', 'sala-ondjango'])
+})
+
+
+
+
+export const SetAdminRoomPhotoOrderBody = zod.object({
+  "photoIds": zod.array(zod.number().int().min(1))
+})
+
+
+
+
+export const SetAdminRoomPhotoOrderResponse = zod.object({
+  "roomId": zod.enum(['sala-soba', 'sala-kilamba', 'sala-kudi', 'sala-ondjango']),
+  "photoIds": zod.array(zod.number().int().min(1))
+})
 
 
 /**

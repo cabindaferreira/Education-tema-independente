@@ -117,6 +117,7 @@ export interface RoomGalleryPhoto {
   title: string;
   altText: string;
   url: string;
+  sortOrder: number;
 }
 
 export type RoomGalleryPhotoList = RoomGalleryPhoto[];
@@ -463,6 +464,7 @@ export interface AdminMedia {
   /** @nullable */
   roomId: AdminMediaRoomId;
   homeBanner: boolean;
+  sortOrder: number;
   contentType: string;
   sizeBytes: number;
   createdAt: string;
@@ -543,6 +545,17 @@ export interface AdminMediaUpdate {
   /** @nullable */
   roomId: AdminMediaUpdateRoomId;
   homeBanner: boolean;
+}
+
+export interface RoomPhotoOrderInput {
+  /** @items.minimum 1 */
+  photoIds: number[];
+}
+
+export interface RoomPhotoOrder {
+  roomId: RoomId;
+  /** @items.minimum 1 */
+  photoIds: number[];
 }
 
 export type AdminUploadUrlInputContentType = typeof AdminUploadUrlInputContentType[keyof typeof AdminUploadUrlInputContentType];

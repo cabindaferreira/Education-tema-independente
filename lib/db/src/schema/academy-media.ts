@@ -8,6 +8,7 @@ export const academyMediaTable = pgTable(
     altText: text("alt_text").notNull().default(""),
     roomId: text("room_id"),
     homeBanner: boolean("home_banner").notNull().default(false),
+    sortOrder: integer("sort_order").notNull().default(0),
     objectPath: text("object_path").notNull(),
     contentType: text("content_type").notNull(),
     sizeBytes: integer("size_bytes").notNull(),

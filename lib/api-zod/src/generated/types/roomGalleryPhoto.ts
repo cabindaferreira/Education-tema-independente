@@ -11,4 +11,5 @@ export interface RoomGalleryPhoto {
   title: string;
   altText: string;
   url: string;
+  sortOrder: number;
 }

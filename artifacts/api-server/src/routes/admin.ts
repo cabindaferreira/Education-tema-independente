@@ -28,6 +28,9 @@ import {
   RemoveAdminMediaParams,
   RemoveAdminMediaResponse,
   RevokeAdminTeamMemberParams,
+  SetAdminRoomPhotoOrderBody,
+  SetAdminRoomPhotoOrderParams,
+  SetAdminRoomPhotoOrderResponse,
   UpdateAdminCourseBody,
   UpdateAdminCourseParams,
   UpdateAdminCourseResponse,
@@ -100,6 +103,7 @@ function mediaResult(media: typeof academyMediaTable.$inferSelect) {
     url: publicMediaUrl(media.objectPath),
     roomId: media.roomId,
     homeBanner: media.homeBanner,
+    sortOrder: media.sortOrder,
     contentType: media.contentType,
     sizeBytes: media.sizeBytes,
     createdAt: media.createdAt,
@@ -527,6 +531,13 @@ router.post("/admin/media", async (req, res): Promise<void> => {
     altText: input.altText.trim(),
     roomId: input.roomId ?? null,
     homeBanner: input.homeBanner,
+    sortOrder: input.roomId
+      ? ((await db.select({ sortOrder: academyMediaTable.sortOrder })
+          .from(academyMediaTable)
+          .where(and(eq(academyMediaTable.roomId, input.roomId), isNull(academyMediaTable.archivedAt)))
+          .orderBy(desc(academyMediaTable.sortOrder))
+          .limit(1))[0]?.sortOrder ?? -1) + 1
+      : 0,
     objectPath: input.objectPath,
     contentType: input.contentType,
     sizeBytes: actualSize,
@@ -548,8 +559,25 @@ router.patch("/admin/media/:id", async (req, res): Promise<void> => {
     res.status(400).json({ error: "Seleccione uma sala válida para esta imagem." });
     return;
   }
+  const [currentMedia] = await db.select()
+    .from(academyMediaTable)
+    .where(and(eq(academyMediaTable.id, params.data.id), isNull(academyMediaTable.archivedAt)))
+    .limit(1);
+  if (!currentMedia) {
+    res.status(404).json({ error: "A imagem activa não foi encontrada." });
+    return;
+  }
+  const nextSortOrder = parsed.data.roomId === currentMedia.roomId
+    ? currentMedia.sortOrder
+    : parsed.data.roomId
+      ? ((await db.select({ sortOrder: academyMediaTable.sortOrder })
+          .from(academyMediaTable)
+          .where(and(eq(academyMediaTable.roomId, parsed.data.roomId), isNull(academyMediaTable.archivedAt)))
+          .orderBy(desc(academyMediaTable.sortOrder))
+          .limit(1))[0]?.sortOrder ?? -1) + 1
+      : 0;
   const [media] = await db.update(academyMediaTable)
-    .set({ roomId: parsed.data.roomId, homeBanner: parsed.data.homeBanner })
+    .set({ roomId: parsed.data.roomId, homeBanner: parsed.data.homeBanner, sortOrder: nextSortOrder })
     .where(and(eq(academyMediaTable.id, params.data.id), isNull(academyMediaTable.archivedAt)))
     .returning();
   if (!media) {
@@ -557,6 +585,44 @@ router.patch("/admin/media/:id", async (req, res): Promise<void> => {
     return;
   }
   res.json(UpdateAdminMediaResponse.parse(mediaResult(media)));
+});
+
+router.put("/admin/rooms/:roomId/photos/order", async (req, res): Promise<void> => {
+  if (!(await getAcademyAdmin(req, res))) return;
+  const params = SetAdminRoomPhotoOrderParams.safeParse(req.params);
+  const parsed = SetAdminRoomPhotoOrderBody.safeParse(req.body);
+  if (!params.success || !parsed.success || new Set(parsed.data.photoIds).size !== parsed.data.photoIds.length) {
+    res.status(400).json({ error: "A ordem das fotografias é inválida." });
+    return;
+  }
+  const { roomId } = params.data;
+  const photoIds = parsed.data.photoIds;
+  const photoOrderSaved = await db.transaction(async (tx) => {
+    await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${roomId}))`);
+    const photos = await tx.select({ id: academyMediaTable.id })
+      .from(academyMediaTable)
+      .where(and(
+        eq(academyMediaTable.roomId, roomId),
+        isNull(academyMediaTable.archivedAt),
+      ));
+    const activeIds = new Set(photos.map((photo) => photo.id));
+    if (photoIds.length !== activeIds.size || photoIds.some((id) => !activeIds.has(id))) return false;
+    for (const [sortOrder, id] of photoIds.entries()) {
+      await tx.update(academyMediaTable)
+        .set({ sortOrder })
+        .where(and(
+          eq(academyMediaTable.id, id),
+          eq(academyMediaTable.roomId, roomId),
+          isNull(academyMediaTable.archivedAt),
+        ));
+    }
+    return true;
+  });
+  if (!photoOrderSaved) {
+    res.status(400).json({ error: "Actualize a página: a lista já não corresponde às fotografias activas desta sala." });
+    return;
+  }
+  res.json(SetAdminRoomPhotoOrderResponse.parse({ roomId, photoIds }));
 });
 
 router.delete("/admin/media/:id", async (req, res): Promise<void> => {

@@ -151,10 +151,11 @@ router.get("/rooms/:roomId/photos", async (req, res): Promise<void> => {
       title: academyMediaTable.title,
       altText: academyMediaTable.altText,
       objectPath: academyMediaTable.objectPath,
+      sortOrder: academyMediaTable.sortOrder,
     })
     .from(academyMediaTable)
     .where(and(eq(academyMediaTable.roomId, roomId), isNull(academyMediaTable.archivedAt)))
-    .orderBy(academyMediaTable.createdAt);
+    .orderBy(academyMediaTable.sortOrder, academyMediaTable.createdAt, academyMediaTable.id);
   res.json(ListRoomPhotosResponse.parse(photos.map((photo) => ({
     ...photo,
     url: `/api/storage${photo.objectPath}`,

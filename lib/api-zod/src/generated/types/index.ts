@@ -77,6 +77,8 @@ export * from './roomGalleryPhoto';
 export * from './roomGalleryPhotoList';
 export * from './roomId';
 export * from './roomList';
+export * from './roomPhotoOrder';
+export * from './roomPhotoOrderInput';
 export * from './roomReservation';
 export * from './roomReservationInput';
 export * from './roomSlot';

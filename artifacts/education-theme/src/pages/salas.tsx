@@ -60,10 +60,12 @@ export default function RoomsPage() {
     },
   });
   const galleryPhotos = galleryRoom
-    ? [
-        { id: 0, title: galleryRoom.name, altText: `Vista principal de ${galleryRoom.name}`, url: galleryRoom.image },
-        ...(galleryPhotosQuery.data ?? []),
-      ]
+    ? galleryPhotosQuery.data?.length
+      ? [
+          ...galleryPhotosQuery.data,
+          { id: 0, title: galleryRoom.name, altText: `Vista principal de ${galleryRoom.name}`, url: galleryRoom.image, sortOrder: Number.MAX_SAFE_INTEGER },
+        ]
+      : [{ id: 0, title: galleryRoom.name, altText: `Vista principal de ${galleryRoom.name}`, url: galleryRoom.image, sortOrder: 0 }]
     : [];
   const currentGalleryPhoto = galleryPhotos[galleryIndex];
 

@@ -396,6 +396,38 @@ paths:
           description: Administrator access required
         "404":
           description: Media asset not found
+  /admin/rooms/{roomId}/photos/order:
+    put:
+      operationId: setAdminRoomPhotoOrder
+      tags: [admin]
+      summary: Save the order of active photos in a room gallery
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/RoomId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoomPhotoOrderInput"
+      responses:
+        "200":
+          description: Room gallery order saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoomPhotoOrder"
+        "400":
+          description: Invalid or incomplete room photo order
+        "401":
+          description: Sign-in required
+        "403":
+          description: Administrator access required
+        "404":
+          description: Room not found
   /storage/uploads/request-url:
     post:
       operationId: requestAdminMediaUploadUrl
@@ -1076,7 +1108,7 @@ components:
             type: string
     RoomGalleryPhoto:
       type: object
-      required: [id, title, altText, url]
+      required: [id, title, altText, url, sortOrder]
       properties:
         id:
           type: integer
@@ -1086,6 +1118,8 @@ components:
           type: string
         url:
           type: string
+        sortOrder:
+          type: integer
     RoomGalleryPhotoList:
       type: array
       items:
@@ -1448,7 +1482,7 @@ components:
         $ref: "#/components/schemas/AdminCustomer"
     AdminMedia:
       type: object
-      required: [id, title, altText, objectPath, url, roomId, homeBanner, contentType, sizeBytes, createdAt]
+      required: [id, title, altText, objectPath, url, roomId, homeBanner, sortOrder, contentType, sizeBytes, createdAt]
       properties:
         id:
           type: integer
@@ -1465,6 +1499,8 @@ components:
           enum: [sala-soba, sala-kilamba, sala-kudi, sala-ondjango, null]
         homeBanner:
           type: boolean
+        sortOrder:
+          type: integer
         contentType:
           type: string
         sizeBytes:
@@ -1528,6 +1564,27 @@ components:
           enum: [sala-soba, sala-kilamba, sala-kudi, sala-ondjango, null]
         homeBanner:
           type: boolean
+    RoomPhotoOrderInput:
+      type: object
+      required: [photoIds]
+      properties:
+        photoIds:
+          type: array
+          uniqueItems: true
+          items:
+            type: integer
+            minimum: 1
+    RoomPhotoOrder:
+      type: object
+      required: [roomId, photoIds]
+      properties:
+        roomId:
+          $ref: "#/components/schemas/RoomId"
+        photoIds:
+          type: array
+          items:
+            type: integer
+            minimum: 1
     AdminUploadUrlInput:
       type: object
       required: [contentType, sizeBytes]
