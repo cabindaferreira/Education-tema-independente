@@ -1,6 +1,6 @@
 kind = "web"
 previewPath = "/"
-title = "Education — site independente"
+title = "Academia Procenter"
 description = "Uma versão independente do tema Education do Colorlib para apresentar cursos, professores, eventos e conteúdos educacionais, sem WordPress."
 version = "1.0.0"
 id = "artifacts/education-theme"
