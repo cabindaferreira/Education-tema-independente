@@ -151,11 +151,14 @@
 
 .account-page { min-height: 100dvh; background: #fbf9f6; }
 .account-topbar { min-height: 78px; padding: 0 max(24px, calc((100% - 1110px)/2)); display: flex; align-items: center; justify-content: space-between; gap: 18px; background: #fff; border-bottom: 1px solid #eee5e1; }
+.account-topbar-actions { display: flex; align-items: center; justify-content: flex-end; gap: 9px; }
+.account-return-site { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 40px; padding: 0 13px; border: 1px solid #e4d8d4; color: #8e222d; background: #fff; text-decoration: none; font-size: 10px; font-weight: 700; transition: background .2s, border-color .2s; }
+.account-return-site:hover { background: #fff1f1; border-color: #e7b7ba; }
 .auth-brand-dark { color: #3e2c2f; }
 .auth-brand-dark small { color: #827674; }
 .account-signout { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; border: 1px solid #e4d8d4; padding: 0 13px; color: #8e222d; background: #fff; font-size: 10px; font-weight: 700; cursor: pointer; transition: background .2s, border-color .2s; }
 .account-signout:hover { background: #fff1f1; border-color: #e7b7ba; }
-.account-signout:focus-visible, .account-state button:focus-visible, .account-primary-link:focus-visible, .account-back-link:focus-visible { outline: 3px solid #df9da3; outline-offset: 3px; }
+.account-signout:focus-visible, .account-return-site:focus-visible, .account-state button:focus-visible, .account-primary-link:focus-visible, .account-back-link:focus-visible { outline: 3px solid #df9da3; outline-offset: 3px; }
 .account-content { width: min(100% - 48px, 890px); margin: 0 auto; padding: 28px 0 58px; }
 .account-breadcrumb { display: flex; gap: 10px; align-items: center; color: #9b8c88; font-size: 10px; }
 .account-breadcrumb a { color: #a51e2a; text-decoration: none; }
@@ -237,6 +240,8 @@
   .auth-heading h2 { font-size: 32px; }
   .auth-footer { margin-top: auto; }
   .account-topbar { min-height: 68px; padding-inline: 18px; }
+  .account-topbar-actions { gap: 6px; }
+  .account-return-site { min-height: 36px; gap: 5px; padding-inline: 9px; font-size: 9px; }
   .account-content { width: calc(100% - 36px); padding-top: 22px; }
   .account-welcome { padding: 35px 0 25px; }
   .account-welcome-mark { width: 52px; height: 52px; }

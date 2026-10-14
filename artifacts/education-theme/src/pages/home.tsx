@@ -36,7 +36,6 @@ export default function HomePage() {
             />
           ))}
         </div>
-        <div className="hero-watermark" aria-hidden="true" />
         <div className="container"><div className="hero-content">
           <div className="eyebrow">Bem-vindo à Academia</div>
           <h1>Aprenda novas competências online com professores experientes</h1>

@@ -77,9 +77,12 @@ export function AccountPage() {
           <img src={`${basePath}/favicon.svg`} alt="" />
           <span>ACADEMIA<small>PROCENTER · ANGOLA</small></span>
         </Link>
-        <button className="account-signout" type="button" onClick={() => signOut({ redirectUrl: basePath || '/' })} data-testid="button-sign-out">
-          <LogOut size={16} /> Terminar sessão
-        </button>
+        <div className="account-topbar-actions">
+          <Link className="account-return-site" href="/" data-testid="link-account-return-site"><ArrowLeft size={15} /> Voltar ao site</Link>
+          <button className="account-signout" type="button" onClick={() => signOut({ redirectUrl: basePath || '/' })} data-testid="button-sign-out">
+            <LogOut size={16} /> Terminar sessão
+          </button>
+        </div>
       </header>
 
       <div className="account-content">

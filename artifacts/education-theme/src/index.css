@@ -91,7 +91,6 @@ button, input { font: inherit; }
 .hero-slide { position:absolute;inset:-1%;background-position:center 40%;background-size:cover;background-repeat:no-repeat;opacity:0;transform:scale(1.035);transition:opacity .9s ease,transform 7s linear; }
 .hero-slide.is-active { opacity:1;transform:scale(1); }
 .hero:before { content:'';position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(90deg,rgba(40,22,25,.94) 0%,rgba(54,25,31,.84) 43%,rgba(75,24,35,.5) 100%); }
-.hero-watermark { position:absolute;z-index:1;pointer-events:none;top:53%;right:-120px;width:min(40vw,480px);aspect-ratio:1;transform:translateY(-50%);background:url('/images/academy-watermark.svg') center/contain no-repeat;opacity:.055; }
 .nav-wrap { position:absolute; z-index:12; top:82px; left:0; right:0; }
 .nav { min-height:57px; display:flex;align-items:center;justify-content:space-between; background:rgba(47,29,32,.64); backdrop-filter:blur(10px); padding:0 0 0 18px; }
 .brand { color:white;text-decoration:none;display:flex;align-items:center;gap:9px;font:800 15px var(--app-font-display);letter-spacing:.02em; }
@@ -312,7 +311,6 @@ button, input { font: inherit; }
    .hero { min-height:605px;height:88vh;background-position:60% center; }
     .hero:before { background:linear-gradient(90deg,rgba(40,22,25,.93),rgba(54,25,31,.77) 62%,rgba(75,24,35,.48)); }
    .hero-slide { background-position:60% center; }
-   .hero-watermark { width:min(62vw,280px);right:-55px;top:56%;opacity:.04; }
    .hero-carousel-controls { right:18px;bottom:22px; }
   .hero-content { padding-top:189px;max-width:410px; }
   .hero h1 { font-size:clamp(34px,9vw,46px); }
@@ -479,6 +477,8 @@ button, input { font: inherit; }
 .admin-gate-card h1 { margin:14px 0 8px;font:800 25px var(--app-font-display);letter-spacing:-.04em;color:#37292b; }
 .admin-gate-card p { color:#817774;font-size:12px;line-height:1.7; }
 .admin-gate-card .admin-button { margin-top:8px; }
+.admin-gate-actions { display:flex;flex-wrap:wrap;gap:10px;margin-top:17px; }
+.admin-gate-actions .admin-button { margin-top:0; }
 @media(max-width:1000px) { .admin-frame{grid-template-columns:210px minmax(0,1fr)}.admin-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))} }
 @media(max-width:760px) {
  .admin-frame{display:block}.admin-sidebar{position:fixed;z-index:50;inset:0 auto 0 0;width:min(290px,86vw);height:100dvh;transform:translateX(-102%);transition:transform .25s ease;box-shadow:16px 0 42px rgba(20,8,10,.18)}.admin-sidebar.is-open{transform:translateX(0)}
@@ -679,7 +679,6 @@ button, input { font: inherit; }
 .admin-dashboard-top { display:grid;grid-template-columns:minmax(0,1.25fr) minmax(360px,.9fr);min-height:248px;margin-bottom:29px;border:1px solid #e3d5cf;background:var(--admin-card); }
 .admin-welcome { position:relative;display:flex;flex-direction:column;justify-content:center;min-width:0;padding:31px clamp(24px,4vw,52px);overflow:hidden;color:#fff9f6;background:var(--admin-red-deep); }
 .admin-welcome:before { content:"";position:absolute;right:-85px;bottom:-195px;width:340px;height:340px;border:1px solid rgba(255,255,255,.17);border-radius:50%;box-shadow:0 0 0 24px rgba(255,255,255,.045),0 0 0 49px rgba(255,255,255,.025);pointer-events:none; }
-.admin-welcome:after { content:"";position:absolute;right:32px;bottom:-42px;width:190px;height:190px;background:url("/favicon.svg") center/contain no-repeat;opacity:.08;filter:grayscale(1) brightness(0) invert(1);pointer-events:none; }
 .admin-welcome-content { position:relative;z-index:1;max-width:590px; }
 .admin-welcome .admin-kicker { display:flex;align-items:center;gap:9px;margin:0 0 13px;color:#f4c5c7;font-size:9px;font-weight:800;letter-spacing:.17em; }
 .admin-welcome .admin-kicker:before { content:"";width:18px;height:2px;background:#f0b1b5; }
@@ -745,7 +744,6 @@ button, input { font: inherit; }
   .admin-dashboard-top { display:block;margin-bottom:24px; }
   .admin-welcome { min-height:232px;padding:25px 22px; }
   .admin-welcome h1 { max-width:410px;font-size:clamp(29px,8vw,39px); }
-  .admin-welcome:after { right:15px;bottom:-35px;width:160px;height:160px; }
   .admin-metrics { padding:8px 14px; }
   .admin-metric { min-height:92px;align-items:center; }
   .admin-work-heading { align-items:flex-start;flex-direction:column;gap:7px; }
