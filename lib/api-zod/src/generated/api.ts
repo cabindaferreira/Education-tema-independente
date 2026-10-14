@@ -33,7 +33,23 @@ export const ListRoomsResponse = zod.array(ListRoomsResponseItem)
 
 
 /**
- * @summary List published courses with open enrollment
+ * @summary List active gallery photos for a room
+ */
+export const ListRoomPhotosParams = zod.object({
+  "roomId": zod.enum(['sala-soba', 'sala-kilamba', 'sala-kudi', 'sala-ondjango'])
+})
+
+export const ListRoomPhotosResponseItem = zod.object({
+  "id": zod.number().int(),
+  "title": zod.string(),
+  "altText": zod.string(),
+  "url": zod.string()
+})
+export const ListRoomPhotosResponse = zod.array(ListRoomPhotosResponseItem)
+
+
+/**
+ * @summary List publicly visible courses
  */
 export const listPublishedCoursesResponseIdMin = 2;
 export const listPublishedCoursesResponseIdMax = 70;
@@ -334,6 +350,7 @@ export const ListAdminMediaResponseItem = zod.object({
   "altText": zod.string(),
   "objectPath": zod.string(),
   "url": zod.string(),
+  "roomId": zod.union([zod.literal('sala-soba'),zod.literal('sala-kilamba'),zod.literal('sala-kudi'),zod.literal('sala-ondjango'),zod.literal(null)]).nullable(),
   "contentType": zod.string(),
   "sizeBytes": zod.number().int(),
   "createdAt": zod.coerce.date()
@@ -360,7 +377,8 @@ export const CreateAdminMediaBody = zod.object({
   "altText": zod.string().max(createAdminMediaBodyAltTextMax),
   "objectPath": zod.string().min(1).max(createAdminMediaBodyObjectPathMax),
   "contentType": zod.enum(['image/jpeg', 'image/png', 'image/webp', 'image/avif']),
-  "sizeBytes": zod.number().int().min(1).max(createAdminMediaBodySizeBytesMax)
+  "sizeBytes": zod.number().int().min(1).max(createAdminMediaBodySizeBytesMax),
+  "roomId": zod.union([zod.literal('sala-soba'),zod.literal('sala-kilamba'),zod.literal('sala-kudi'),zod.literal('sala-ondjango'),zod.literal(null)]).nullish()
 })
 
 export const CreateAdminMediaResponse = zod.object({
@@ -369,6 +387,7 @@ export const CreateAdminMediaResponse = zod.object({
   "altText": zod.string(),
   "objectPath": zod.string(),
   "url": zod.string(),
+  "roomId": zod.union([zod.literal('sala-soba'),zod.literal('sala-kilamba'),zod.literal('sala-kudi'),zod.literal('sala-ondjango'),zod.literal(null)]).nullable(),
   "contentType": zod.string(),
   "sizeBytes": zod.number().int(),
   "createdAt": zod.coerce.date()

@@ -63,6 +63,8 @@ import type {
   RoomAvailabilityBlockList,
   RoomAvailabilityInput,
   RoomBookingSettings,
+  RoomGalleryPhotoList,
+  RoomId,
   RoomList,
   RoomReservation,
   RoomReservationInput,
@@ -255,6 +257,83 @@ export function useListRooms<TData = Awaited<ReturnType<typeof listRooms>>, TErr
 
 
 
+export const getListRoomPhotosUrl = (roomId: RoomId,) => {
+
+
+
+
+  return `/api/rooms/${roomId}/photos`
+}
+
+/**
+ * @summary List active gallery photos for a room
+ */
+export const listRoomPhotos = async (roomId: RoomId, options?: Parameters<typeof customFetch>[1]): Promise<RoomGalleryPhotoList> => {
+
+  return customFetch<RoomGalleryPhotoList>(getListRoomPhotosUrl(roomId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListRoomPhotosQueryKey = (roomId: RoomId,) => {
+    return [
+    `/api/rooms/${roomId}/photos`
+    ] as const;
+    }
+
+
+export const getListRoomPhotosQueryOptions = <TData = Awaited<ReturnType<typeof listRoomPhotos>>, TError = ErrorType<void>>(roomId: RoomId, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listRoomPhotos>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListRoomPhotosQueryKey(roomId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listRoomPhotos>>> = ({ signal }) => listRoomPhotos(roomId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: roomId !== null && roomId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listRoomPhotos>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListRoomPhotosQueryResult = NonNullable<Awaited<ReturnType<typeof listRoomPhotos>>>
+export type ListRoomPhotosQueryError = ErrorType<void>
+
+
+/**
+ * @summary List active gallery photos for a room
+ */
+
+export function useListRoomPhotos<TData = Awaited<ReturnType<typeof listRoomPhotos>>, TError = ErrorType<void>>(
+ roomId: RoomId, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listRoomPhotos>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListRoomPhotosQueryOptions(roomId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
 export const getListPublishedCoursesUrl = () => {
 
 
@@ -264,7 +343,7 @@ export const getListPublishedCoursesUrl = () => {
 }
 
 /**
- * @summary List published courses with open enrollment
+ * @summary List publicly visible courses
  */
 export const listPublishedCourses = async ( options?: Parameters<typeof customFetch>[1]): Promise<AdminCourseList> => {
 
@@ -311,7 +390,7 @@ export type ListPublishedCoursesQueryError = ErrorType<unknown>
 
 
 /**
- * @summary List published courses with open enrollment
+ * @summary List publicly visible courses
  */
 
 export function useListPublishedCourses<TData = Awaited<ReturnType<typeof listPublishedCourses>>, TError = ErrorType<unknown>>(

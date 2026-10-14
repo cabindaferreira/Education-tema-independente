@@ -5,6 +5,7 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
+import type { AdminMediaRoomId } from './adminMediaRoomId';
 
 export interface AdminMedia {
   id: number;
@@ -12,6 +13,8 @@ export interface AdminMedia {
   altText: string;
   objectPath: string;
   url: string;
+  /** @nullable */
+  roomId: AdminMediaRoomId;
   contentType: string;
   sizeBytes: number;
   createdAt: Date;

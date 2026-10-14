@@ -48,6 +48,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/RoomList"
+  /rooms/{roomId}/photos:
+    get:
+      operationId: listRoomPhotos
+      tags: [rooms]
+      summary: List active gallery photos for a room
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/RoomId"
+      responses:
+        "200":
+          description: Room gallery photos
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoomGalleryPhotoList"
+        "404":
+          description: Room not found
   /courses:
     get:
       operationId: listPublishedCourses
@@ -982,6 +1002,22 @@ components:
           type: array
           items:
             type: string
+    RoomGalleryPhoto:
+      type: object
+      required: [id, title, altText, url]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        altText:
+          type: string
+        url:
+          type: string
+    RoomGalleryPhotoList:
+      type: array
+      items:
+        $ref: "#/components/schemas/RoomGalleryPhoto"
     RoomBookingRules:
       type: object
       required: [standardStartTime, standardEndTime, standardMinimumHours, standardHourlyRate, standardShortStayHourlyRate, standardDiscountFromHours, afterHoursStartTime, afterHoursEndTime, afterHoursPriceKz, sessionMorningStartTime, sessionMorningEndTime, sessionAfternoonStartTime, sessionAfternoonEndTime, weekdaySessionPriceKz, holidaySessionPriceKz]
@@ -1334,7 +1370,7 @@ components:
         $ref: "#/components/schemas/AdminCustomer"
     AdminMedia:
       type: object
-      required: [id, title, altText, objectPath, url, contentType, sizeBytes, createdAt]
+      required: [id, title, altText, objectPath, url, roomId, contentType, sizeBytes, createdAt]
       properties:
         id:
           type: integer
@@ -1346,6 +1382,9 @@ components:
           type: string
         url:
           type: string
+        roomId:
+          type: ["string", "null"]
+          enum: [sala-soba, sala-kilamba, sala-kudi, sala-ondjango, null]
         contentType:
           type: string
         sizeBytes:
@@ -1379,6 +1418,9 @@ components:
           type: integer
           minimum: 1
           maximum: 15728640
+        roomId:
+          type: ["string", "null"]
+          enum: [sala-soba, sala-kilamba, sala-kudi, sala-ondjango, null]
     AdminUploadUrlInput:
       type: object
       required: [contentType, sizeBytes]

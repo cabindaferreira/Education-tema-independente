@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, ArrowRight, Check, Clock3, Users, X } from 'lucide-react';
-import { getListRoomsQueryKey, useCheckRoomAvailability, useCreateRoomReservation, useListRooms } from '@workspace/api-client-react';
+import { ArrowLeft, ArrowRight, Check, ChevronLeft, ChevronRight, Clock3, Images, Users, X } from 'lucide-react';
+import { getListRoomPhotosQueryKey, getListRoomsQueryKey, useCheckRoomAvailability, useCreateRoomReservation, useListRoomPhotos, useListRooms } from '@workspace/api-client-react';
 import type { ReservationPeriod, Room, RoomAvailability, RoomReservation, RoomSlot } from '@workspace/api-client-react';
 import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -41,6 +41,8 @@ export default function RoomsPage() {
   const availabilityMutation = useCheckRoomAvailability();
   const reservationMutation = useCreateRoomReservation();
   const [activeRoom, setActiveRoom] = useState<Room | null>(null);
+  const [galleryRoom, setGalleryRoom] = useState<Room | null>(null);
+  const [galleryIndex, setGalleryIndex] = useState(0);
   const [bookingStep, setBookingStep] = useState<'identity' | 'availability' | 'confirmation'>('identity');
   const [availability, setAvailability] = useState<RoomAvailability | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<RoomSlot | null>(null);
@@ -51,6 +53,19 @@ export default function RoomsPage() {
   const selectedDate = form.watch('date');
   const selectedPeriod = form.watch('period');
   const selectedDuration = form.watch('durationHours');
+  const galleryPhotosQuery = useListRoomPhotos(galleryRoom?.id ?? 'sala-soba', {
+    query: {
+      queryKey: getListRoomPhotosQueryKey(galleryRoom?.id ?? 'sala-soba'),
+      enabled: Boolean(galleryRoom),
+    },
+  });
+  const galleryPhotos = galleryRoom
+    ? [
+        { id: 0, title: galleryRoom.name, altText: `Vista principal de ${galleryRoom.name}`, url: galleryRoom.image },
+        ...(galleryPhotosQuery.data ?? []),
+      ]
+    : [];
+  const currentGalleryPhoto = galleryPhotos[galleryIndex];
 
   useEffect(() => {
     setAvailability(null); setSelectedSlot(null); setAvailabilityError(''); setReservationError('');
@@ -62,6 +77,10 @@ export default function RoomsPage() {
   }
   function closeBooking() {
     setActiveRoom(null); setAvailability(null); setSelectedSlot(null); setReservation(null); setAvailabilityError(''); setReservationError('');
+  }
+  function openGallery(room: Room) {
+    setGalleryRoom(room);
+    setGalleryIndex(0);
   }
   async function continueToAvailability() {
     if (await form.trigger(['name', 'nif'])) setBookingStep('availability');
@@ -101,15 +120,30 @@ export default function RoomsPage() {
       {roomsQuery.isLoading ? <div className="room-grid" aria-label="A carregar salas" data-testid="status-rooms-loading">{[0, 1, 2, 3].map((item) => <div className="room-skeleton" key={item}><div /><span /><span /><span /></div>)}</div>
         : roomsQuery.isError ? <div className="rooms-state rooms-error" role="alert" data-testid="status-rooms-error"><strong>Não foi possível carregar as salas.</strong><p>Verifique a ligação e tente novamente.</p><button className="button button-outline" type="button" onClick={() => roomsQuery.refetch()} data-testid="button-retry-rooms">TENTAR NOVAMENTE</button></div>
         : !roomsQuery.data?.length ? <div className="rooms-state" data-testid="status-rooms-empty"><strong>Não há salas disponíveis neste momento.</strong><p>Volte a consultar mais tarde ou contacte a Academia.</p></div>
-        : <div className="room-grid">{roomsQuery.data.map((room) => <article className="room-card" key={room.id} data-testid={`card-room-${room.id}`}>
-          <div className="room-image-wrap"><img className={`room-image ${room.id === 'sala-kilamba' ? 'mt-[-13px] mb-[-13px]' : ''}`} src={room.image} alt={`Imagem de ${room.name}`} loading="lazy" data-testid={`img-room-${room.id}`} /><span className="room-capacity" data-testid={`text-room-capacity-${room.id}`}><Users size={15} /> Até {room.capacity} lugares</span></div>
+         : <div className="room-grid">{roomsQuery.data.map((room) => <article className="room-card" key={room.id} data-testid={`card-room-${room.id}`}>
+           <div className="room-image-wrap"><button className="room-gallery-trigger" type="button" onClick={() => openGallery(room)} aria-label={`Abrir catálogo de fotografias de ${room.name}`} data-testid={`button-room-gallery-${room.id}`}><img className={`room-image ${room.id === 'sala-kilamba' ? 'mt-[-13px] mb-[-13px]' : ''}`} src={room.image} alt={`Imagem de ${room.name}`} loading="lazy" data-testid={`img-room-${room.id}`} /><span className="room-gallery-hint"><Images size={15} /> Ver fotografias</span></button><span className="room-capacity" data-testid={`text-room-capacity-${room.id}`}><Users size={15} /> Até {room.capacity} lugares</span></div>
           <div className="room-content"><div className="room-title-row"><span className="room-kicker">ACADEMIA PROCENTER</span><span className="room-id">{room.id}</span></div><h3 data-testid={`text-room-name-${room.id}`}>{room.name}</h3><p className="room-description" data-testid={`text-room-description-${room.id}`}>{room.description}</p>
             <div className="room-facilities"><h4>Facilidades</h4><ul>{room.facilities.map((facility, index) => <li key={`${room.id}-${facility}`} data-testid={`text-room-facility-${room.id}-${index}`}><Check size={14} />{facility}</li>)}</ul></div>
             {!!room.rateDetails.length && <div className="room-rates"><span>Informação de tarifas</span><ul>{room.rateDetails.map((detail, index) => <li key={`${room.id}-rate-${index}`} data-testid={`text-room-rate-${room.id}-${index}`}>{detail}</li>)}</ul></div>}
-            <button className="room-book-button" type="button" onClick={() => beginBooking(room)} data-testid={`button-reserve-${room.id}`}>Reservar esta sala <ArrowRight size={15} /></button>
+             <button className="room-gallery-cta" type="button" onClick={() => openGallery(room)} data-testid={`button-room-gallery-cta-${room.id}`}><Images size={15} /> Ver catálogo de fotografias <ArrowRight size={14} /></button>
+             <button className="room-book-button" type="button" onClick={() => beginBooking(room)} data-testid={`button-reserve-${room.id}`}>Reservar esta sala <ArrowRight size={15} /></button>
           </div>
         </article>)}</div>}
     </div></section>
+     {galleryRoom && <div className="room-gallery-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setGalleryRoom(null); }}>
+       <section className="room-gallery-dialog" role="dialog" aria-modal="true" aria-labelledby="room-gallery-title" tabIndex={-1} onKeyDown={(event) => { if (event.key === 'Escape') setGalleryRoom(null); else if (event.key === 'ArrowRight') setGalleryIndex((index) => (index + 1) % Math.max(galleryPhotos.length, 1)); else if (event.key === 'ArrowLeft') setGalleryIndex((index) => (index - 1 + galleryPhotos.length) % Math.max(galleryPhotos.length, 1)); }} data-testid="dialog-room-gallery">
+         <header className="room-gallery-head"><div><span className="booking-overline">CATÁLOGO DE FOTOGRAFIAS</span><h2 id="room-gallery-title">{galleryRoom.name}</h2><p>{galleryPhotos.length} {galleryPhotos.length === 1 ? 'fotografia' : 'fotografias'}</p></div><button className="booking-close" type="button" aria-label="Fechar catálogo" onClick={() => setGalleryRoom(null)} data-testid="button-close-room-gallery"><X size={20} /></button></header>
+         <div className="room-gallery-stage">
+           {currentGalleryPhoto && <img src={currentGalleryPhoto.url} alt={currentGalleryPhoto.altText || currentGalleryPhoto.title} data-testid="img-room-gallery-active" />}
+           {galleryPhotos.length > 1 && <><button className="room-gallery-arrow prev" type="button" aria-label="Fotografia anterior" onClick={() => setGalleryIndex((index) => (index - 1 + galleryPhotos.length) % galleryPhotos.length)} data-testid="button-room-gallery-previous"><ChevronLeft size={22} /></button><button className="room-gallery-arrow next" type="button" aria-label="Fotografia seguinte" onClick={() => setGalleryIndex((index) => (index + 1) % galleryPhotos.length)} data-testid="button-room-gallery-next"><ChevronRight size={22} /></button></>}
+           <span className="room-gallery-counter">{galleryIndex + 1} / {galleryPhotos.length}</span>
+         </div>
+         {galleryPhotosQuery.isLoading && <p className="room-gallery-note" role="status">A carregar fotografias adicionais…</p>}
+         {galleryPhotosQuery.isError && <p className="room-gallery-note error" role="alert">Não foi possível carregar as fotografias. <button type="button" onClick={() => galleryPhotosQuery.refetch()}>Tentar novamente</button></p>}
+         {!galleryPhotosQuery.isLoading && !galleryPhotosQuery.isError && galleryPhotosQuery.data?.length === 0 && <p className="room-gallery-note">Ainda não foram adicionadas outras fotografias desta sala.</p>}
+         {galleryPhotos.length > 1 && <div className="room-gallery-thumbnails" aria-label="Fotografias da sala">{galleryPhotos.map((photo, index) => <button className={`room-gallery-thumb ${index === galleryIndex ? 'selected' : ''}`} type="button" key={photo.id} onClick={() => setGalleryIndex(index)} aria-label={`Ver fotografia ${index + 1}: ${photo.title}`} aria-pressed={index === galleryIndex} data-testid={`button-room-gallery-photo-${index}`}><img src={photo.url} alt="" loading="lazy" /></button>)}</div>}
+       </section>
+     </div>}
     {activeRoom && <div className="booking-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) closeBooking(); }}>
       <section className="booking-panel" role="dialog" aria-modal="true" aria-labelledby="booking-title" onKeyDown={(event) => { if (event.key === 'Escape') closeBooking(); }} data-testid="dialog-room-booking">
         <div className="booking-panel-head"><div><span className="booking-overline">RESERVA DE ESPAÇO</span><h2 id="booking-title">{activeRoom.name}</h2></div><button className="booking-close" type="button" aria-label="Fechar reserva" onClick={closeBooking} data-testid="button-close-booking"><X size={20} /></button></div>

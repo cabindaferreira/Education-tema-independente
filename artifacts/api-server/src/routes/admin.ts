@@ -94,6 +94,7 @@ function mediaResult(media: typeof academyMediaTable.$inferSelect) {
     altText: media.altText,
     objectPath: media.objectPath,
     url: publicMediaUrl(media.objectPath),
+    roomId: media.roomId,
     contentType: media.contentType,
     sizeBytes: media.sizeBytes,
     createdAt: media.createdAt,
@@ -476,6 +477,10 @@ router.post("/admin/media", async (req, res): Promise<void> => {
     return;
   }
   const input = parsed.data;
+  if (input.roomId !== undefined && input.roomId !== null && !hasRoom(input.roomId)) {
+    res.status(400).json({ error: "Seleccione uma sala válida para esta imagem." });
+    return;
+  }
   if (!/^\/objects\/uploads\/[0-9a-f-]{36}$/i.test(input.objectPath)) {
     res.status(400).json({ error: "O caminho da imagem enviada é inválido." });
     return;
@@ -494,6 +499,7 @@ router.post("/admin/media", async (req, res): Promise<void> => {
   const [media] = await db.insert(academyMediaTable).values({
     title: input.title.trim(),
     altText: input.altText.trim(),
+    roomId: input.roomId ?? null,
     objectPath: input.objectPath,
     contentType: input.contentType,
     sizeBytes: actualSize,

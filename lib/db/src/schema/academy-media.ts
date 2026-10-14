@@ -6,6 +6,7 @@ export const academyMediaTable = pgTable(
     id: serial("id").primaryKey(),
     title: text("title").notNull(),
     altText: text("alt_text").notNull().default(""),
+    roomId: text("room_id"),
     objectPath: text("object_path").notNull(),
     contentType: text("content_type").notNull(),
     sizeBytes: integer("size_bytes").notNull(),

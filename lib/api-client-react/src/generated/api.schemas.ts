@@ -112,6 +112,15 @@ export interface Room {
   rateDetails: string[];
 }
 
+export interface RoomGalleryPhoto {
+  id: number;
+  title: string;
+  altText: string;
+  url: string;
+}
+
+export type RoomGalleryPhotoList = RoomGalleryPhoto[];
+
 export interface RoomBookingRules {
   /** @pattern ^\d{2}:\d{2}$ */
   standardStartTime: string;
@@ -425,12 +434,27 @@ export interface AdminCustomer {
 
 export type AdminCustomerList = AdminCustomer[];
 
+/**
+ * @nullable
+ */
+export type AdminMediaRoomId = typeof AdminMediaRoomId[keyof typeof AdminMediaRoomId] | null;
+
+
+export const AdminMediaRoomId = {
+  'sala-soba': 'sala-soba',
+  'sala-kilamba': 'sala-kilamba',
+  'sala-kudi': 'sala-kudi',
+  'sala-ondjango': 'sala-ondjango',
+} as const;
+
 export interface AdminMedia {
   id: number;
   title: string;
   altText: string;
   objectPath: string;
   url: string;
+  /** @nullable */
+  roomId: AdminMediaRoomId;
   contentType: string;
   sizeBytes: number;
   createdAt: string;
@@ -446,6 +470,19 @@ export const AdminMediaInputContentType = {
   'image/png': 'image/png',
   'image/webp': 'image/webp',
   'image/avif': 'image/avif',
+} as const;
+
+/**
+ * @nullable
+ */
+export type AdminMediaInputRoomId = typeof AdminMediaInputRoomId[keyof typeof AdminMediaInputRoomId] | null;
+
+
+export const AdminMediaInputRoomId = {
+  'sala-soba': 'sala-soba',
+  'sala-kilamba': 'sala-kilamba',
+  'sala-kudi': 'sala-kudi',
+  'sala-ondjango': 'sala-ondjango',
 } as const;
 
 export interface AdminMediaInput {
@@ -467,6 +504,8 @@ export interface AdminMediaInput {
      * @maximum 15728640
      */
   sizeBytes: number;
+  /** @nullable */
+  roomId?: AdminMediaInputRoomId;
 }
 
 export type AdminUploadUrlInputContentType = typeof AdminUploadUrlInputContentType[keyof typeof AdminUploadUrlInputContentType];

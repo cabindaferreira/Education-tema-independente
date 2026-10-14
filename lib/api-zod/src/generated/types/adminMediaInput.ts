@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { AdminMediaInputContentType } from './adminMediaInputContentType';
+import type { AdminMediaInputRoomId } from './adminMediaInputRoomId';
 
 export interface AdminMediaInput {
   /**
@@ -26,4 +27,6 @@ export interface AdminMediaInput {
      * @maximum 15728640
      */
   sizeBytes: number;
+  /** @nullable */
+  roomId?: AdminMediaInputRoomId;
 }

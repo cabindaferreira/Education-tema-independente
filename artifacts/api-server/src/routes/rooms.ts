@@ -11,11 +11,12 @@ import {
   GetRoomBookingSettingsResponse,
   ListRoomReservationsQueryParams,
   ListRoomReservationsResponse,
+  ListRoomPhotosResponse,
   ListRoomsResponse,
   UpdateRoomBookingSettingsBody,
   UpdateRoomBookingSettingsResponse,
 } from "@workspace/api-zod";
-import { db, roomAvailabilityBlocksTable, roomBookingSettingsTable, roomReservationsTable } from "@workspace/db";
+import { academyMediaTable, db, roomAvailabilityBlocksTable, roomBookingSettingsTable, roomReservationsTable } from "@workspace/db";
 import {
   buildRoomSlots,
   defaultRoomBookingSettings,
@@ -161,6 +162,28 @@ function staffReservationResponse(reservation: {
 router.get("/rooms", async (_req, res): Promise<void> => {
   const settings = await loadRoomBookingSettings();
   res.json(ListRoomsResponse.parse(getRooms(settings)));
+});
+
+router.get("/rooms/:roomId/photos", async (req, res): Promise<void> => {
+  const roomId = String(req.params.roomId);
+  if (!hasRoom(roomId)) {
+    res.status(404).json({ error: "A sala não foi encontrada." });
+    return;
+  }
+  const photos = await db
+    .select({
+      id: academyMediaTable.id,
+      title: academyMediaTable.title,
+      altText: academyMediaTable.altText,
+      objectPath: academyMediaTable.objectPath,
+    })
+    .from(academyMediaTable)
+    .where(and(eq(academyMediaTable.roomId, roomId), isNull(academyMediaTable.archivedAt)))
+    .orderBy(academyMediaTable.createdAt);
+  res.json(ListRoomPhotosResponse.parse(photos.map((photo) => ({
+    ...photo,
+    url: `/api/storage${photo.objectPath}`,
+  }))));
 });
 
 router.get("/room-booking-settings", async (req, res): Promise<void> => {
