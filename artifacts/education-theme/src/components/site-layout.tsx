@@ -1,7 +1,8 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { Show } from "@clerk/react";
+import { Show, useAuth } from "@clerk/react";
 import { Link, useLocation } from "wouter";
 import { ArrowRight, Clock3, Menu, Phone, X } from "lucide-react";
+import { getGetAdminAccessQueryKey, useGetAdminAccess } from "@workspace/api-client-react";
 
 const links = [
   ["Início", "/"],
@@ -15,6 +16,14 @@ const links = [
 export function SiteLayout({ children }: { children: ReactNode }) {
   const [location] = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const { isLoaded, isSignedIn } = useAuth();
+  const adminAccess = useGetAdminAccess({
+    query: {
+      queryKey: getGetAdminAccessQueryKey(),
+      enabled: Boolean(isLoaded && isSignedIn),
+      retry: false,
+    },
+  });
 
   useEffect(() => {
     setMenuOpen(false);
@@ -196,6 +205,17 @@ export function SiteLayout({ children }: { children: ReactNode }) {
               <Link href="/conta" onClick={closeMenu} className="nav-auth-link">
                 Minha conta
               </Link>
+              {adminAccess.data?.isAdmin && (
+                <Link
+                  href="/equipa"
+                  onClick={closeMenu}
+                  className="nav-auth-link"
+                  aria-current={location.startsWith("/equipa") ? "page" : undefined}
+                  data-testid="link-admin-dashboard"
+                >
+                  Painel Administrativo
+                </Link>
+              )}
             </Show>
             <Link
               className="nav-cta bg-[#FF0101]"

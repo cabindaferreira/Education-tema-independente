@@ -237,7 +237,7 @@ router.post("/course-enrollments", async (req, res): Promise<void> => {
     return;
   }
 
-  const parsed = ReceiveProxyPayPaymentBody.safeParse(eventPayload);
+  const parsed = CreateCourseEnrollmentBody.safeParse(candidate);
   if (!parsed.success) {
     res.status(400).json({ error: "Preencha todos os dados da ficha de inscrição." });
     return;
@@ -275,15 +275,36 @@ router.post("/course-enrollments", async (req, res): Promise<void> => {
 
   const id = randomUUID();
   const expiresAt = new Date(Date.now() + REFERENCE_VALIDITY_HOURS * 60 * 60 * 1000);
-  const paymentReference = String(event.reference_id);
+  let paymentReference: string | undefined;
 
   try {
     paymentReference = await createProxyPayReference(course.priceKz, id, input.courseId, expiresAt);
-  const [enrollment] = await db
-    .select()
-    .from(courseEnrollmentsTable)
-    .where(eq(courseEnrollmentsTable.id, params.data.id))
-    .limit(1);
+    const [enrollment] = await db
+      .insert(courseEnrollmentsTable)
+      .values({
+        id,
+        courseId: input.courseId,
+        courseTitle: course.title,
+        fullName,
+        birthDate,
+        identityNumber,
+        nationality: input.nationality.trim(),
+        phone: input.phone.trim(),
+        email: input.email.trim().toLowerCase(),
+        address: input.address.trim(),
+        municipality: input.municipality.trim(),
+        province: input.province.trim(),
+        profession: input.profession.trim(),
+        maritalStatus: input.maritalStatus.trim(),
+        privacyAcceptedAt: new Date(),
+        amountKz: course.priceKz,
+        paymentEntity: PROXYPAY_ENTITY,
+        paymentReference,
+        paymentStatus: "pending",
+        expiresAt,
+        updatedAt: new Date(),
+      })
+      .returning();
 
     res.status(201).json(CreateCourseEnrollmentResponse.parse(checkoutResponse(enrollment)));
   } catch (error) {
@@ -301,9 +322,15 @@ router.post("/course-enrollments", async (req, res): Promise<void> => {
     }
 
     const status = error instanceof ProxyPayRequestError ? error.status : undefined;
+    req.log.error({ providerStatus: status }, "Course checkout reference creation failed");
+    res.status(502).json({ error: "Não foi possível gerar a referência agora. Tente novamente." });
+  }
+});
 
-  let renewed: typeof claimed | undefined;
-  const parsed = ReceiveProxyPayPaymentBody.safeParse(eventPayload);
+router.get("/course-enrollments/staff", async (req, res): Promise<void> => {
+  if (!(await requireCourseStaff(req, res))) return;
+
+  const parsed = ListStaffCourseEnrollmentsQueryParams.safeParse(req.query);
   if (!parsed.success) {
     res.status(400).json({ error: "Os filtros de pesquisa não são válidos." });
     return;
@@ -365,7 +392,7 @@ router.post("/course-enrollments/:id/resolve", async (req, res): Promise<void> =
   const actorUserId = await requireCourseStaff(req, res);
   if (!actorUserId) return;
 
-  const params = GetCourseEnrollmentStatusParams.safeParse(req.params);
+  const params = ResolveStaffCourseEnrollmentParams.safeParse(req.params);
   const body = ResolveStaffCourseEnrollmentBody.safeParse(req.body);
   if (!params.success || !body.success || body.data.note.trim().length < 5) {
     res.status(400).json({ error: "Indique uma decisão e uma justificação válida." });
@@ -403,61 +430,57 @@ router.post("/course-enrollments/:id/resolve", async (req, res): Promise<void> =
   });
 
   if (!transaction) {
-  const [existing] = await db
-    .select()
-    .from(courseEnrollmentsTable)
-    .where(eq(courseEnrollmentsTable.paymentReference, paymentReference))
-    .limit(1);
+    const [existing] = await db
+      .select({ id: courseEnrollmentsTable.id })
+      .from(courseEnrollmentsTable)
+      .where(eq(courseEnrollmentsTable.id, params.data.id))
+      .limit(1);
+    res.status(existing ? 409 : 404).json({
+      error: existing ? "Esta exceção já foi resolvida por outra pessoa." : "Inscrição não encontrada.",
+    });
+    return;
+  }
 
-  const now = new Date();
-    if (!existing) {
-      res.status(404).json({ error: "Inscrição não encontrada." });
-      return;
+  if (nextPaymentStatus === "paid") {
+    try {
+      await sendCoursePaymentConfirmation({
+        enrollmentId: transaction.enrollment.id,
+        name: transaction.enrollment.fullName,
+        email: transaction.enrollment.email,
+        courseTitle: transaction.enrollment.courseTitle,
+        amountKz: transaction.enrollment.amountKz,
+        paymentReference: transaction.enrollment.paymentReference,
+        idempotencyKey: `course-payment-confirmation-${transaction.enrollment.id}-resolution-${transaction.action.id}`,
+      });
+      await db.transaction(async (tx) => {
+        await tx
+          .update(courseEnrollmentsTable)
+          .set({ confirmationEmailStatus: "sent", confirmationEmailSentAt: new Date(), updatedAt: new Date() })
+          .where(eq(courseEnrollmentsTable.id, transaction.enrollment.id));
+        await tx
+          .update(courseEnrollmentActionsTable)
+          .set({ confirmationEmailStatus: "sent" })
+          .where(eq(courseEnrollmentActionsTable.id, transaction.action.id));
+      });
+    } catch (error) {
+      await db.transaction(async (tx) => {
+        await tx
+          .update(courseEnrollmentsTable)
+          .set({ confirmationEmailStatus: "failed", updatedAt: new Date() })
+          .where(eq(courseEnrollmentsTable.id, transaction.enrollment.id));
+        await tx
+          .update(courseEnrollmentActionsTable)
+          .set({ confirmationEmailStatus: "failed" })
+          .where(eq(courseEnrollmentActionsTable.id, transaction.action.id));
+      });
+      req.log.error(
+        { enrollmentId: transaction.enrollment.id, errorName: error instanceof Error ? error.name : "UnknownError" },
+        "Payment review was resolved, but the confirmation email failed",
+      );
     }
-    res.status(409).json({ error: "Só é possível reenviar uma confirmação que tenha falhado." });
-    return;
   }
 
-  try {
-    await sendCoursePaymentConfirmation({
-      enrollmentId: claimed.enrollment.id,
-      name: claimed.enrollment.fullName,
-      email: claimed.enrollment.email,
-      courseTitle: claimed.enrollment.courseTitle,
-      amountKz: claimed.enrollment.amountKz,
-      paymentReference: claimed.enrollment.paymentReference,
-      idempotencyKey: `course-payment-confirmation-${claimed.enrollment.id}-retry-${claimed.action.id}`,
-    });
-    await db.transaction(async (tx) => {
-      await tx
-        .update(courseEnrollmentsTable)
-        .set({ confirmationEmailStatus: "sent", confirmationEmailSentAt: new Date(), updatedAt: new Date() })
-        .where(eq(courseEnrollmentsTable.id, claimed.enrollment.id));
-      await tx
-        .update(courseEnrollmentActionsTable)
-        .set({ confirmationEmailStatus: "sent" })
-        .where(eq(courseEnrollmentActionsTable.id, claimed.action.id));
-    });
-  } catch (error) {
-    await db.transaction(async (tx) => {
-      await tx
-        .update(courseEnrollmentsTable)
-        .set({ confirmationEmailStatus: "failed", updatedAt: new Date() })
-        .where(eq(courseEnrollmentsTable.id, claimed.enrollment.id));
-      await tx
-        .update(courseEnrollmentActionsTable)
-        .set({ confirmationEmailStatus: "failed" })
-        .where(eq(courseEnrollmentActionsTable.id, claimed.action.id));
-    });
-    req.log.error(
-      { enrollmentId: claimed.enrollment.id, errorName: error instanceof Error ? error.name : "UnknownError" },
-      "Staff course payment confirmation retry failed",
-    );
-    res.status(502).json({ error: "O reenvio falhou e ficou registado. Pode tentar novamente mais tarde." });
-    return;
-  }
-
-  const response = await loadStaffEnrollment(claimed.enrollment.id);
+  const response = await loadStaffEnrollment(transaction.enrollment.id);
   if (!response) {
     res.status(500).json({ error: "A inscrição foi actualizada, mas não foi possível recarregá-la." });
     return;
@@ -469,7 +492,7 @@ router.post("/course-enrollments/:id/retry-confirmation", async (req, res): Prom
   const actorUserId = await requireCourseStaff(req, res);
   if (!actorUserId) return;
 
-  const params = GetCourseEnrollmentStatusParams.safeParse(req.params);
+  const params = RetryStaffCourseEnrollmentConfirmationParams.safeParse(req.params);
   if (!params.success) {
     res.status(404).json({ error: "Inscrição não encontrada." });
     return;
@@ -502,18 +525,23 @@ router.post("/course-enrollments/:id/retry-confirmation", async (req, res): Prom
   });
 
   if (!claimed) {
-  const [existing] = await db
-    .select()
-    .from(courseEnrollmentsTable)
-    .where(eq(courseEnrollmentsTable.paymentReference, paymentReference))
-    .limit(1);
-
-  const now = new Date();
+    const [existing] = await db
+      .select({
+        id: courseEnrollmentsTable.id,
+        paymentStatus: courseEnrollmentsTable.paymentStatus,
+      })
+      .from(courseEnrollmentsTable)
+      .where(eq(courseEnrollmentsTable.id, params.data.id))
+      .limit(1);
     if (!existing) {
       res.status(404).json({ error: "Inscrição não encontrada." });
       return;
     }
-    res.status(409).json({ error: "Só é possível reenviar uma confirmação que tenha falhado." });
+    res.status(409).json({
+      error: existing.paymentStatus === "paid"
+        ? "A confirmação desta inscrição não está pendente de reenvio."
+        : "Só é possível reenviar uma confirmação após o pagamento.",
+    });
     return;
   }
 
@@ -600,6 +628,134 @@ router.get("/course-enrollments/:id", async (req, res): Promise<void> => {
   }));
 });
 
+router.post("/course-enrollments/:id/renew-reference", async (req, res): Promise<void> => {
+  const params = RenewCourseEnrollmentReferenceParams.safeParse(req.params);
+  if (!params.success) {
+    res.status(404).json({ error: "Inscrição não encontrada." });
+    return;
+  }
+
+  const [initial] = await db
+    .select()
+    .from(courseEnrollmentsTable)
+    .where(eq(courseEnrollmentsTable.id, params.data.id))
+    .limit(1);
+  if (!initial) {
+    res.status(404).json({ error: "Inscrição não encontrada." });
+    return;
+  }
+
+  const now = new Date();
+  if (initial.paymentStatus === "pending" && initial.expiresAt.getTime() < now.getTime()) {
+    await db
+      .update(courseEnrollmentsTable)
+      .set({ paymentStatus: "expired", updatedAt: now })
+      .where(and(
+        eq(courseEnrollmentsTable.id, initial.id),
+        eq(courseEnrollmentsTable.paymentStatus, "pending"),
+        lt(courseEnrollmentsTable.expiresAt, now),
+      ));
+  }
+
+  const [enrollment] = await db
+    .select()
+    .from(courseEnrollmentsTable)
+    .where(eq(courseEnrollmentsTable.id, params.data.id))
+    .limit(1);
+  if (!enrollment) {
+    res.status(404).json({ error: "Inscrição não encontrada." });
+    return;
+  }
+  if (
+    enrollment.paymentStatus !== "expired"
+    || enrollment.paymentTransactionId
+    || enrollment.expiresAt.getTime() >= now.getTime()
+  ) {
+    res.status(409).json({ error: "Esta inscrição ainda não pode renovar a referência." });
+    return;
+  }
+
+  const cooldownStartedAt = new Date(now.getTime() - REFERENCE_RENEWAL_COOLDOWN_MS);
+  const [claim] = await db
+    .update(courseEnrollmentsTable)
+    .set({ paymentReferenceRenewalRequestedAt: now, updatedAt: now })
+    .where(and(
+      eq(courseEnrollmentsTable.id, enrollment.id),
+      eq(courseEnrollmentsTable.paymentStatus, "expired"),
+      isNull(courseEnrollmentsTable.paymentTransactionId),
+      lt(courseEnrollmentsTable.expiresAt, now),
+      or(
+        isNull(courseEnrollmentsTable.paymentReferenceRenewalRequestedAt),
+        lt(courseEnrollmentsTable.paymentReferenceRenewalRequestedAt, cooldownStartedAt),
+      ),
+    ))
+    .returning({ id: courseEnrollmentsTable.id });
+
+  if (!claim) {
+    const [latest] = await db
+      .select()
+      .from(courseEnrollmentsTable)
+      .where(eq(courseEnrollmentsTable.id, enrollment.id))
+      .limit(1);
+    if (!latest) {
+      res.status(404).json({ error: "Inscrição não encontrada." });
+      return;
+    }
+    if (
+      latest.paymentReferenceRenewalRequestedAt
+      && latest.paymentReferenceRenewalRequestedAt.getTime() >= cooldownStartedAt.getTime()
+    ) {
+      res.status(429).json({ error: "Já existe um pedido recente para renovar esta referência." });
+      return;
+    }
+    res.status(409).json({ error: "Esta inscrição já não pode renovar a referência." });
+    return;
+  }
+
+  const newExpiresAt = new Date(now.getTime() + REFERENCE_VALIDITY_HOURS * 60 * 60 * 1000);
+  let newPaymentReference: string | undefined;
+  try {
+    newPaymentReference = await createProxyPayReference(
+      enrollment.amountKz,
+      enrollment.id,
+      enrollment.courseId,
+      newExpiresAt,
+    );
+    const [renewed] = await db
+      .update(courseEnrollmentsTable)
+      .set({
+        paymentReference: newPaymentReference,
+        paymentStatus: "pending",
+        expiresAt: newExpiresAt,
+        updatedAt: now,
+      })
+      .where(and(
+        eq(courseEnrollmentsTable.id, enrollment.id),
+        eq(courseEnrollmentsTable.paymentStatus, "expired"),
+        isNull(courseEnrollmentsTable.paymentTransactionId),
+        eq(courseEnrollmentsTable.paymentReferenceRenewalRequestedAt, now),
+      ))
+      .returning();
+    if (!renewed) {
+      await proxyPayRequest(`/references/${newPaymentReference}`, { method: "DELETE" }).catch(() => undefined);
+      res.status(409).json({ error: "A inscrição foi actualizada por outro pedido. Consulte o estado do pagamento." });
+      return;
+    }
+    res.json(RenewCourseEnrollmentReferenceResponse.parse(checkoutResponse(renewed)));
+  } catch (error) {
+    if (newPaymentReference) {
+      await proxyPayRequest(`/references/${newPaymentReference}`, { method: "DELETE" }).catch(() => undefined);
+    }
+    if (error instanceof ProxyPayNotConfiguredError) {
+      res.status(503).json({ error: "O serviço de pagamentos não está configurado." });
+      return;
+    }
+    const status = error instanceof ProxyPayRequestError ? error.status : undefined;
+    req.log.error({ providerStatus: status }, "Course payment reference renewal failed");
+    res.status(502).json({ error: "Não foi possível renovar a referência agora. Tente novamente." });
+  }
+});
+
 router.post("/proxypay/webhook", async (req, res): Promise<void> => {
   const rawBody = (req as Request & { rawBody?: Buffer }).rawBody;
   const signature = req.get("X-Signature")?.trim() ?? "";
@@ -642,8 +798,6 @@ router.post("/proxypay/webhook", async (req, res): Promise<void> => {
     .from(courseEnrollmentsTable)
     .where(eq(courseEnrollmentsTable.paymentReference, paymentReference))
     .limit(1);
-
-  const now = new Date();
 
   if (!existing) {
     req.log.warn({ paymentReference }, "ProxyPay payment has no matching course enrollment");
@@ -696,13 +850,6 @@ router.post("/proxypay/webhook", async (req, res): Promise<void> => {
         .from(courseEnrollmentsTable)
         .where(eq(courseEnrollmentsTable.id, existing.id))
         .limit(1);
-
-    const recentlyRequested =
-      latest?.paymentStatus === "expired"
-      && !latest.paymentTransactionId
-      && latest.expiresAt.getTime() < now.getTime()
-      && latest.renewalRequestedAt !== null
-      && latest.renewalRequestedAt.getTime() >= cooldownStartedAt.getTime();
       if (latest) enrollment = latest;
     }
   }
@@ -761,27 +908,3 @@ router.post("/proxypay/webhook", async (req, res): Promise<void> => {
 });
 
 export default router;
-
-  const [claimed] = await db
-    .update(courseEnrollmentsTable)
-    .set({
-      paymentReferenceRenewalRequestedAt: now,
-      updatedAt: now,
-    })
-    .where(and(
-      eq(courseEnrollmentsTable.id, existing.id),
-      eq(courseEnrollmentsTable.paymentStatus, "expired"),
-      isNull(courseEnrollmentsTable.paymentTransactionId),
-      lt(courseEnrollmentsTable.expiresAt, now),
-      or(
-        isNull(courseEnrollmentsTable.paymentReferenceRenewalRequestedAt),
-        lt(courseEnrollmentsTable.paymentReferenceRenewalRequestedAt, cooldownStartedAt),
-      ),
-    ))
-    .returning();
-
-  const newExpiresAt = new Date(Date.now() + REFERENCE_VALIDITY_HOURS * 60 * 60 * 1000);
-
-  const cooldownStartedAt = new Date(now.getTime() - REFERENCE_RENEWAL_COOLDOWN_MS);
-
-  let newPaymentReference: string;

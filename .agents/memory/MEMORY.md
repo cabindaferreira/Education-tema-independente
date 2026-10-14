@@ -1,2 +1,3 @@
 - [ImageMagick PGM output](image-tracing-pgm-output.md) — Check the PGM magic header; this runtime emitted ASCII P2 instead of binary P5.
 - [Orval parameter exports](orval-parameter-exports.md) — Generated Zod and TypeScript parameter names can collide; verify codegen before choosing a GET contract.
+- [Workspace generated types](workspace-generated-types.md) — Run `pnpm run typecheck:libs` after API code generation so workspace declaration outputs match generated source.
