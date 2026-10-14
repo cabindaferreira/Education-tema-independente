@@ -401,6 +401,10 @@
   font-size: 13px;
 }
 
+.payment-renewal {
+  margin-top: 20px;
+}
+
 .payment-total {
   text-align: right;
 }

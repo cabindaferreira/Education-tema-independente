@@ -10,6 +10,8 @@ import {
   ListStaffCourseEnrollmentsQueryParams,
   ListStaffCourseEnrollmentsResponse,
   ReceiveProxyPayPaymentBody,
+  RenewCourseEnrollmentReferenceParams,
+  RenewCourseEnrollmentReferenceResponse,
   ResolveStaffCourseEnrollmentBody,
   ResolveStaffCourseEnrollmentParams,
   ResolveStaffCourseEnrollmentResponse,
@@ -26,6 +28,7 @@ const PROXYPAY_ENTITY = "00413";
 const WEBHOOK_URL = "https://education-tema-independente.replit.app/api/proxypay/webhook";
 const REFERENCE_VALIDITY_HOURS = 72;
 
+const REFERENCE_RENEWAL_COOLDOWN_MS = 2 * 60 * 1000;
 async function requireCourseStaff(
   req: Parameters<typeof getAuth>[0],
   res: import("express").Response,
@@ -234,7 +237,7 @@ router.post("/course-enrollments", async (req, res): Promise<void> => {
     return;
   }
 
-  const parsed = CreateCourseEnrollmentBody.safeParse(candidate);
+  const parsed = ReceiveProxyPayPaymentBody.safeParse(eventPayload);
   if (!parsed.success) {
     res.status(400).json({ error: "Preencha todos os dados da ficha de inscrição." });
     return;
@@ -272,36 +275,15 @@ router.post("/course-enrollments", async (req, res): Promise<void> => {
 
   const id = randomUUID();
   const expiresAt = new Date(Date.now() + REFERENCE_VALIDITY_HOURS * 60 * 60 * 1000);
-  let paymentReference: string | undefined;
+  const paymentReference = String(event.reference_id);
 
   try {
     paymentReference = await createProxyPayReference(course.priceKz, id, input.courseId, expiresAt);
-    const [enrollment] = await db
-      .insert(courseEnrollmentsTable)
-      .values({
-        id,
-        courseId: input.courseId,
-        courseTitle: course.title,
-        fullName,
-        birthDate,
-        identityNumber,
-        nationality: input.nationality.trim(),
-        phone: input.phone.trim(),
-        email: input.email.trim().toLowerCase(),
-        address: input.address.trim(),
-        municipality: input.municipality.trim(),
-        province: input.province.trim(),
-        profession: input.profession.trim(),
-        maritalStatus: input.maritalStatus.trim(),
-        privacyAcceptedAt: new Date(),
-        amountKz: course.priceKz,
-        paymentEntity: PROXYPAY_ENTITY,
-        paymentReference,
-        paymentStatus: "pending",
-        expiresAt,
-        updatedAt: new Date(),
-      })
-      .returning();
+  const [enrollment] = await db
+    .select()
+    .from(courseEnrollmentsTable)
+    .where(eq(courseEnrollmentsTable.id, params.data.id))
+    .limit(1);
 
     res.status(201).json(CreateCourseEnrollmentResponse.parse(checkoutResponse(enrollment)));
   } catch (error) {
@@ -319,15 +301,9 @@ router.post("/course-enrollments", async (req, res): Promise<void> => {
     }
 
     const status = error instanceof ProxyPayRequestError ? error.status : undefined;
-    req.log.error({ providerStatus: status }, "Course checkout reference creation failed");
-    res.status(502).json({ error: "Não foi possível gerar a referência agora. Tente novamente." });
-  }
-});
 
-router.get("/course-enrollments/staff", async (req, res): Promise<void> => {
-  if (!(await requireCourseStaff(req, res))) return;
-
-  const parsed = ListStaffCourseEnrollmentsQueryParams.safeParse(req.query);
+  let renewed: typeof claimed | undefined;
+  const parsed = ReceiveProxyPayPaymentBody.safeParse(eventPayload);
   if (!parsed.success) {
     res.status(400).json({ error: "Os filtros de pesquisa não são válidos." });
     return;
@@ -389,7 +365,7 @@ router.post("/course-enrollments/:id/resolve", async (req, res): Promise<void> =
   const actorUserId = await requireCourseStaff(req, res);
   if (!actorUserId) return;
 
-  const params = ResolveStaffCourseEnrollmentParams.safeParse(req.params);
+  const params = GetCourseEnrollmentStatusParams.safeParse(req.params);
   const body = ResolveStaffCourseEnrollmentBody.safeParse(req.body);
   if (!params.success || !body.success || body.data.note.trim().length < 5) {
     res.status(400).json({ error: "Indique uma decisão e uma justificação válida." });
@@ -427,57 +403,61 @@ router.post("/course-enrollments/:id/resolve", async (req, res): Promise<void> =
   });
 
   if (!transaction) {
-    const [existing] = await db
-      .select({ id: courseEnrollmentsTable.id })
-      .from(courseEnrollmentsTable)
-      .where(eq(courseEnrollmentsTable.id, params.data.id))
-      .limit(1);
-    res.status(existing ? 409 : 404).json({
-      error: existing ? "Esta exceção já foi resolvida por outra pessoa." : "Inscrição não encontrada.",
-    });
+  const [existing] = await db
+    .select()
+    .from(courseEnrollmentsTable)
+    .where(eq(courseEnrollmentsTable.paymentReference, paymentReference))
+    .limit(1);
+
+  const now = new Date();
+    if (!existing) {
+      res.status(404).json({ error: "Inscrição não encontrada." });
+      return;
+    }
+    res.status(409).json({ error: "Só é possível reenviar uma confirmação que tenha falhado." });
     return;
   }
 
-  if (nextPaymentStatus === "paid") {
-    try {
-      await sendCoursePaymentConfirmation({
-        enrollmentId: transaction.enrollment.id,
-        name: transaction.enrollment.fullName,
-        email: transaction.enrollment.email,
-        courseTitle: transaction.enrollment.courseTitle,
-        amountKz: transaction.enrollment.amountKz,
-        paymentReference: transaction.enrollment.paymentReference,
-        idempotencyKey: `course-payment-confirmation-${transaction.enrollment.id}-resolution-${transaction.action.id}`,
-      });
-      await db.transaction(async (tx) => {
-        await tx
-          .update(courseEnrollmentsTable)
-          .set({ confirmationEmailStatus: "sent", confirmationEmailSentAt: new Date(), updatedAt: new Date() })
-          .where(eq(courseEnrollmentsTable.id, transaction.enrollment.id));
-        await tx
-          .update(courseEnrollmentActionsTable)
-          .set({ confirmationEmailStatus: "sent" })
-          .where(eq(courseEnrollmentActionsTable.id, transaction.action.id));
-      });
-    } catch (error) {
-      await db.transaction(async (tx) => {
-        await tx
-          .update(courseEnrollmentsTable)
-          .set({ confirmationEmailStatus: "failed", updatedAt: new Date() })
-          .where(eq(courseEnrollmentsTable.id, transaction.enrollment.id));
-        await tx
-          .update(courseEnrollmentActionsTable)
-          .set({ confirmationEmailStatus: "failed" })
-          .where(eq(courseEnrollmentActionsTable.id, transaction.action.id));
-      });
-      req.log.error(
-        { enrollmentId: transaction.enrollment.id, errorName: error instanceof Error ? error.name : "UnknownError" },
-        "Payment review was resolved, but the confirmation email failed",
-      );
-    }
+  try {
+    await sendCoursePaymentConfirmation({
+      enrollmentId: claimed.enrollment.id,
+      name: claimed.enrollment.fullName,
+      email: claimed.enrollment.email,
+      courseTitle: claimed.enrollment.courseTitle,
+      amountKz: claimed.enrollment.amountKz,
+      paymentReference: claimed.enrollment.paymentReference,
+      idempotencyKey: `course-payment-confirmation-${claimed.enrollment.id}-retry-${claimed.action.id}`,
+    });
+    await db.transaction(async (tx) => {
+      await tx
+        .update(courseEnrollmentsTable)
+        .set({ confirmationEmailStatus: "sent", confirmationEmailSentAt: new Date(), updatedAt: new Date() })
+        .where(eq(courseEnrollmentsTable.id, claimed.enrollment.id));
+      await tx
+        .update(courseEnrollmentActionsTable)
+        .set({ confirmationEmailStatus: "sent" })
+        .where(eq(courseEnrollmentActionsTable.id, claimed.action.id));
+    });
+  } catch (error) {
+    await db.transaction(async (tx) => {
+      await tx
+        .update(courseEnrollmentsTable)
+        .set({ confirmationEmailStatus: "failed", updatedAt: new Date() })
+        .where(eq(courseEnrollmentsTable.id, claimed.enrollment.id));
+      await tx
+        .update(courseEnrollmentActionsTable)
+        .set({ confirmationEmailStatus: "failed" })
+        .where(eq(courseEnrollmentActionsTable.id, claimed.action.id));
+    });
+    req.log.error(
+      { enrollmentId: claimed.enrollment.id, errorName: error instanceof Error ? error.name : "UnknownError" },
+      "Staff course payment confirmation retry failed",
+    );
+    res.status(502).json({ error: "O reenvio falhou e ficou registado. Pode tentar novamente mais tarde." });
+    return;
   }
 
-  const response = await loadStaffEnrollment(transaction.enrollment.id);
+  const response = await loadStaffEnrollment(claimed.enrollment.id);
   if (!response) {
     res.status(500).json({ error: "A inscrição foi actualizada, mas não foi possível recarregá-la." });
     return;
@@ -489,7 +469,7 @@ router.post("/course-enrollments/:id/retry-confirmation", async (req, res): Prom
   const actorUserId = await requireCourseStaff(req, res);
   if (!actorUserId) return;
 
-  const params = RetryStaffCourseEnrollmentConfirmationParams.safeParse(req.params);
+  const params = GetCourseEnrollmentStatusParams.safeParse(req.params);
   if (!params.success) {
     res.status(404).json({ error: "Inscrição não encontrada." });
     return;
@@ -522,14 +502,13 @@ router.post("/course-enrollments/:id/retry-confirmation", async (req, res): Prom
   });
 
   if (!claimed) {
-    const [existing] = await db
-      .select({
-        id: courseEnrollmentsTable.id,
-        paymentStatus: courseEnrollmentsTable.paymentStatus,
-      })
-      .from(courseEnrollmentsTable)
-      .where(eq(courseEnrollmentsTable.id, params.data.id))
-      .limit(1);
+  const [existing] = await db
+    .select()
+    .from(courseEnrollmentsTable)
+    .where(eq(courseEnrollmentsTable.paymentReference, paymentReference))
+    .limit(1);
+
+  const now = new Date();
     if (!existing) {
       res.status(404).json({ error: "Inscrição não encontrada." });
       return;
@@ -664,6 +643,8 @@ router.post("/proxypay/webhook", async (req, res): Promise<void> => {
     .where(eq(courseEnrollmentsTable.paymentReference, paymentReference))
     .limit(1);
 
+  const now = new Date();
+
   if (!existing) {
     req.log.warn({ paymentReference }, "ProxyPay payment has no matching course enrollment");
     res.sendStatus(200);
@@ -715,6 +696,13 @@ router.post("/proxypay/webhook", async (req, res): Promise<void> => {
         .from(courseEnrollmentsTable)
         .where(eq(courseEnrollmentsTable.id, existing.id))
         .limit(1);
+
+    const recentlyRequested =
+      latest?.paymentStatus === "expired"
+      && !latest.paymentTransactionId
+      && latest.expiresAt.getTime() < now.getTime()
+      && latest.renewalRequestedAt !== null
+      && latest.renewalRequestedAt.getTime() >= cooldownStartedAt.getTime();
       if (latest) enrollment = latest;
     }
   }
@@ -773,3 +761,27 @@ router.post("/proxypay/webhook", async (req, res): Promise<void> => {
 });
 
 export default router;
+
+  const [claimed] = await db
+    .update(courseEnrollmentsTable)
+    .set({
+      paymentReferenceRenewalRequestedAt: now,
+      updatedAt: now,
+    })
+    .where(and(
+      eq(courseEnrollmentsTable.id, existing.id),
+      eq(courseEnrollmentsTable.paymentStatus, "expired"),
+      isNull(courseEnrollmentsTable.paymentTransactionId),
+      lt(courseEnrollmentsTable.expiresAt, now),
+      or(
+        isNull(courseEnrollmentsTable.paymentReferenceRenewalRequestedAt),
+        lt(courseEnrollmentsTable.paymentReferenceRenewalRequestedAt, cooldownStartedAt),
+      ),
+    ))
+    .returning();
+
+  const newExpiresAt = new Date(Date.now() + REFERENCE_VALIDITY_HOURS * 60 * 60 * 1000);
+
+  const cooldownStartedAt = new Date(now.getTime() - REFERENCE_RENEWAL_COOLDOWN_MS);
+
+  let newPaymentReference: string;

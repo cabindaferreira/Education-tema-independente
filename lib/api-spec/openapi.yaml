@@ -692,6 +692,35 @@ paths:
                 $ref: "#/components/schemas/CourseEnrollmentStatus"
         "404":
           description: Enrollment not found
+  /course-enrollments/{id}/renew-reference:
+    post:
+      operationId: renewCourseEnrollmentReference
+      tags: [course-enrollments]
+      summary: Renew an expired course enrollment payment reference
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Replacement payment details without personal data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseEnrollmentCheckout"
+        "404":
+          description: Enrollment not found
+        "409":
+          description: Enrollment is not eligible for reference renewal
+        "429":
+          description: A recent renewal request is already in progress
+        "502":
+          description: ProxyPay could not create the replacement reference
+        "503":
+          description: Payment service is not configured
   /course-enrollments/staff:
     get:
       operationId: listStaffCourseEnrollments

@@ -34,6 +34,7 @@ export const courseEnrollmentsTable = pgTable(
     paymentEntity: text("payment_entity").notNull(),
     paymentReference: text("payment_reference").notNull(),
     paymentStatus: text("payment_status").notNull().default("pending"),
+    paymentReferenceRenewalRequestedAt: timestamp("payment_reference_renewal_requested_at", { withTimezone: true }),
     paymentTransactionId: text("payment_transaction_id"),
     paymentAmountKz: integer("payment_amount_kz"),
     paidAt: timestamp("paid_at", { withTimezone: true }),

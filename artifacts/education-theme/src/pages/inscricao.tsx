@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'wouter';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   AlertCircle,
   ArrowLeft,
@@ -18,7 +19,7 @@ import type {
   CourseEnrollmentInput,
   CourseEnrollmentStatus,
 } from '@workspace/api-client-react';
-import { getGetCourseEnrollmentStatusQueryKey, useCreateCourseEnrollment, useGetCourseEnrollmentStatus, useListPublishedCourses } from '@workspace/api-client-react';
+import { getGetCourseEnrollmentStatusQueryKey, useCreateCourseEnrollment, useGetCourseEnrollmentStatus, useListPublishedCourses, useRenewCourseEnrollmentReference } from '@workspace/api-client-react';
 import './inscricao.css';
 
 type EnrollmentForm = Omit<CourseEnrollmentInput, 'privacyAccepted'> & {
@@ -33,7 +34,9 @@ export default function CourseEnrollmentPage() {
   const { courseId = '' } = useParams<{ courseId: string }>();
   const coursesQuery = useListPublishedCourses();
   const course = coursesQuery.data?.find((entry) => entry.id === courseId);
+  const queryClient = useQueryClient();
   const createEnrollment = useCreateCourseEnrollment();
+  const renewEnrollmentReference = useRenewCourseEnrollmentReference();
   const [form, setForm] = useState<EnrollmentForm>({
     courseId: courseId as CourseEnrollmentInput['courseId'],
     fullName: '',
@@ -52,6 +55,8 @@ export default function CourseEnrollmentPage() {
   const [checkout, setCheckout] = useState<CourseEnrollmentCheckout | null>(null);
   const [paymentStatus, setPaymentStatus] = useState<CourseEnrollmentStatus | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRenewingReference, setIsRenewingReference] = useState(false);
+  const [renewalError, setRenewalError] = useState('');
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState('');
   const statusQuery = useGetCourseEnrollmentStatus(checkout?.id ?? '', {
@@ -111,6 +116,32 @@ export default function CourseEnrollmentPage() {
     }
   }
 
+  async function renewPaymentReference() {
+    if (!checkout || isRenewingReference) return;
+
+    setRenewalError('');
+    setIsRenewingReference(true);
+    try {
+      const result = await renewEnrollmentReference.mutateAsync({ id: checkout.id });
+      const nextStatus: CourseEnrollmentStatus = {
+        ...result,
+        confirmationEmailStatus: paymentStatus?.confirmationEmailStatus ?? 'pending',
+        paidAt: null,
+      };
+      setCheckout(result);
+      setPaymentStatus(nextStatus);
+      queryClient.setQueryData(getGetCourseEnrollmentStatusQueryKey(result.id), nextStatus);
+    } catch (renewalRequestError) {
+      setRenewalError(
+        renewalRequestError instanceof Error
+          ? renewalRequestError.message
+          : 'Ocorreu um erro. Tente novamente.',
+      );
+    } finally {
+      setIsRenewingReference(false);
+    }
+  }
+
   if (coursesQuery.isLoading) {
     return <section className="section course-enrollment-section"><div className="container enrollment-container"><div className="enrollment-layout"><div className="enrollment-main"><div className="enrollment-skeleton" aria-busy="true"><span /><span /><span /><span /></div></div></div></div></section>;
   }
@@ -158,7 +189,7 @@ export default function CourseEnrollmentPage() {
                     : reviewRequired
                       ? 'Recebemos uma notificação de valor diferente. A equipa da Academia irá verificar o pagamento.'
                       : expired
-                        ? 'Esta referência já expirou. Contacte a Academia para gerar uma nova.'
+                        ? 'Esta referência já expirou. Pode gerar uma nova sem preencher outra ficha de inscrição.'
                         : 'Pague com os dados abaixo. A página atualizará o estado automaticamente.'}
                 </p>
               </div>
@@ -169,6 +200,22 @@ export default function CourseEnrollmentPage() {
               <div><span>Curso</span><strong>{course.title}</strong></div>
               <div className="payment-total"><span>Valor</span><strong>{formatKz(checkout.amountKz)}</strong></div>
             </div>
+
+            {expired && (
+              <div className="payment-renewal">
+                {renewalError && <p className="enrollment-error" role="alert"><AlertCircle size={16} />{renewalError}</p>}
+                <button
+                  className="enrollment-submit"
+                  type="button"
+                  onClick={renewPaymentReference}
+                  disabled={isRenewingReference}
+                >
+                  {isRenewingReference
+                    ? <><LoaderCircle className="enrollment-spinner" size={17} /> A gerar nova referência…</>
+                    : <>Gerar nova referência <ArrowRight size={16} /></>}
+                </button>
+              </div>
+            )}
 
             {!paid && !reviewRequired && !expired && (
               <>
