@@ -515,6 +515,24 @@ export interface AdminMediaInput {
   roomId?: AdminMediaInputRoomId;
 }
 
+/**
+ * @nullable
+ */
+export type AdminMediaUpdateRoomId = typeof AdminMediaUpdateRoomId[keyof typeof AdminMediaUpdateRoomId] | null;
+
+
+export const AdminMediaUpdateRoomId = {
+  'sala-soba': 'sala-soba',
+  'sala-kilamba': 'sala-kilamba',
+  'sala-kudi': 'sala-kudi',
+  'sala-ondjango': 'sala-ondjango',
+} as const;
+
+export interface AdminMediaUpdate {
+  /** @nullable */
+  roomId: AdminMediaUpdateRoomId;
+}
+
 export type AdminUploadUrlInputContentType = typeof AdminUploadUrlInputContentType[keyof typeof AdminUploadUrlInputContentType];
 
 

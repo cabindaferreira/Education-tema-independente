@@ -332,6 +332,37 @@ paths:
         "403":
           description: Administrator access required
   /admin/media/{id}:
+    patch:
+      operationId: updateAdminMedia
+      tags: [admin]
+      summary: Update the room association of an active media asset
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminMediaUpdate"
+      responses:
+        "200":
+          description: Media asset updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminMedia"
+        "400":
+          description: Invalid media identifier or room
+        "401":
+          description: Sign-in required
+        "403":
+          description: Administrator access required
+        "404":
+          description: Active media asset not found
     delete:
       operationId: removeAdminMedia
       tags: [admin]
@@ -1453,6 +1484,13 @@ components:
           type: integer
           minimum: 1
           maximum: 15728640
+        roomId:
+          type: ["string", "null"]
+          enum: [sala-soba, sala-kilamba, sala-kudi, sala-ondjango, null]
+    AdminMediaUpdate:
+      type: object
+      required: [roomId]
+      properties:
         roomId:
           type: ["string", "null"]
           enum: [sala-soba, sala-kilamba, sala-kudi, sala-ondjango, null]

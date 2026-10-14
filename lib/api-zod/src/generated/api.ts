@@ -395,6 +395,30 @@ export const CreateAdminMediaResponse = zod.object({
 
 
 /**
+ * @summary Update the room association of an active media asset
+ */
+export const UpdateAdminMediaParams = zod.object({
+  "id": zod.coerce.number().int()
+})
+
+export const UpdateAdminMediaBody = zod.object({
+  "roomId": zod.union([zod.literal('sala-soba'),zod.literal('sala-kilamba'),zod.literal('sala-kudi'),zod.literal('sala-ondjango'),zod.literal(null)]).nullable()
+})
+
+export const UpdateAdminMediaResponse = zod.object({
+  "id": zod.number().int(),
+  "title": zod.string(),
+  "altText": zod.string(),
+  "objectPath": zod.string(),
+  "url": zod.string(),
+  "roomId": zod.union([zod.literal('sala-soba'),zod.literal('sala-kilamba'),zod.literal('sala-kudi'),zod.literal('sala-ondjango'),zod.literal(null)]).nullable(),
+  "contentType": zod.string(),
+  "sizeBytes": zod.number().int(),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
  * @summary Remove an unused media asset from the library
  */
 export const RemoveAdminMediaParams = zod.object({

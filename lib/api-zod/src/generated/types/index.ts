@@ -21,6 +21,8 @@ export * from './adminMediaInputContentType';
 export * from './adminMediaInputRoomId';
 export * from './adminMediaList';
 export * from './adminMediaRoomId';
+export * from './adminMediaUpdate';
+export * from './adminMediaUpdateRoomId';
 export * from './adminOverview';
 export * from './adminTeamList';
 export * from './adminTeamMember';

@@ -30,6 +30,9 @@ import {
   UpdateAdminCourseBody,
   UpdateAdminCourseParams,
   UpdateAdminCourseResponse,
+  UpdateAdminMediaBody,
+  UpdateAdminMediaParams,
+  UpdateAdminMediaResponse,
 } from "@workspace/api-zod";
 import {
   academyCoursesTable,
@@ -509,6 +512,29 @@ router.post("/admin/media", async (req, res): Promise<void> => {
   }).returning();
   await setAcademyObjectVisibility(file, "public", admin.userId);
   res.status(201).json(CreateAdminMediaResponse.parse(mediaResult(media)));
+});
+
+router.patch("/admin/media/:id", async (req, res): Promise<void> => {
+  if (!(await getAcademyAdmin(req, res))) return;
+  const params = UpdateAdminMediaParams.safeParse(req.params);
+  const parsed = UpdateAdminMediaBody.safeParse(req.body);
+  if (!params.success || !parsed.success) {
+    res.status(400).json({ error: "Identificador ou sala inválidos." });
+    return;
+  }
+  if (parsed.data.roomId !== null && !hasRoom(parsed.data.roomId)) {
+    res.status(400).json({ error: "Seleccione uma sala válida para esta imagem." });
+    return;
+  }
+  const [media] = await db.update(academyMediaTable)
+    .set({ roomId: parsed.data.roomId })
+    .where(and(eq(academyMediaTable.id, params.data.id), isNull(academyMediaTable.archivedAt)))
+    .returning();
+  if (!media) {
+    res.status(404).json({ error: "A imagem activa não foi encontrada." });
+    return;
+  }
+  res.json(UpdateAdminMediaResponse.parse(mediaResult(media)));
 });
 
 router.delete("/admin/media/:id", async (req, res): Promise<void> => {

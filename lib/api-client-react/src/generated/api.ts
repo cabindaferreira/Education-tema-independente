@@ -30,6 +30,7 @@ import type {
   AdminMedia,
   AdminMediaInput,
   AdminMediaList,
+  AdminMediaUpdate,
   AdminOverview,
   AdminTeamList,
   AdminTeamMember,
@@ -1379,6 +1380,95 @@ export const useCreateAdminMedia = <TError = ErrorType<void>,
         TContext
       > => {
       return useMutation(getCreateAdminMediaMutationOptions(options));
+    }
+
+export const getUpdateAdminMediaUrl = (id: number,) => {
+
+
+
+
+  return `/api/admin/media/${id}`
+}
+
+/**
+ * @summary Update the room association of an active media asset
+ */
+export const updateAdminMedia = async (id: number,
+    adminMediaUpdate: AdminMediaUpdate, options?: Parameters<typeof customFetch>[1]): Promise<AdminMedia> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<AdminMedia>(getUpdateAdminMediaUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(adminMediaUpdate)
+  }
+);}
+
+
+
+
+
+export const getUpdateAdminMediaMutationKey = () => ['updateAdminMedia'] as const;
+
+export const getUpdateAdminMediaMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminMedia>>, TError,UpdateAdminMediaMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateAdminMedia>>, TError,UpdateAdminMediaMutationVariables, TContext> => {
+
+const mutationKey = getUpdateAdminMediaMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateAdminMedia>>, UpdateAdminMediaMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateAdminMedia(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateAdminMediaMutationResult = NonNullable<Awaited<ReturnType<typeof updateAdminMedia>>>
+    export type UpdateAdminMediaMutationBody = BodyType<AdminMediaUpdate>
+    export type UpdateAdminMediaMutationError = ErrorType<void>
+    export type UpdateAdminMediaMutationVariables = {id: number;data: BodyType<AdminMediaUpdate>}
+
+    /**
+ * @summary Update the room association of an active media asset
+ */
+export const useUpdateAdminMedia = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminMedia>>, TError,UpdateAdminMediaMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateAdminMedia>>,
+        TError,
+        UpdateAdminMediaMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdateAdminMediaMutationOptions(options));
     }
 
 export const getRemoveAdminMediaUrl = (id: number,) => {

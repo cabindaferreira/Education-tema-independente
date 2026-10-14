@@ -462,6 +462,11 @@ button, input { font: inherit; }
 .admin-media-info strong { display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:700 11px var(--app-font-display); }
 .admin-media-info small { display:block;color:#8c817d;font-size:9px;margin-top:5px; }
 .admin-media-actions { display:flex;justify-content:space-between;align-items:center;margin-top:10px; }
+.admin-media-room-edit { display:grid;gap:8px;margin-top:9px; }
+.admin-media-room-edit .admin-field select { padding:8px 9px;font-size:10px; }
+.admin-media-room-edit-actions { display:flex;flex-wrap:wrap;gap:7px; }
+.admin-media-room-edit-actions .admin-button { min-height:31px;padding-inline:9px;font-size:9px; }
+.admin-media-room-edit-trigger { margin-top:8px;padding:0;border:0;background:none;cursor:pointer; }
 .admin-agenda-grid { display:grid;grid-template-columns:1fr 1fr;gap:16px; }
 .admin-agenda-list { display:grid;gap:9px; }
 .admin-agenda-entry { display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 13px;background:#faf7f3;border:1px solid #eee6df; }
