@@ -2,3 +2,4 @@
 - [Orval parameter exports](orval-parameter-exports.md) — Generated Zod and TypeScript parameter names can collide; verify codegen before choosing a GET contract.
 - [Workspace generated types](workspace-generated-types.md) — Run `pnpm run typecheck:libs` after API code generation so workspace declaration outputs match generated source.
 - [Academy super-admin access](academy-super-admin-access.md) — The designated owner account must retain full access across all admin areas and cannot be removed as a team member.
+- [One-off media imports](one-off-media-imports.md) — Bundle temporary database/storage scripts as CommonJS with the API workspace's esbuild when native TypeScript execution cannot resolve workspace imports.
