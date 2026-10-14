@@ -22,4 +22,11 @@ export interface RoomStaffReservation {
   name: string;
   /** @nullable */
   company: string | null;
+  /**
+     * Staff member who cancelled the reservation, when the cancellation happened after audit tracking was added
+     * @nullable
+     */
+  cancelledBy: string | null;
+  /** @nullable */
+  cancelledAt: Date | null;
 }

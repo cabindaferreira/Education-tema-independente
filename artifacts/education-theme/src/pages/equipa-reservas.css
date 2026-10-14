@@ -92,6 +92,8 @@
 .staff-status-pill > span { width: 6px; height: 6px; border-radius: 50%; background: #64886a; }
 .staff-status-pill.cancelled { color: #887e78; background: #efede8; }
 .staff-status-pill.cancelled > span { background: #a49b94; }
+.staff-booking-state { min-width: 0; }
+.staff-cancel-audit { margin: 6px 0 0; color: #897b75; font-size: 9px; line-height: 1.4; }
 .staff-cancel-button { min-height: 34px; display: inline-flex; justify-content: center; align-items: center; gap: 6px; padding: 0 9px; border: 1px solid #e9c9c7; color: #a12a36; background: transparent; font-size: 9px; font-weight: 700; cursor: pointer; transition: background .18s, color .18s, transform .18s; }
 .staff-cancel-button:hover:not(:disabled) { transform: translateY(-1px); color: white; background: #a92735; border-color: #a92735; }
 .staff-cancel-button:disabled { opacity: .65; cursor: wait; }
@@ -167,7 +169,7 @@
   .staff-booking-price { display: block; grid-column: 2; grid-row: 1; text-align: right; }
   .staff-booking-price > span { font-size: 7px; }
   .staff-booking-price strong { font-size: 11px; }
-  .staff-status-pill { grid-column: 1; grid-row: 3; }
+  .staff-booking-state { grid-column: 1; grid-row: 3; }
   .staff-cancel-button,.staff-released { grid-column: 2; grid-row: 3; justify-self: end; }
   .staff-cancel-button { min-height: 33px; }
   .staff-booking-skeleton { grid-template-columns: 1fr 1fr; height: 100px; }

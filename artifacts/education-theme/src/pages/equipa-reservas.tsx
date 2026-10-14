@@ -60,6 +60,16 @@ function formatPrice(value: number) {
   return new Intl.NumberFormat('pt-AO', { maximumFractionDigits: 0 }).format(value);
 }
 
+function formatCancellationDateTime(value: string | null) {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return new Intl.DateTimeFormat('pt-AO', {
+    dateStyle: 'short',
+    timeStyle: 'short',
+  }).format(date);
+}
+
 function getBookingTime(reservation: RoomStaffReservation) {
   return `${reservation.startTime} – ${reservation.endTime}`;
 }
@@ -254,8 +264,17 @@ export default function StaffReservationsPage() {
                         <div><strong data-testid={`text-reservation-name-${reservation.id}`}>{reservation.name}</strong><span data-testid={`text-reservation-company-${reservation.id}`}>{reservation.company || 'Reserva individual'}</span></div>
                       </div>
                       <div className="staff-booking-price"><span>Valor</span><strong data-testid={`text-reservation-price-${reservation.id}`}>{formatPrice(reservation.priceKz)} <small>Kz</small></strong></div>
-                      <div className={`staff-status-pill ${reservation.status}`} data-testid={`status-reservation-${reservation.id}`}>
-                        <span />{reservation.status === 'confirmed' ? 'Confirmada' : 'Cancelada'}
+                      <div className="staff-booking-state">
+                        <div className={`staff-status-pill ${reservation.status}`} data-testid={`status-reservation-${reservation.id}`}>
+                          <span />{reservation.status === 'confirmed' ? 'Confirmada' : 'Cancelada'}
+                        </div>
+                        {reservation.status === 'cancelled' && (
+                          <p className="staff-cancel-audit" data-testid={`text-reservation-cancellation-${reservation.id}`}>
+                            {reservation.cancelledAt && formatCancellationDateTime(reservation.cancelledAt)
+                              ? `Cancelada por ${reservation.cancelledBy || 'membro da equipa'} em ${formatCancellationDateTime(reservation.cancelledAt)}`
+                              : 'Cancelada antes do registo de auditoria.'}
+                          </p>
+                        )}
                       </div>
                       {reservation.status === 'confirmed' ? (
                         <button

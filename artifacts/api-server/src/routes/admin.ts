@@ -126,6 +126,8 @@ function adminReservationResult(reservation: typeof roomReservationsTable.$infer
     status: reservation.status,
     name: reservation.name,
     company: reservation.company,
+    cancelledBy: reservation.cancelledByName,
+    cancelledAt: reservation.cancelledAt,
   };
 }
 

@@ -141,6 +141,7 @@ export const createAdminCourseBodyPriceKzMax = 100000000;
 export const createAdminCourseBodyImageUrlMax = 1000;
 
 
+
 export const CreateAdminCourseBody = zod.object({
   "id": zod.string().min(createAdminCourseBodyIdMin).max(createAdminCourseBodyIdMax).regex(createAdminCourseBodyIdRegExp),
   "title": zod.string().min(createAdminCourseBodyTitleMin).max(createAdminCourseBodyTitleMax),
@@ -199,6 +200,7 @@ export const updateAdminCourseBodyDurationMax = 100;
 export const updateAdminCourseBodyPriceKzMax = 100000000;
 
 export const updateAdminCourseBodyImageUrlMax = 1000;
+
 
 
 export const UpdateAdminCourseBody = zod.object({
@@ -287,6 +289,7 @@ export const ListAdminTeamResponse = zod.array(ListAdminTeamResponseItem)
 export const authorizeAdminTeamMemberBodyEmailMax = 320;
 
 
+
 export const AuthorizeAdminTeamMemberBody = zod.object({
   "email": zod.string().email().max(authorizeAdminTeamMemberBodyEmailMax)
 })
@@ -315,6 +318,7 @@ export const RevokeAdminTeamMemberResponse = zod.void()
  * @summary Search course and room customers
  */
 export const listAdminCustomersQuerySearchMax = 100;
+
 
 
 export const ListAdminCustomersQueryParams = zod.object({
@@ -367,6 +371,7 @@ export const createAdminMediaBodyObjectPathMax = 1000;
 export const createAdminMediaBodySizeBytesMax = 15728640;
 
 
+
 export const CreateAdminMediaBody = zod.object({
   "title": zod.string().min(createAdminMediaBodyTitleMin).max(createAdminMediaBodyTitleMax),
   "altText": zod.string().max(createAdminMediaBodyAltTextMax),
@@ -403,6 +408,7 @@ export const RemoveAdminMediaResponse = zod.void()
  * @summary Get a short-lived upload URL for an administrator
  */
 export const requestAdminMediaUploadUrlBodySizeBytesMax = 15728640;
+
 
 
 export const RequestAdminMediaUploadUrlBody = zod.object({
@@ -449,7 +455,9 @@ export const GetAdminAgendaResponse = zod.object({
   "priceKz": zod.number().int(),
   "status": zod.enum(['confirmed', 'cancelled']),
   "name": zod.string(),
-  "company": zod.string().nullable()
+  "company": zod.string().nullable(),
+  "cancelledBy": zod.string().nullable().describe('Staff member who cancelled the reservation, when the cancellation happened after audit tracking was added'),
+  "cancelledAt": zod.coerce.date().nullable()
 })),
   "blocks": zod.array(zod.object({
   "id": zod.number().int(),
@@ -501,6 +509,7 @@ export const createAdminRoomBlockBodyReasonMin = 2;
 export const createAdminRoomBlockBodyReasonMax = 300;
 
 
+
 export const CreateAdminRoomBlockBody = zod.object({
   "roomId": zod.enum(['sala-soba', 'sala-kilamba', 'sala-kudi', 'sala-ondjango']),
   "date": zod.string().regex(createAdminRoomBlockBodyDateRegExp),
@@ -543,6 +552,7 @@ export const getRoomBookingSettingsResponseRoomRulesSalaSobaStandardEndTimeRegEx
 export const getRoomBookingSettingsResponseRoomRulesSalaSobaStandardMinimumHoursMax = 9;
 
 
+
 export const getRoomBookingSettingsResponseRoomRulesSalaSobaStandardDiscountFromHoursMax = 9;
 
 export const getRoomBookingSettingsResponseRoomRulesSalaSobaAfterHoursStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
@@ -557,6 +567,7 @@ export const getRoomBookingSettingsResponseRoomRulesSalaSobaSessionAfternoonEndT
 export const getRoomBookingSettingsResponseRoomRulesSalaKilambaStandardStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
 export const getRoomBookingSettingsResponseRoomRulesSalaKilambaStandardEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
 export const getRoomBookingSettingsResponseRoomRulesSalaKilambaStandardMinimumHoursMax = 9;
+
 
 
 export const getRoomBookingSettingsResponseRoomRulesSalaKilambaStandardDiscountFromHoursMax = 9;
@@ -575,6 +586,7 @@ export const getRoomBookingSettingsResponseRoomRulesSalaKudiStandardEndTimeRegEx
 export const getRoomBookingSettingsResponseRoomRulesSalaKudiStandardMinimumHoursMax = 9;
 
 
+
 export const getRoomBookingSettingsResponseRoomRulesSalaKudiStandardDiscountFromHoursMax = 9;
 
 export const getRoomBookingSettingsResponseRoomRulesSalaKudiAfterHoursStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
@@ -589,6 +601,7 @@ export const getRoomBookingSettingsResponseRoomRulesSalaKudiSessionAfternoonEndT
 export const getRoomBookingSettingsResponseRoomRulesSalaOndjangoStandardStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
 export const getRoomBookingSettingsResponseRoomRulesSalaOndjangoStandardEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
 export const getRoomBookingSettingsResponseRoomRulesSalaOndjangoStandardMinimumHoursMax = 9;
+
 
 
 export const getRoomBookingSettingsResponseRoomRulesSalaOndjangoStandardDiscountFromHoursMax = 9;
@@ -688,6 +701,7 @@ export const updateRoomBookingSettingsBodyRoomRulesSalaSobaStandardEndTimeRegExp
 export const updateRoomBookingSettingsBodyRoomRulesSalaSobaStandardMinimumHoursMax = 9;
 
 
+
 export const updateRoomBookingSettingsBodyRoomRulesSalaSobaStandardDiscountFromHoursMax = 9;
 
 export const updateRoomBookingSettingsBodyRoomRulesSalaSobaAfterHoursStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
@@ -702,6 +716,7 @@ export const updateRoomBookingSettingsBodyRoomRulesSalaSobaSessionAfternoonEndTi
 export const updateRoomBookingSettingsBodyRoomRulesSalaKilambaStandardStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
 export const updateRoomBookingSettingsBodyRoomRulesSalaKilambaStandardEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
 export const updateRoomBookingSettingsBodyRoomRulesSalaKilambaStandardMinimumHoursMax = 9;
+
 
 
 export const updateRoomBookingSettingsBodyRoomRulesSalaKilambaStandardDiscountFromHoursMax = 9;
@@ -720,6 +735,7 @@ export const updateRoomBookingSettingsBodyRoomRulesSalaKudiStandardEndTimeRegExp
 export const updateRoomBookingSettingsBodyRoomRulesSalaKudiStandardMinimumHoursMax = 9;
 
 
+
 export const updateRoomBookingSettingsBodyRoomRulesSalaKudiStandardDiscountFromHoursMax = 9;
 
 export const updateRoomBookingSettingsBodyRoomRulesSalaKudiAfterHoursStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
@@ -734,6 +750,7 @@ export const updateRoomBookingSettingsBodyRoomRulesSalaKudiSessionAfternoonEndTi
 export const updateRoomBookingSettingsBodyRoomRulesSalaOndjangoStandardStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
 export const updateRoomBookingSettingsBodyRoomRulesSalaOndjangoStandardEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
 export const updateRoomBookingSettingsBodyRoomRulesSalaOndjangoStandardMinimumHoursMax = 9;
+
 
 
 export const updateRoomBookingSettingsBodyRoomRulesSalaOndjangoStandardDiscountFromHoursMax = 9;
@@ -829,6 +846,7 @@ export const updateRoomBookingSettingsResponseRoomRulesSalaSobaStandardEndTimeRe
 export const updateRoomBookingSettingsResponseRoomRulesSalaSobaStandardMinimumHoursMax = 9;
 
 
+
 export const updateRoomBookingSettingsResponseRoomRulesSalaSobaStandardDiscountFromHoursMax = 9;
 
 export const updateRoomBookingSettingsResponseRoomRulesSalaSobaAfterHoursStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
@@ -843,6 +861,7 @@ export const updateRoomBookingSettingsResponseRoomRulesSalaSobaSessionAfternoonE
 export const updateRoomBookingSettingsResponseRoomRulesSalaKilambaStandardStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
 export const updateRoomBookingSettingsResponseRoomRulesSalaKilambaStandardEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
 export const updateRoomBookingSettingsResponseRoomRulesSalaKilambaStandardMinimumHoursMax = 9;
+
 
 
 export const updateRoomBookingSettingsResponseRoomRulesSalaKilambaStandardDiscountFromHoursMax = 9;
@@ -861,6 +880,7 @@ export const updateRoomBookingSettingsResponseRoomRulesSalaKudiStandardEndTimeRe
 export const updateRoomBookingSettingsResponseRoomRulesSalaKudiStandardMinimumHoursMax = 9;
 
 
+
 export const updateRoomBookingSettingsResponseRoomRulesSalaKudiStandardDiscountFromHoursMax = 9;
 
 export const updateRoomBookingSettingsResponseRoomRulesSalaKudiAfterHoursStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
@@ -875,6 +895,7 @@ export const updateRoomBookingSettingsResponseRoomRulesSalaKudiSessionAfternoonE
 export const updateRoomBookingSettingsResponseRoomRulesSalaOndjangoStandardStartTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
 export const updateRoomBookingSettingsResponseRoomRulesSalaOndjangoStandardEndTimeRegExp = new RegExp('^\\d{2}:\\d{2}$');
 export const updateRoomBookingSettingsResponseRoomRulesSalaOndjangoStandardMinimumHoursMax = 9;
+
 
 
 export const updateRoomBookingSettingsResponseRoomRulesSalaOndjangoStandardDiscountFromHoursMax = 9;
@@ -973,6 +994,7 @@ export const checkRoomAvailabilityBodyDateRegExp = new RegExp('^\\d{4}-\\d{2}-\\
 export const checkRoomAvailabilityBodyDurationHoursMax = 9;
 
 
+
 export const CheckRoomAvailabilityBody = zod.object({
   "roomId": zod.enum(['sala-soba', 'sala-kilamba', 'sala-kudi', 'sala-ondjango']),
   "date": zod.string().regex(checkRoomAvailabilityBodyDateRegExp).describe('Calendar date in YYYY-MM-DD format'),
@@ -1022,7 +1044,9 @@ export const ListRoomReservationsResponseItem = zod.object({
   "priceKz": zod.number().int(),
   "status": zod.enum(['confirmed', 'cancelled']),
   "name": zod.string(),
-  "company": zod.string().nullable()
+  "company": zod.string().nullable(),
+  "cancelledBy": zod.string().nullable().describe('Staff member who cancelled the reservation, when the cancellation happened after audit tracking was added'),
+  "cancelledAt": zod.coerce.date().nullable()
 })
 export const ListRoomReservationsResponse = zod.array(ListRoomReservationsResponseItem)
 
@@ -1040,6 +1064,7 @@ export const createRoomReservationBodyCompanyMax = 160;
 
 export const createRoomReservationBodyNifMin = 3;
 export const createRoomReservationBodyNifMax = 32;
+
 
 
 export const CreateRoomReservationBody = zod.object({
@@ -1074,6 +1099,7 @@ export const CreateRoomReservationResponse = zod.object({
  */
 
 
+
 export const CancelRoomReservationParams = zod.object({
   "id": zod.coerce.number().int().min(1)
 })
@@ -1092,7 +1118,9 @@ export const CancelRoomReservationResponse = zod.object({
   "priceKz": zod.number().int(),
   "status": zod.enum(['confirmed', 'cancelled']),
   "name": zod.string(),
-  "company": zod.string().nullable()
+  "company": zod.string().nullable(),
+  "cancelledBy": zod.string().nullable().describe('Staff member who cancelled the reservation, when the cancellation happened after audit tracking was added'),
+  "cancelledAt": zod.coerce.date().nullable()
 })
 
 
@@ -1132,6 +1160,7 @@ export const createCourseEnrollmentBodyProfessionMax = 120;
 
 export const createCourseEnrollmentBodyMaritalStatusMin = 2;
 export const createCourseEnrollmentBodyMaritalStatusMax = 40;
+
 
 
 export const CreateCourseEnrollmentBody = zod.object({
@@ -1188,6 +1217,7 @@ export const createCourseEnrollmentRequestBodyPhoneRegExp = new RegExp('^\\+?[\\
 export const createCourseEnrollmentRequestBodyEmailMax = 320;
 
 
+
 export const CreateCourseEnrollmentRequestBody = zod.object({
   "courseId": zod.string().min(createCourseEnrollmentRequestBodyCourseIdMin).max(createCourseEnrollmentRequestBodyCourseIdMax).regex(createCourseEnrollmentRequestBodyCourseIdRegExp),
   "fullName": zod.string().min(createCourseEnrollmentRequestBodyFullNameMin).max(createCourseEnrollmentRequestBodyFullNameMax),
@@ -1229,11 +1259,30 @@ export const GetCourseEnrollmentStatusResponse = zod.object({
   "paidAt": zod.coerce.date().nullish()
 }))
 
+
 /**
  * @summary Renew an expired course enrollment payment reference
  */
 export const RenewCourseEnrollmentReferenceParams = zod.object({
   "id": zod.coerce.string().uuid()
+})
+
+export const renewCourseEnrollmentReferenceResponseCourseIdMin = 2;
+export const renewCourseEnrollmentReferenceResponseCourseIdMax = 70;
+
+
+export const renewCourseEnrollmentReferenceResponseCourseIdRegExp = new RegExp('^[a-z0-9]+(?:-[a-z0-9]+)*$');
+
+
+export const RenewCourseEnrollmentReferenceResponse = zod.object({
+  "id": zod.string().uuid(),
+  "courseId": zod.string().min(renewCourseEnrollmentReferenceResponseCourseIdMin).max(renewCourseEnrollmentReferenceResponseCourseIdMax).regex(renewCourseEnrollmentReferenceResponseCourseIdRegExp),
+  "courseTitle": zod.string(),
+  "amountKz": zod.number().int(),
+  "paymentEntity": zod.string(),
+  "paymentReference": zod.string(),
+  "paymentStatus": zod.enum(['pending', 'paid', 'review_required', 'expired']),
+  "expiresAt": zod.coerce.date()
 })
 
 
@@ -1246,6 +1295,7 @@ export const listStaffCourseEnrollmentsQueryCourseIdMax = 70;
 
 export const listStaffCourseEnrollmentsQueryCourseIdRegExp = new RegExp('^[a-z0-9]+(?:-[a-z0-9]+)*$');
 export const listStaffCourseEnrollmentsQuerySearchMax = 100;
+
 
 
 export const ListStaffCourseEnrollmentsQueryParams = zod.object({
@@ -1308,6 +1358,7 @@ export const ResolveStaffCourseEnrollmentParams = zod.object({
 
 export const resolveStaffCourseEnrollmentBodyNoteMin = 5;
 export const resolveStaffCourseEnrollmentBodyNoteMax = 1000;
+
 
 
 export const ResolveStaffCourseEnrollmentBody = zod.object({
@@ -1457,6 +1508,7 @@ export const GetAuthProfileResponse = zod.object({
 export const subscribeToNewsletterBodyEmailMax = 320;
 
 
+
 export const SubscribeToNewsletterBody = zod.object({
   "email": zod.string().email().max(subscribeToNewsletterBodyEmailMax)
 })
@@ -1483,16 +1535,4 @@ export const UnsubscribeFromNewsletterBody = zod.object({
 
 export const UnsubscribeFromNewsletterResponse = zod.object({
   "status": zod.enum(['unsubscribed', 'already_unsubscribed'])
-})
-
-
-export const RenewCourseEnrollmentReferenceResponse = zod.object({
-  "id": zod.string().uuid(),
-  "courseId": zod.enum(['crm', 'tesouraria', 'lideranca-equipas', 'gestao-comercial', 'gestao-empresas', 'recursos-humanos']),
-  "courseTitle": zod.string(),
-  "amountKz": zod.number().int(),
-  "paymentEntity": zod.string(),
-  "paymentReference": zod.string(),
-  "paymentStatus": zod.enum(['pending', 'paid', 'review_required', 'expired']),
-  "expiresAt": zod.coerce.date()
 })

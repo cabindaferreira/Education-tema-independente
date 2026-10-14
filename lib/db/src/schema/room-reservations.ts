@@ -24,6 +24,9 @@ export const roomReservationsTable = pgTable(
     nif: text("nif").notNull(),
     status: text("status").notNull().default("confirmed"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    cancelledByUserId: text("cancelled_by_user_id"),
+    cancelledByName: text("cancelled_by_name"),
+    cancelledAt: timestamp("cancelled_at", { withTimezone: true }),
   },
   (table) => [index("room_reservations_room_date_idx").on(table.roomId, table.bookingDate)],
 );

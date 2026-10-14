@@ -106,11 +106,14 @@ function validateSettings(settings: RoomBookingSettings): string | null {
   return null;
 }
 
-async function requireRoomStaff(req: Parameters<typeof getAuth>[0], res: import("express").Response): Promise<boolean> {
+async function requireRoomStaff(
+  req: Parameters<typeof getAuth>[0],
+  res: import("express").Response,
+): Promise<{ userId: string; displayName: string } | null> {
   const { userId } = getAuth(req);
   if (!userId) {
     res.status(401).json({ error: "Inicie sessão para continuar." });
-    return false;
+    return null;
   }
 
   const user = await clerkClient.users.getUser(userId);
@@ -122,10 +125,13 @@ async function requireRoomStaff(req: Parameters<typeof getAuth>[0], res: import(
   if (!roleList.some((entry) => ["room_staff", "academy_admin", "admin"].includes(entry))
     && !["room_staff", "academy_admin", "admin"].includes(String(role))) {
     res.status(403).json({ error: "Esta área está reservada à equipa da Academia." });
-    return false;
+    return null;
   }
 
-  return true;
+  return {
+    userId,
+    displayName: user.fullName || user.username || user.primaryEmailAddress?.emailAddress || userId,
+  };
 }
 
 function staffReservationResponse(reservation: {
@@ -139,6 +145,8 @@ function staffReservationResponse(reservation: {
   status: string;
   name: string;
   company: string | null;
+  cancelledByName: string | null;
+  cancelledAt: Date | null;
 }) {
   if (!hasRoom(reservation.roomId)) {
     throw new Error("A sala desta reserva já não está disponível.");
@@ -156,6 +164,8 @@ function staffReservationResponse(reservation: {
     status: reservation.status,
     name: reservation.name,
     company: reservation.company,
+    cancelledBy: reservation.cancelledByName,
+    cancelledAt: reservation.cancelledAt,
   };
 }
 
@@ -241,6 +251,8 @@ router.get("/room-reservations", async (req, res): Promise<void> => {
       status: roomReservationsTable.status,
       name: roomReservationsTable.name,
       company: roomReservationsTable.company,
+      cancelledByName: roomReservationsTable.cancelledByName,
+      cancelledAt: roomReservationsTable.cancelledAt,
     })
     .from(roomReservationsTable)
     .where(and(
@@ -253,7 +265,8 @@ router.get("/room-reservations", async (req, res): Promise<void> => {
 });
 
 router.patch("/room-reservations/:id/cancel", async (req, res): Promise<void> => {
-  if (!(await requireRoomStaff(req, res))) return;
+  const staff = await requireRoomStaff(req, res);
+  if (!staff) return;
 
   const parsed = CancelRoomReservationParams.safeParse(req.params);
   if (!parsed.success) {
@@ -263,7 +276,12 @@ router.patch("/room-reservations/:id/cancel", async (req, res): Promise<void> =>
 
   const [updated] = await db
     .update(roomReservationsTable)
-    .set({ status: "cancelled" })
+    .set({
+      status: "cancelled",
+      cancelledByUserId: staff.userId,
+      cancelledByName: staff.displayName,
+      cancelledAt: new Date(),
+    })
     .where(and(
       eq(roomReservationsTable.id, parsed.data.id),
       eq(roomReservationsTable.status, "confirmed"),
@@ -279,6 +297,8 @@ router.patch("/room-reservations/:id/cancel", async (req, res): Promise<void> =>
       status: roomReservationsTable.status,
       name: roomReservationsTable.name,
       company: roomReservationsTable.company,
+      cancelledByName: roomReservationsTable.cancelledByName,
+      cancelledAt: roomReservationsTable.cancelledAt,
     });
 
   if (updated) {
@@ -298,6 +318,8 @@ router.patch("/room-reservations/:id/cancel", async (req, res): Promise<void> =>
       status: roomReservationsTable.status,
       name: roomReservationsTable.name,
       company: roomReservationsTable.company,
+      cancelledByName: roomReservationsTable.cancelledByName,
+      cancelledAt: roomReservationsTable.cancelledAt,
     })
     .from(roomReservationsTable)
     .where(eq(roomReservationsTable.id, parsed.data.id));

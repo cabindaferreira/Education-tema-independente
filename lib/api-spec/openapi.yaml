@@ -1191,7 +1191,7 @@ components:
           type: string
     RoomStaffReservation:
       type: object
-      required: [id, roomId, roomName, date, startTime, endTime, durationMinutes, priceKz, status, name, company]
+      required: [id, roomId, roomName, date, startTime, endTime, durationMinutes, priceKz, status, name, company, cancelledBy, cancelledAt]
       properties:
         id:
           type: integer
@@ -1217,6 +1217,12 @@ components:
           type: string
         company:
           type: ["string", "null"]
+        cancelledBy:
+          type: ["string", "null"]
+          description: Staff member who cancelled the reservation, when the cancellation happened after audit tracking was added
+        cancelledAt:
+          type: ["string", "null"]
+          format: date-time
     RoomStaffReservationList:
       type: array
       items:
