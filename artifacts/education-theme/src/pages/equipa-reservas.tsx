@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useAuth } from '@clerk/react';
 import { Link } from 'wouter';
+import { AdminMasthead } from '@/components/admin-shell';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   AlertCircle,
@@ -150,26 +151,10 @@ export default function StaffReservationsPage() {
   const isForbidden = queryIsForbidden || cancelIsForbidden;
 
   return (
-    <main className="staff-reservations" data-testid="page-staff-reservations">
-      <header className="staff-topbar">
-        <div className="staff-topbar-inner">
-          <Link className="staff-brand" href="/" aria-label="Academia Procenter, página inicial" data-testid="link-staff-brand">
-            <img src="/favicon.svg" alt="" />
-            <span>ACADEMIA<small>PROCENTER · EQUIPA</small></span>
-          </Link>
-          <div className="staff-topbar-meta"><span className="staff-secure-dot" /> Área interna <span className="staff-topbar-separator">/</span> Reservas</div>
-          <Link className="staff-exit-link" href="/equipa" data-testid="link-admin-dashboard">Painel</Link>
-          <Link className="staff-exit-link" href="/equipa/salas" data-testid="link-room-settings">Preços e horários</Link>
-          <Link className="staff-exit-link" href="/equipa/inscricoes" data-testid="link-course-enrollments">Inscrições</Link>
-          <Link className="staff-exit-link" href="/" data-testid="link-staff-exit">Voltar ao site <ArrowLeft size={14} /></Link>
-        </div>
-      </header>
+    <main className="staff-reservations academy-admin" data-testid="page-staff-reservations">
+      {!isForbidden && <AdminMasthead title="Reservas" />}
 
       <div className="staff-main">
-        <div className="staff-breadcrumb" aria-label="Caminho de navegação">
-          <Link href="/" data-testid="link-reservations-breadcrumb-home">Academia</Link><span>/</span><span>Equipa</span><span>/</span><strong>Reservas</strong>
-        </div>
-
         <section className="staff-heading">
           <div>
             <p className="staff-overline"><span /> OPERAÇÕES · SALAS</p>

@@ -4,7 +4,6 @@ import { Link } from 'wouter';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   AlertCircle,
-  ArrowLeft,
   Check,
   Clock3,
   LockKeyhole,
@@ -25,6 +24,7 @@ import {
   type ListStaffCourseEnrollmentsParams,
   type StaffCourseEnrollment,
 } from '@workspace/api-client-react';
+import { AdminMasthead } from '@/components/admin-shell';
 import './equipa-inscricoes.css';
 
 const paymentStatuses: { value: CoursePaymentStatus | ''; label: string }[] = [
@@ -161,15 +161,9 @@ export default function StaffCourseEnrollmentsPage() {
   }
 
   return (
-    <main className="staff-enrollments" data-testid="page-staff-course-enrollments">
-      <header className="enrollment-topbar">
-        <Link to="/" className="enrollment-brand"><img src="/favicon.svg" alt="" /><span>ACADEMIA<small>PROCENTER · EQUIPA</small></span></Link>
-        <span className="enrollment-topbar-meta"><i /> Área interna / Inscrições</span>
-        <Link to="/equipa" className="enrollment-back-link">Painel</Link>
-        <Link to="/equipa/reservas" className="enrollment-back-link">Reservas <ArrowLeft size={14} /></Link>
-      </header>
+    <main className="staff-enrollments academy-admin" data-testid="page-staff-course-enrollments">
+      {!isForbidden && <AdminMasthead title="Inscrições" />}
       <div className="enrollment-main">
-        <nav className="enrollment-breadcrumb"><Link to="/">Academia</Link><span>/</span><Link to="/equipa/reservas">Equipa</Link><span>/</span><strong>Inscrições</strong></nav>
         <section className="enrollment-heading">
           <div>
             <p className="enrollment-overline"><span /> OPERAÇÕES · FORMAÇÃO</p>

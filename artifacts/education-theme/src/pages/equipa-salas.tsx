@@ -11,6 +11,7 @@ import {
   type RoomBookingRules,
   type RoomBookingSettings,
 } from '@workspace/api-client-react';
+import { AdminMasthead } from '@/components/admin-shell';
 import './equipa-salas.css';
 
 const roomChoices = [
@@ -133,16 +134,9 @@ export default function StaffRoomSettingsPage() {
   }
 
   return (
-    <main className="staff-settings" data-testid="page-staff-room-settings">
-      <header className="staff-settings-topbar">
-        <Link to="/" className="staff-settings-brand"><img src="/favicon.svg" alt="" /><span>ACADEMIA<small>PROCENTER · EQUIPA</small></span></Link>
-        <span><i /> Área interna / Salas</span>
-        <Link to="/equipa" className="staff-settings-back">Painel</Link>
-        <Link to="/equipa/inscricoes" className="staff-settings-back">Inscrições</Link>
-        <Link to="/equipa/reservas" className="staff-settings-back">Reservas <ArrowLeft size={14} /></Link>
-      </header>
+    <main className="staff-settings academy-admin" data-testid="page-staff-room-settings">
+      {!isForbidden && <AdminMasthead title="Preços e horários" />}
       <div className="staff-settings-main">
-        <nav className="staff-settings-breadcrumb"><Link to="/">Academia</Link><span>/</span><Link to="/equipa/reservas">Equipa</Link><span>/</span><strong>Preços e horários</strong></nav>
         <section className="staff-settings-heading">
           <div><p className="staff-settings-overline"><span /> OPERAÇÕES · SALAS</p><h1>Preços e horários</h1><p>As alterações passam a valer nas próximas consultas e reservas. Reservas confirmadas mantêm o valor acordado.</p></div>
           <ShieldCheck size={22} />

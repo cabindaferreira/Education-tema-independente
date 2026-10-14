@@ -27,3 +27,6 @@ channel = "stable-25_05"
 [userenv.shared]
 NEWSLETTER_FROM_EMAIL = "academia@procenter.co.ao"
 ACADEMY_OWNER_EMAIL = "dti.procenter@gmail.com"
+
+[objectStorage]
+defaultBucketID = "replit-objstore-b2bcbec6-4121-453a-a920-c74b0c60e174"

@@ -1,19 +1,19 @@
-import { useState, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { useAuth } from '@clerk/react';
 import { Link, useLocation } from 'wouter';
-import { ArrowLeft, BookOpen, CalendarDays, ChevronRight, Image, LayoutDashboard, Menu, Shield, Users, X } from 'lucide-react';
+import { ArrowLeft, BookOpen, CalendarDays, ChevronRight, Image, LayoutDashboard, Shield, Users } from 'lucide-react';
 import { getGetAdminAccessQueryKey, useGetAdminAccess } from '@workspace/api-client-react';
 
 const navItems = [
-  { href: '/equipa', label: 'Visão geral', icon: LayoutDashboard },
-  { href: '/equipa/cursos', label: 'Cursos', icon: BookOpen },
-  { href: '/equipa/midias', label: 'Biblioteca de mídias', icon: Image },
-  { href: '/equipa/clientes', label: 'Clientes', icon: Users },
-  { href: '/equipa/agenda', label: 'Agenda de salas', icon: CalendarDays },
-  { href: '/equipa/reservas', label: 'Reservas', icon: CalendarDays },
-  { href: '/equipa/salas', label: 'Preços e horários', icon: CalendarDays },
-  { href: '/equipa/inscricoes', label: 'Inscrições', icon: BookOpen },
-  { href: '/equipa/acessos', label: 'Acessos da equipa', icon: Shield, owner: true },
+  { href: '/equipa', label: 'Visão geral', icon: LayoutDashboard, id: 'overview' },
+  { href: '/equipa/cursos', label: 'Cursos', icon: BookOpen, id: 'courses' },
+  { href: '/equipa/midias', label: 'Biblioteca de mídias', icon: Image, id: 'media' },
+  { href: '/equipa/clientes', label: 'Clientes', icon: Users, id: 'customers' },
+  { href: '/equipa/agenda', label: 'Agenda de salas', icon: CalendarDays, id: 'agenda' },
+  { href: '/equipa/reservas', label: 'Reservas', icon: CalendarDays, id: 'reservations' },
+  { href: '/equipa/salas', label: 'Preços e horários', icon: CalendarDays, id: 'room-settings' },
+  { href: '/equipa/inscricoes', label: 'Inscrições', icon: BookOpen, id: 'enrollments' },
+  { href: '/equipa/acessos', label: 'Acessos da equipa', icon: Shield, id: 'team-access', owner: true },
 ] as const;
 
 function statusCode(error: unknown) {
@@ -44,33 +44,47 @@ export function AdminGuard({ children, ownerOnly = false }: { children: ReactNod
   return <>{children}</>;
 }
 
-export function AdminShell({ children, title }: { children: ReactNode; title: string }) {
+export function AdminMasthead({ title }: { title: string }) {
   const [location] = useLocation();
   const { isLoaded, isSignedIn } = useAuth();
   const access = useGetAdminAccess({
     query: { queryKey: getGetAdminAccessQueryKey(), enabled: Boolean(isLoaded && isSignedIn), retry: false },
   });
-  const [menuOpen, setMenuOpen] = useState(false);
+  return (
+    <header className="admin-masthead" data-page-title={title}>
+      <div className="admin-mast-inner">
+        <div className="admin-brand-row">
+          <Link href="/equipa" className="admin-logo" aria-label="Academia Procenter — Visão geral" data-testid="link-admin-home">
+            <img src="/favicon.svg" alt="" />
+            <span>ACADEMIA<small>PROCENTER · GESTÃO</small></span>
+          </Link>
+          <Link className="admin-public-link" href="/" data-testid="link-admin-public-site"><ArrowLeft size={14} /> Ver site público</Link>
+        </div>
+        <div className="admin-nav-wrap">
+          <p className="admin-nav-label">Espaço de trabalho</p>
+          <nav className="admin-nav" aria-label={`Navegação da administração — ${title}`}>
+            {navItems.filter(item => !('owner' in item) || access.data?.isOwner).map(item => {
+              const Icon = item.icon;
+              return (
+                <Link key={item.href} href={item.href} aria-current={location === item.href ? 'page' : undefined} data-testid={`admin-nav-${item.id}`}>
+                  <Icon size={15} aria-hidden="true" /><span>{item.label}</span>
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+export function AdminShell({ children, title }: { children: ReactNode; title: string }) {
   return (
     <main className="academy-admin">
-      <div className={`admin-sidebar ${menuOpen ? 'is-open' : ''}`}>
-        <Link href="/equipa" className="admin-logo" onClick={() => setMenuOpen(false)}><img src="/favicon.svg" alt="" /><span>ACADEMIA<small>PROCENTER · GESTÃO</small></span></Link>
-        <p className="admin-nav-label">Espaço de trabalho</p>
-        <nav className="admin-nav" aria-label="Navegação da administração">
-          {navItems.filter(item => !('owner' in item) || access.data?.isOwner).map(item => {
-            const Icon = item.icon;
-            return <Link key={item.href} href={item.href} aria-current={location === item.href ? 'page' : undefined} onClick={() => setMenuOpen(false)}><Icon size={16} /><span>{item.label}</span></Link>;
-          })}
-        </nav>
-        <div className="admin-sidebar-foot"><b>{access.data?.email ?? 'Conta da equipa'}</b>Dados internos protegidos<br />Sessão Academia Procenter</div>
-      </div>
+      <AdminMasthead title={title} />
       <section className="admin-main">
-        <header className="admin-topbar">
-          <button className="admin-mobile-menu" type="button" aria-label={menuOpen ? 'Fechar navegação' : 'Abrir navegação'} onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X size={17} /> : <Menu size={17} />}</button>
-          <div className="admin-topbar-crumb"><span>Academia</span><ChevronRight size={13} /><strong>{title}</strong></div>
-          <div className="admin-top-actions"><span className="admin-live"><i /> Ligação activa</span><Link className="admin-public-link" href="/"><ArrowLeft size={14} /> Ver site público</Link></div>
-        </header>
         <div className="admin-content">{children}</div>
+        <footer className="admin-footnote"><span>Academia Procenter · Gestão interna</span><span>Dados internos protegidos</span></footer>
       </section>
     </main>
   );
