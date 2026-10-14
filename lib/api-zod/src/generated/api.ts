@@ -351,6 +351,7 @@ export const ListAdminMediaResponseItem = zod.object({
   "objectPath": zod.string(),
   "url": zod.string(),
   "roomId": zod.union([zod.literal('sala-soba'),zod.literal('sala-kilamba'),zod.literal('sala-kudi'),zod.literal('sala-ondjango'),zod.literal(null)]).nullable(),
+  "homeBanner": zod.boolean(),
   "contentType": zod.string(),
   "sizeBytes": zod.number().int(),
   "createdAt": zod.coerce.date()
@@ -378,7 +379,8 @@ export const CreateAdminMediaBody = zod.object({
   "objectPath": zod.string().min(1).max(createAdminMediaBodyObjectPathMax),
   "contentType": zod.enum(['image/jpeg', 'image/png', 'image/webp', 'image/avif']),
   "sizeBytes": zod.number().int().min(1).max(createAdminMediaBodySizeBytesMax),
-  "roomId": zod.union([zod.literal('sala-soba'),zod.literal('sala-kilamba'),zod.literal('sala-kudi'),zod.literal('sala-ondjango'),zod.literal(null)]).nullish()
+  "roomId": zod.union([zod.literal('sala-soba'),zod.literal('sala-kilamba'),zod.literal('sala-kudi'),zod.literal('sala-ondjango'),zod.literal(null)]).nullish(),
+  "homeBanner": zod.boolean()
 })
 
 export const CreateAdminMediaResponse = zod.object({
@@ -388,6 +390,7 @@ export const CreateAdminMediaResponse = zod.object({
   "objectPath": zod.string(),
   "url": zod.string(),
   "roomId": zod.union([zod.literal('sala-soba'),zod.literal('sala-kilamba'),zod.literal('sala-kudi'),zod.literal('sala-ondjango'),zod.literal(null)]).nullable(),
+  "homeBanner": zod.boolean(),
   "contentType": zod.string(),
   "sizeBytes": zod.number().int(),
   "createdAt": zod.coerce.date()
@@ -395,14 +398,27 @@ export const CreateAdminMediaResponse = zod.object({
 
 
 /**
- * @summary Update the room association of an active media asset
+ * @summary List active images for the public home page banner
+ */
+export const ListHomepageBannersResponseItem = zod.object({
+  "id": zod.number().int(),
+  "title": zod.string(),
+  "altText": zod.string(),
+  "url": zod.string()
+})
+export const ListHomepageBannersResponse = zod.array(ListHomepageBannersResponseItem)
+
+
+/**
+ * @summary Update the room and home banner associations of an active media asset
  */
 export const UpdateAdminMediaParams = zod.object({
   "id": zod.coerce.number().int()
 })
 
 export const UpdateAdminMediaBody = zod.object({
-  "roomId": zod.union([zod.literal('sala-soba'),zod.literal('sala-kilamba'),zod.literal('sala-kudi'),zod.literal('sala-ondjango'),zod.literal(null)]).nullable()
+  "roomId": zod.union([zod.literal('sala-soba'),zod.literal('sala-kilamba'),zod.literal('sala-kudi'),zod.literal('sala-ondjango'),zod.literal(null)]).nullable(),
+  "homeBanner": zod.boolean()
 })
 
 export const UpdateAdminMediaResponse = zod.object({
@@ -412,6 +428,7 @@ export const UpdateAdminMediaResponse = zod.object({
   "objectPath": zod.string(),
   "url": zod.string(),
   "roomId": zod.union([zod.literal('sala-soba'),zod.literal('sala-kilamba'),zod.literal('sala-kudi'),zod.literal('sala-ondjango'),zod.literal(null)]).nullable(),
+  "homeBanner": zod.boolean(),
   "contentType": zod.string(),
   "sizeBytes": zod.number().int(),
   "createdAt": zod.coerce.date()
@@ -1560,3 +1577,5 @@ export const UnsubscribeFromNewsletterBody = zod.object({
 export const UnsubscribeFromNewsletterResponse = zod.object({
   "status": zod.enum(['unsubscribed', 'already_unsubscribed'])
 })
+
+

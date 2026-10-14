@@ -1,4 +1,4 @@
-import { integer, pgTable, serial, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
+import { boolean, integer, pgTable, serial, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
 
 export const academyMediaTable = pgTable(
   "academy_media",
@@ -7,6 +7,7 @@ export const academyMediaTable = pgTable(
     title: text("title").notNull(),
     altText: text("alt_text").notNull().default(""),
     roomId: text("room_id"),
+    homeBanner: boolean("home_banner").notNull().default(false),
     objectPath: text("object_path").notNull(),
     contentType: text("content_type").notNull(),
     sizeBytes: integer("size_bytes").notNull(),

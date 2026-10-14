@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'wouter';
 import { ArrowRight } from 'lucide-react';
+import { getListHomepageBannersQueryKey, useListHomepageBanners } from '@workspace/api-client-react';
 
-const heroSlides = [
+const defaultHeroSlides = [
   { image: '/images/academia-hero.jpg', label: 'A Academia' },
   { image: '/images/education-banner-bg.jpg', label: 'Aprendizagem e formação' },
   { image: '/images/courses/crm.jpg', label: 'Formação em CRM' },
@@ -11,6 +12,16 @@ const heroSlides = [
 ] as const;
 
 export default function HomePage() {
+  const bannerImages = useListHomepageBanners({
+    query: { queryKey: getListHomepageBannersQueryKey(), retry: 1, staleTime: 60_000 },
+  });
+  const heroSlides = useMemo(() => [
+    ...defaultHeroSlides,
+    ...(bannerImages.data ?? []).map((banner) => ({
+      image: banner.url,
+      label: banner.altText || banner.title,
+    })),
+  ], [bannerImages.data]);
   const [activeSlide, setActiveSlide] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [hasFocus, setHasFocus] = useState(false);
@@ -23,6 +34,10 @@ export default function HomePage() {
     }, 6500);
     return () => window.clearInterval(interval);
   }, [activeSlide, isPaused]);
+
+  useEffect(() => {
+    setActiveSlide((current) => Math.min(current, heroSlides.length - 1));
+  }, [heroSlides.length]);
 
   return (
     <>

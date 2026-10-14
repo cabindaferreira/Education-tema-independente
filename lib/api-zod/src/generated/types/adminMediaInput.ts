@@ -29,4 +29,5 @@ export interface AdminMediaInput {
   sizeBytes: number;
   /** @nullable */
   roomId?: AdminMediaInputRoomId;
+  homeBanner: boolean;
 }

@@ -331,11 +331,23 @@ paths:
           description: Sign-in required
         "403":
           description: Administrator access required
+  /homepage/banners:
+    get:
+      operationId: listHomepageBanners
+      tags: [public]
+      summary: List active images for the public home page banner
+      responses:
+        "200":
+          description: Public home page banner images in display order
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HomeBannerList"
   /admin/media/{id}:
     patch:
       operationId: updateAdminMedia
       tags: [admin]
-      summary: Update the room association of an active media asset
+      summary: Update the room and home banner associations of an active media asset
       parameters:
         - name: id
           in: path
@@ -1436,7 +1448,7 @@ components:
         $ref: "#/components/schemas/AdminCustomer"
     AdminMedia:
       type: object
-      required: [id, title, altText, objectPath, url, roomId, contentType, sizeBytes, createdAt]
+      required: [id, title, altText, objectPath, url, roomId, homeBanner, contentType, sizeBytes, createdAt]
       properties:
         id:
           type: integer
@@ -1451,6 +1463,8 @@ components:
         roomId:
           type: ["string", "null"]
           enum: [sala-soba, sala-kilamba, sala-kudi, sala-ondjango, null]
+        homeBanner:
+          type: boolean
         contentType:
           type: string
         sizeBytes:
@@ -1462,9 +1476,25 @@ components:
       type: array
       items:
         $ref: "#/components/schemas/AdminMedia"
+    HomeBanner:
+      type: object
+      required: [id, title, altText, url]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        altText:
+          type: string
+        url:
+          type: string
+    HomeBannerList:
+      type: array
+      items:
+        $ref: "#/components/schemas/HomeBanner"
     AdminMediaInput:
       type: object
-      required: [title, altText, objectPath, contentType, sizeBytes]
+      required: [title, altText, objectPath, contentType, sizeBytes, homeBanner]
       properties:
         title:
           type: string
@@ -1487,13 +1517,17 @@ components:
         roomId:
           type: ["string", "null"]
           enum: [sala-soba, sala-kilamba, sala-kudi, sala-ondjango, null]
+        homeBanner:
+          type: boolean
     AdminMediaUpdate:
       type: object
-      required: [roomId]
+      required: [roomId, homeBanner]
       properties:
         roomId:
           type: ["string", "null"]
           enum: [sala-soba, sala-kilamba, sala-kudi, sala-ondjango, null]
+        homeBanner:
+          type: boolean
     AdminUploadUrlInput:
       type: object
       required: [contentType, sizeBytes]

@@ -10,4 +10,5 @@ import type { AdminMediaUpdateRoomId } from './adminMediaUpdateRoomId';
 export interface AdminMediaUpdate {
   /** @nullable */
   roomId: AdminMediaUpdateRoomId;
+  homeBanner: boolean;
 }

@@ -15,6 +15,7 @@ export interface AdminMedia {
   url: string;
   /** @nullable */
   roomId: AdminMediaRoomId;
+  homeBanner: boolean;
   contentType: string;
   sizeBytes: number;
   createdAt: Date;

@@ -43,6 +43,8 @@ export * from './courseId';
 export * from './coursePaymentStatus';
 export * from './getAdminAgendaParams';
 export * from './healthStatus';
+export * from './homeBanner';
+export * from './homeBannerList';
 export * from './listAdminCustomersParams';
 export * from './listAdminRoomBlocksParams';
 export * from './listRoomReservationsParams';

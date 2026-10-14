@@ -46,6 +46,7 @@ import type {
   CourseId,
   GetAdminAgendaParams,
   HealthStatus,
+  HomeBannerList,
   ListAdminCustomersParams,
   ListAdminRoomBlocksParams,
   ListRoomReservationsParams,
@@ -1382,6 +1383,83 @@ export const useCreateAdminMedia = <TError = ErrorType<void>,
       return useMutation(getCreateAdminMediaMutationOptions(options));
     }
 
+export const getListHomepageBannersUrl = () => {
+
+
+
+
+  return `/api/homepage/banners`
+}
+
+/**
+ * @summary List active images for the public home page banner
+ */
+export const listHomepageBanners = async ( options?: Parameters<typeof customFetch>[1]): Promise<HomeBannerList> => {
+
+  return customFetch<HomeBannerList>(getListHomepageBannersUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListHomepageBannersQueryKey = () => {
+    return [
+    `/api/homepage/banners`
+    ] as const;
+    }
+
+
+export const getListHomepageBannersQueryOptions = <TData = Awaited<ReturnType<typeof listHomepageBanners>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listHomepageBanners>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListHomepageBannersQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listHomepageBanners>>> = ({ signal }) => listHomepageBanners({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listHomepageBanners>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListHomepageBannersQueryResult = NonNullable<Awaited<ReturnType<typeof listHomepageBanners>>>
+export type ListHomepageBannersQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List active images for the public home page banner
+ */
+
+export function useListHomepageBanners<TData = Awaited<ReturnType<typeof listHomepageBanners>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listHomepageBanners>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListHomepageBannersQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
 export const getUpdateAdminMediaUrl = (id: number,) => {
 
 
@@ -1391,7 +1469,7 @@ export const getUpdateAdminMediaUrl = (id: number,) => {
 }
 
 /**
- * @summary Update the room association of an active media asset
+ * @summary Update the room and home banner associations of an active media asset
  */
 export const updateAdminMedia = async (id: number,
     adminMediaUpdate: AdminMediaUpdate, options?: Parameters<typeof customFetch>[1]): Promise<AdminMedia> => {
@@ -1458,7 +1536,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type UpdateAdminMediaMutationVariables = {id: number;data: BodyType<AdminMediaUpdate>}
 
     /**
- * @summary Update the room association of an active media asset
+ * @summary Update the room and home banner associations of an active media asset
  */
 export const useUpdateAdminMedia = <TError = ErrorType<void>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminMedia>>, TError,UpdateAdminMediaMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
@@ -3452,3 +3530,4 @@ export const useUnsubscribeFromNewsletter = <TError = ErrorType<NewsletterUnsubs
       > => {
       return useMutation(getUnsubscribeFromNewsletterMutationOptions(options));
     }
+

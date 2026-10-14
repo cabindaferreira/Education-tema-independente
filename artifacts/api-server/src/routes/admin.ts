@@ -16,6 +16,7 @@ import {
   GetAdminAgendaQueryParams,
   GetAdminAgendaResponse,
   GetAdminOverviewResponse,
+  ListHomepageBannersResponse,
   ListAdminCoursesResponse,
   ListAdminCustomersQueryParams,
   ListAdminCustomersResponse,
@@ -98,6 +99,7 @@ function mediaResult(media: typeof academyMediaTable.$inferSelect) {
     objectPath: media.objectPath,
     url: publicMediaUrl(media.objectPath),
     roomId: media.roomId,
+    homeBanner: media.homeBanner,
     contentType: media.contentType,
     sizeBytes: media.sizeBytes,
     createdAt: media.createdAt,
@@ -463,6 +465,25 @@ router.get("/admin/customers", async (req, res): Promise<void> => {
   res.json(ListAdminCustomersResponse.parse(customers));
 });
 
+router.get("/homepage/banners", async (_req, res): Promise<void> => {
+  const banners = await db
+    .select({
+      id: academyMediaTable.id,
+      title: academyMediaTable.title,
+      altText: academyMediaTable.altText,
+      objectPath: academyMediaTable.objectPath,
+    })
+    .from(academyMediaTable)
+    .where(and(eq(academyMediaTable.homeBanner, true), isNull(academyMediaTable.archivedAt)))
+    .orderBy(academyMediaTable.createdAt, academyMediaTable.id);
+  res.json(ListHomepageBannersResponse.parse(banners.map((banner) => ({
+    id: banner.id,
+    title: banner.title,
+    altText: banner.altText,
+    url: publicMediaUrl(banner.objectPath),
+  }))));
+});
+
 router.get("/admin/media", async (req, res): Promise<void> => {
   if (!(await getAcademyAdmin(req, res))) return;
   const media = await db
@@ -505,6 +526,7 @@ router.post("/admin/media", async (req, res): Promise<void> => {
     title: input.title.trim(),
     altText: input.altText.trim(),
     roomId: input.roomId ?? null,
+    homeBanner: input.homeBanner,
     objectPath: input.objectPath,
     contentType: input.contentType,
     sizeBytes: actualSize,
@@ -527,7 +549,7 @@ router.patch("/admin/media/:id", async (req, res): Promise<void> => {
     return;
   }
   const [media] = await db.update(academyMediaTable)
-    .set({ roomId: parsed.data.roomId })
+    .set({ roomId: parsed.data.roomId, homeBanner: parsed.data.homeBanner })
     .where(and(eq(academyMediaTable.id, params.data.id), isNull(academyMediaTable.archivedAt)))
     .returning();
   if (!media) {

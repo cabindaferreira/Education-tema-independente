@@ -462,12 +462,22 @@ export interface AdminMedia {
   url: string;
   /** @nullable */
   roomId: AdminMediaRoomId;
+  homeBanner: boolean;
   contentType: string;
   sizeBytes: number;
   createdAt: string;
 }
 
 export type AdminMediaList = AdminMedia[];
+
+export interface HomeBanner {
+  id: number;
+  title: string;
+  altText: string;
+  url: string;
+}
+
+export type HomeBannerList = HomeBanner[];
 
 export type AdminMediaInputContentType = typeof AdminMediaInputContentType[keyof typeof AdminMediaInputContentType];
 
@@ -513,6 +523,7 @@ export interface AdminMediaInput {
   sizeBytes: number;
   /** @nullable */
   roomId?: AdminMediaInputRoomId;
+  homeBanner: boolean;
 }
 
 /**
@@ -531,6 +542,7 @@ export const AdminMediaUpdateRoomId = {
 export interface AdminMediaUpdate {
   /** @nullable */
   roomId: AdminMediaUpdateRoomId;
+  homeBanner: boolean;
 }
 
 export type AdminUploadUrlInputContentType = typeof AdminUploadUrlInputContentType[keyof typeof AdminUploadUrlInputContentType];
