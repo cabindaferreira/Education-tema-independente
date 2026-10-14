@@ -17,15 +17,20 @@ import {
   UpdateRoomBookingSettingsResponse,
 } from "@workspace/api-zod";
 import { academyMediaTable, db, roomAvailabilityBlocksTable, roomBookingSettingsTable, roomReservationsTable } from "@workspace/db";
+import { bootstrapConfiguredOwner } from "../lib/admin-auth";
 import {
   buildRoomSlots,
   defaultRoomBookingSettings,
-  getRooms,
+  filterAvailableRoomSlots,
+  filterRoomReservationsForStaff,
   getRoom,
+  getRooms,
   hasRoom,
+  hasRoomStaffAccess,
   isTodayOrFuture,
   isValidBookingDate,
   isValidRoomPeriod,
+  roomStaffReservationResponse,
   slotHasStarted,
   slotsOverlap,
   type RoomBookingRules,
@@ -116,14 +121,9 @@ async function requireRoomStaff(
     return null;
   }
 
-  const user = await clerkClient.users.getUser(userId);
+  const user = await bootstrapConfiguredOwner(await clerkClient.users.getUser(userId));
   const metadata = user.privateMetadata as Record<string, unknown>;
-  const roleList = Array.isArray(metadata.academyRoles)
-    ? metadata.academyRoles.filter((role): role is string => typeof role === "string")
-    : [];
-  const role = metadata.academyRole;
-  if (!roleList.some((entry) => ["room_staff", "academy_admin", "admin"].includes(entry))
-    && !["room_staff", "academy_admin", "admin"].includes(String(role))) {
+  if (!hasRoomStaffAccess(metadata)) {
     res.status(403).json({ error: "Esta área está reservada à equipa da Academia." });
     return null;
   }
@@ -131,41 +131,6 @@ async function requireRoomStaff(
   return {
     userId,
     displayName: user.fullName || user.username || user.primaryEmailAddress?.emailAddress || userId,
-  };
-}
-
-function staffReservationResponse(reservation: {
-  id: number;
-  roomId: string;
-  bookingDate: string;
-  startTime: string;
-  endTime: string;
-  durationMinutes: number;
-  priceKz: number;
-  status: string;
-  name: string;
-  company: string | null;
-  cancelledByName: string | null;
-  cancelledAt: Date | null;
-}) {
-  if (!hasRoom(reservation.roomId)) {
-    throw new Error("A sala desta reserva já não está disponível.");
-  }
-
-  return {
-    id: reservation.id,
-    roomId: reservation.roomId,
-    roomName: getRoom(reservation.roomId).name,
-    date: reservation.bookingDate,
-    startTime: reservation.startTime.slice(0, 5),
-    endTime: reservation.endTime.slice(0, 5),
-    durationMinutes: reservation.durationMinutes,
-    priceKz: reservation.priceKz,
-    status: reservation.status,
-    name: reservation.name,
-    company: reservation.company,
-    cancelledBy: reservation.cancelledByName,
-    cancelledAt: reservation.cancelledAt,
   };
 }
 
@@ -261,7 +226,10 @@ router.get("/room-reservations", async (req, res): Promise<void> => {
     ))
     .orderBy(roomReservationsTable.startTime);
 
-  res.json(ListRoomReservationsResponse.parse(reservations.map(staffReservationResponse)));
+  res.json(ListRoomReservationsResponse.parse(
+    filterRoomReservationsForStaff(reservations, parsed.data.roomId, parsed.data.date)
+      .map(roomStaffReservationResponse),
+  ));
 });
 
 router.patch("/room-reservations/:id/cancel", async (req, res): Promise<void> => {
@@ -302,7 +270,7 @@ router.patch("/room-reservations/:id/cancel", async (req, res): Promise<void> =>
     });
 
   if (updated) {
-    res.json(CancelRoomReservationResponse.parse(staffReservationResponse(updated)));
+    res.json(CancelRoomReservationResponse.parse(roomStaffReservationResponse(updated)));
     return;
   }
 
@@ -329,7 +297,7 @@ router.patch("/room-reservations/:id/cancel", async (req, res): Promise<void> =>
     return;
   }
 
-  res.json(CancelRoomReservationResponse.parse(staffReservationResponse(existing)));
+  res.json(CancelRoomReservationResponse.parse(roomStaffReservationResponse(existing)));
 });
 
 router.post("/room-availability", async (req, res): Promise<void> => {
@@ -351,12 +319,15 @@ router.post("/room-availability", async (req, res): Promise<void> => {
   }
 
   const bookedSlots = await db
-    .select({ startTime: roomReservationsTable.startTime, endTime: roomReservationsTable.endTime })
+    .select({
+      startTime: roomReservationsTable.startTime,
+      endTime: roomReservationsTable.endTime,
+      status: roomReservationsTable.status,
+    })
     .from(roomReservationsTable)
     .where(and(
       eq(roomReservationsTable.roomId, input.roomId),
       eq(roomReservationsTable.bookingDate, input.date),
-      eq(roomReservationsTable.status, "confirmed"),
     ));
   const blockedSlots = await db
     .select({ startTime: roomAvailabilityBlocksTable.startTime, endTime: roomAvailabilityBlocksTable.endTime })
@@ -367,9 +338,11 @@ router.post("/room-availability", async (req, res): Promise<void> => {
       isNull(roomAvailabilityBlocksTable.releasedAt),
     ));
 
-  const slots = buildRoomSlots(input.roomId, input.date, input.period, input.durationHours, settings)
+  const slots = filterAvailableRoomSlots(
+    buildRoomSlots(input.roomId, input.date, input.period, input.durationHours, settings),
+    bookedSlots,
+  )
     .filter((slot) => !slotHasStarted(input.date, slot))
-    .filter((slot) => !bookedSlots.some((booked) => slotsOverlap(slot, booked)))
     .filter((slot) => !blockedSlots.some((block) => slotsOverlap(slot, block)));
 
   res.json(CheckRoomAvailabilityResponse.parse({

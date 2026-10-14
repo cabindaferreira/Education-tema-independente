@@ -249,6 +249,74 @@ export function getRoom(roomId: RoomId): Omit<Room, "rateDetails"> {
   return roomDetails.find((room) => room.id === roomId)!;
 }
 
+export function hasRoomStaffAccess(metadata: Record<string, unknown>): boolean {
+  if (metadata.academyOwner === true) return true;
+
+  const roleList = Array.isArray(metadata.academyRoles)
+    ? metadata.academyRoles.filter((role): role is string => typeof role === "string")
+    : [];
+  const legacyRole = metadata.academyRole;
+  const roles = [...roleList, ...(typeof legacyRole === "string" ? [legacyRole] : [])];
+  return roles.some((role) => ["room_staff", "academy_admin", "admin"].includes(role));
+}
+
+export type RoomStaffReservation = {
+  id: number;
+  roomId: string;
+  bookingDate: string;
+  startTime: string;
+  endTime: string;
+  durationMinutes: number;
+  priceKz: number;
+  status: string;
+  name: string;
+  company: string | null;
+  cancelledByName: string | null;
+  cancelledAt: Date | null;
+};
+
+export function filterRoomReservationsForStaff(
+  reservations: RoomStaffReservation[],
+  roomId: string,
+  date: string,
+): RoomStaffReservation[] {
+  return reservations.filter((reservation) =>
+    reservation.roomId === roomId && reservation.bookingDate === date,
+  );
+}
+
+export function roomStaffReservationResponse(reservation: RoomStaffReservation) {
+  if (!hasRoom(reservation.roomId)) {
+    throw new Error("A sala desta reserva já não está disponível.");
+  }
+
+  return {
+    id: reservation.id,
+    roomId: reservation.roomId,
+    roomName: getRoom(reservation.roomId).name,
+    date: reservation.bookingDate,
+    startTime: reservation.startTime.slice(0, 5),
+    endTime: reservation.endTime.slice(0, 5),
+    durationMinutes: reservation.durationMinutes,
+    priceKz: reservation.priceKz,
+    status: reservation.status,
+    name: reservation.name,
+    company: reservation.company,
+    cancelledBy: reservation.cancelledByName,
+    cancelledAt: reservation.cancelledAt,
+  };
+}
+
+export function filterAvailableRoomSlots<T extends Pick<RoomSlot, "startTime" | "endTime">>(
+  slots: T[],
+  reservations: Array<Pick<RoomStaffReservation, "status" | "startTime" | "endTime">>,
+): T[] {
+  const confirmedReservations = reservations.filter((reservation) => reservation.status === "confirmed");
+  return slots.filter((slot) =>
+    !confirmedReservations.some((reservation) => slotsOverlap(slot, reservation)),
+  );
+}
+
 function formatRate(value: number): string {
   return new Intl.NumberFormat("pt-AO", { maximumFractionDigits: 0 }).format(value);
 }

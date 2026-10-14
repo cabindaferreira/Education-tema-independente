@@ -29,7 +29,7 @@ function hasVerifiedOwnerEmail(user: AcademyUser): boolean {
   );
 }
 
-async function bootstrapConfiguredOwner(user: AcademyUser): Promise<AcademyUser> {
+export async function bootstrapConfiguredOwner(user: AcademyUser): Promise<AcademyUser> {
   if (!hasVerifiedOwnerEmail(user)) return user;
 
   const metadata = user.privateMetadata as Record<string, unknown>;
