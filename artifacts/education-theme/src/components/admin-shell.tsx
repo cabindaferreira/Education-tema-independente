@@ -1,8 +1,10 @@
 import type { ReactNode } from 'react';
-import { useAuth } from '@clerk/react';
+import { useAuth, useClerk } from '@clerk/react';
 import { Link, useLocation } from 'wouter';
-import { ArrowLeft, BookOpen, CalendarDays, ChevronRight, Image, LayoutDashboard, Shield, Users } from 'lucide-react';
+import { ArrowLeft, BookOpen, CalendarDays, ChevronRight, Image, LayoutDashboard, LogOut, Shield, Users } from 'lucide-react';
 import { getGetAdminAccessQueryKey, useGetAdminAccess } from '@workspace/api-client-react';
+
+const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 const navItems = [
   { href: '/equipa', label: 'Visão geral', icon: LayoutDashboard, id: 'overview' },
@@ -47,6 +49,7 @@ export function AdminGuard({ children, ownerOnly = false }: { children: ReactNod
 export function AdminMasthead({ title }: { title: string }) {
   const [location] = useLocation();
   const { isLoaded, isSignedIn } = useAuth();
+  const { signOut } = useClerk();
   const access = useGetAdminAccess({
     query: { queryKey: getGetAdminAccessQueryKey(), enabled: Boolean(isLoaded && isSignedIn), retry: false },
   });
@@ -58,7 +61,17 @@ export function AdminMasthead({ title }: { title: string }) {
             <img src="/favicon.svg" alt="" />
             <span>ACADEMIA<small>PROCENTER · GESTÃO</small></span>
           </Link>
-          <Link className="admin-public-link" href="/" data-testid="link-admin-public-site"><ArrowLeft size={14} /> Ver site público</Link>
+          <div className="admin-header-actions">
+            <Link className="admin-public-link" href="/" data-testid="link-admin-public-site"><ArrowLeft size={14} /> Ver site público</Link>
+            <button
+              className="admin-signout"
+              type="button"
+              onClick={() => void signOut({ redirectUrl: basePath || '/' })}
+              data-testid="button-admin-signout"
+            >
+              <LogOut size={14} aria-hidden="true" /> Terminar sessão
+            </button>
+          </div>
         </div>
         <div className="admin-nav-wrap">
           <p className="admin-nav-label">Espaço de trabalho</p>

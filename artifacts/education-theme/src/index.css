@@ -656,8 +656,11 @@ button, input { font: inherit; }
 .admin-logo { display:flex;align-items:center;gap:12px;padding:0;border:0;color:inherit;text-decoration:none;font:800 13px/1.15 var(--app-font-display);letter-spacing:.08em; }
 .admin-logo img { width:40px;height:40px;object-fit:contain;border-radius:9px; }
 .admin-logo small { display:block;margin-top:5px;color:#d8c0c2;font:700 8px/1 var(--app-font-sans);letter-spacing:.18em; }
+.admin-header-actions { display:flex;align-items:center;justify-content:flex-end;gap:16px; }
 .admin-public-link { display:inline-flex;align-items:center;gap:8px;color:#f3dfe0;text-decoration:none;font-size:11px;font-weight:700;transition:color .18s ease,transform .18s ease; }
 .admin-public-link:hover { color:#fff;transform:translateX(-2px); }
+.admin-signout { min-height:35px;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:0 11px;border:1px solid rgba(255,255,255,.27);border-radius:6px;background:rgba(255,255,255,.06);color:#fff8f3;font:700 10px/1 var(--app-font-sans);cursor:pointer;transition:background .18s ease,border-color .18s ease,transform .18s ease; }
+.admin-signout:hover { border-color:rgba(255,255,255,.48);background:rgba(255,255,255,.13);transform:translateY(-1px); }
 .admin-nav-wrap { padding:0 0 12px; }
 .admin-nav-label { margin:0;padding:12px 0 8px;color:#c2a9ac;font-size:9px;font-weight:800;letter-spacing:.17em;text-transform:uppercase; }
 .admin-nav { display:flex;flex-wrap:wrap;gap:6px; }
@@ -665,7 +668,7 @@ button, input { font: inherit; }
 .admin-nav a:hover { color:#fff;border-color:#ffffff30;background:#ffffff0b;transform:translateY(-1px); }
 .admin-nav a[aria-current="page"] { color:#fff;border-color:#d95b65;background:var(--admin-red); }
 .admin-nav a svg { flex:none;opacity:.9; }
-.admin-logo:focus-visible,.admin-public-link:focus-visible,.admin-nav a:focus-visible,.admin-task-link:focus-visible,.admin-quick-link:focus-visible,.admin-button:focus-visible,.admin-icon-button:focus-visible {
+.admin-logo:focus-visible,.admin-public-link:focus-visible,.admin-signout:focus-visible,.admin-nav a:focus-visible,.admin-task-link:focus-visible,.admin-quick-link:focus-visible,.admin-button:focus-visible,.admin-icon-button:focus-visible {
   outline:3px solid #f2b6bb;outline-offset:3px;
 }
 .admin-main { padding:34px 0 40px; }
@@ -741,7 +744,9 @@ button, input { font: inherit; }
   .admin-brand-row { min-height:65px; }
   .admin-logo img { width:36px;height:36px; }
   .admin-logo { gap:9px;font-size:12px; }
+  .admin-header-actions { gap:9px;flex-wrap:wrap; }
   .admin-public-link { gap:5px;font-size:10px; }
+  .admin-signout { min-height:33px;gap:5px;padding:0 8px;font-size:10px; }
   .admin-nav-label { padding-top:10px; }
   .admin-nav { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px; }
   .admin-nav a { min-width:0;min-height:39px;padding:0 7px;font-size:10px; }
@@ -774,7 +779,9 @@ button, input { font: inherit; }
   .admin-brand-row { gap:12px; }
   .admin-logo { gap:7px;font-size:10px; }
   .admin-logo small { font-size:7px; }
+  .admin-header-actions { gap:7px; }
   .admin-public-link { font-size:9px; }
+  .admin-signout { gap:4px;padding:0 7px;font-size:9px; }
   .admin-nav a { gap:5px;font-size:9px; }
   .admin-metric { gap:7px; }
   .admin-metric-icon { width:29px;height:29px; }
@@ -783,7 +790,7 @@ button, input { font: inherit; }
   .admin-media-grid { grid-template-columns:1fr; }
 }
 @media(prefers-reduced-motion:reduce) {
-  .admin-content,.admin-metric,.admin-task-link,.admin-task-arrow,.admin-nav a,.admin-public-link,.admin-button {
+  .admin-content,.admin-metric,.admin-task-link,.admin-task-arrow,.admin-nav a,.admin-public-link,.admin-signout,.admin-button {
     animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important;
   }
 }
